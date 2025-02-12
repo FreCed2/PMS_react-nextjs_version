@@ -1,0 +1,549 @@
+console.log("tasks_table_interactions.js script is executing");
+
+/**
+ * Initializes toggle arrows to match the visibility state of child rows.
+ */
+function initializeToggleStates() {
+    document.querySelectorAll(".toggle-details").forEach(button => {
+        const taskId = button.dataset.taskId;
+        const childRows = document.querySelectorAll(`[data-parent-id="${taskId}"]`);
+        const icon = button.querySelector("i");
+
+        if (!icon || !childRows.length) {
+            return; // Skip if no icon or child rows
+        }
+
+        // Check visibility of the first child row
+        const isAnyChildVisible = Array.from(childRows).some(row => row.style.display !== "none");
+
+        // Update the toggle icon to reflect the state
+        icon.classList.toggle("bi-chevron-down", isAnyChildVisible);
+        icon.classList.toggle("bi-chevron-right", !isAnyChildVisible);
+    });
+}
+
+/**
+ * Refresh the specific row from the backend.
+ * Updates contributor and other relevant fields dynamically.
+ * 
+ * @param {number} taskId - The ID of the task to refresh.
+ */
+async function refreshTaskRow(taskId) {
+    try {
+        const response = await fetch(`/api/tasks/${taskId}`);
+        const data = await response.json();
+        const taskRow = document.getElementById(`task-${taskId}`);
+        if (taskRow && data) {
+            // Update the contributor column directly
+            const contributorCell = taskRow.querySelector("td[data-contributor-column]");
+            if (contributorCell) {
+                contributorCell.textContent = data.contributor_name || "Unassigned";
+            }
+        }
+    } catch (error) {
+        console.error("Error refreshing task row:", error);
+    }
+}
+
+/**
+ * Adds a data-level attribute to each row based on its hierarchy.
+ */
+function initializeRowLevels() {
+    document.querySelectorAll("tr[data-task-id]").forEach(row => {
+        const level = getHierarchyLevel(row);
+        row.setAttribute("data-level", level);
+    });
+}
+
+/**
+ * Determines the hierarchy level of a task row.
+ * @param {HTMLElement} row - The task row.
+ * @returns {number} - The hierarchy level (1 for top-level, 2 for nested, etc.).
+ */
+function getHierarchyLevel(row) {
+    let level = 1;
+    let parentId = row.getAttribute("data-parent-id");
+
+    // Traverse up the hierarchy to calculate the level
+    while (parentId) {
+        level++;
+        const parentRow = document.querySelector(`[data-task-id="${parentId}"]`);
+        parentId = parentRow ? parentRow.getAttribute("data-parent-id") : null;
+    }
+
+    return level;
+}
+
+/**
+ * Setup modal lifecycle events for the Create/Edit Task modal.
+ */
+function setupModalLifecycleEvents() {
+    const modalElement = $("#createTaskModal");
+    const parentDropdown = $("#taskParent");
+
+    if (!modalElement.length) {
+        console.error("Modal element #createTaskModal not found.");
+        return;
+    }
+
+
+    // Utility function to update aria-hidden
+    function updateAriaHidden(state) {
+        modalElement.attr("aria-hidden", state);
+    }
+
+    // Ensure consistent focus management
+    function manageFocus(state) {
+        if (state === "show") {
+            modalElement.find("input, select, textarea").first().focus();
+        } else {
+            modalElement.blur(); // Defocus modal to avoid interference
+        }
+    }
+
+    // Event: Modal shown
+    modalElement.on("shown.bs.modal", () => {
+        console.log("Modal #createTaskModal is now visible.");
+        updateAriaHidden("false");
+        initializeParentDropdown(); // Ensure dropdown is ready
+        resetModalSize(modalElement); // Reset size if toggled
+        manageFocus("show");
+    });
+
+    // Event: Modal hidden
+    modalElement.on("hidden.bs.modal", () => {
+        console.log("Modal #createTaskModal is now hidden.");
+        updateAriaHidden("true");
+        manageFocus("hide");
+        if (parentDropdown.hasClass("select2-hidden-accessible")) {
+            parentDropdown.select2("destroy");
+        }
+    });
+
+    // Handle Select2 dropdown open/close events
+    parentDropdown.on("select2:open", () => {
+        console.log("Parent dropdown opened.");
+        updateAriaHidden("false"); // Ensure aria-hidden is correct
+    });
+
+    parentDropdown.on("select2:close", () => {
+        console.log("Parent dropdown closed.");
+        updateAriaHidden("false"); // Retain accessibility state
+    });
+}
+
+/**
+ * Reset the modal size to its default state.
+ * @param {jQuery} modalElement - The modal element.
+ */
+function resetModalSize(modalElement) {
+    const toggleButton = document.getElementById("toggleModalSize");
+    if (modalElement.hasClass("full-page-modal")) {
+        modalElement.removeClass("full-page-modal");
+        if (toggleButton) {
+            toggleButton.innerHTML = `<i class="bi bi-arrows-angle-expand"></i>`;
+        }
+    }
+}
+
+/**
+ * Clear and reset all input fields in the modal.
+ */
+function resetModalFields() {
+    const modalFields = [
+        "#task-id",
+        "#taskTitle",
+        "#taskDescription",
+        "#taskProject",
+        "#taskType",
+        "#taskEstimation",
+        "#taskParent"
+    ];
+
+    modalFields.forEach(selector => {
+        const element = document.querySelector(selector);
+        if (element) {
+            if (element.tagName === "SELECT") {
+                element.value = ""; // Reset dropdowns
+            } else if (element.tagName === "TEXTAREA" || element.tagName === "INPUT") {
+                element.value = ""; // Reset text fields
+            }
+        }
+    });
+
+    console.log("Modal fields have been reset.");
+}
+
+// Add event listener for assigning contributors
+document.body.addEventListener("click", async (event) => {
+    if (event.target.id === "assign-contributor-btn") {
+        const taskIdField = document.getElementById("task-id");
+        const taskId = taskIdField ? taskIdField.value : null;
+        const contributorId = document.getElementById("contributor-select").value;
+
+        if (!contributorId) {
+            alert("Please select a contributor.");
+            return;
+        }
+
+        if (!taskId) {
+            alert("Task must be saved before assigning a contributor.");
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        try {
+            const payload = { contributor_id: parseInt(contributorId, 10) };
+            const response = await fetch(`/tasks/${taskId}/assign_contributor`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await response.json();
+            console.log("Response from backend:", result); // Debug log
+
+            if (response.ok) {
+                // Display the success message
+                const successMessage = document.getElementById("success-message");
+                if (successMessage) {
+                    successMessage.textContent = "Contributor assigned successfully!";
+                    successMessage.style.display = "block";
+                    setTimeout(() => (successMessage.style.display = "none"), 3000);
+                }
+
+                // Highlight the updated task row
+                highlightTask(taskId);
+                refreshTaskRow(taskId); // Fetch and update the row dynamically
+
+
+                // Update the contributor column in the task table
+                const taskRow = document.getElementById(`task-${taskId}`);
+                if (taskRow) {
+                    const contributorCell = taskRow.querySelector("td[data-contributor-column]");
+                    if (contributorCell) {
+                        console.log("Updating contributor cell:", contributorCell); // Debug log
+                        contributorCell.textContent = result.contributor_name || "Unassigned";
+                        contributorCell.classList.add("updated-cell");
+                        setTimeout(() => contributorCell.classList.remove("updated-cell"), 2000);
+                    } else {
+                        console.warn("Contributor cell not found in task row. Task Row Structure:", taskRow.innerHTML);
+                    }
+                } else {
+                    console.warn("Task row not found for ID:", taskId); // Debug log
+                }
+            } else {
+                console.error("Detailed error response:", result);
+                alert(result.error || "An error occurred while assigning the contributor.");
+            }
+        } catch (error) {
+            console.error("Error assigning contributor:", error);
+            alert("An error occurred. Please try again.");
+        }
+    }
+});
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOMContentLoaded fired in tasks_table_interactions.js");
+
+    const taskTypeSelect = document.getElementById("taskType");
+    const parentDropdown = $("#taskParent"); // Using jQuery selector for Select2
+
+    
+
+    /**
+     * Initializes the Select2 dropdown with AJAX support and preloaded tasks.
+     */
+    function initializeParentDropdown() {
+        if (!parentDropdown.length) {
+            console.error("Parent dropdown element not found.");
+            return;
+        }
+
+        // Remove aria-hidden dynamically when the modal is shown
+        $("#createTaskModal").on("shown.bs.modal", () => {
+            $("#createTaskModal").attr("aria-hidden", "false");
+        });
+
+        // Restore aria-hidden when the modal is hidden
+        $("#createTaskModal").on("hidden.bs.modal", () => {
+            $("#createTaskModal").attr("aria-hidden", "true");
+        });
+
+        const currentParentTask = $('#taskParent').val() || ''; // Current selection or fallback to empty
+
+        $.ajax({
+            url: '/tasks/available_tasks',
+            dataType: 'json',
+            data: {
+                task_type: $('#taskType').val(),
+                exclude_task_id: $('#task-id').val() || null,
+                limit: 30,
+            },
+            success: function (data) {
+                const preloadedOptions = [{ id: '', text: 'None' }];
+                const tasks = data.map(task => ({
+                    id: task.id,
+                    text: `${task.name} (ID: ${task.id})`,
+                }));
+                const options = preloadedOptions.concat(tasks);
+
+                console.log('Preloading tasks:', options);
+
+                // Destroy and clear
+                if (parentDropdown.hasClass('select2-hidden-accessible')) {
+                    parentDropdown.select2('destroy');
+                }
+                parentDropdown.empty();
+
+                // Append options
+                options.forEach(option => {
+                    const isSelected = option.id === currentParentTask;
+                    const newOption = new Option(option.text, option.id, isSelected, isSelected);
+                    parentDropdown.append(newOption);
+                });
+
+                // Initialize Select2
+                parentDropdown.select2({
+                    placeholder: currentParentTask ? undefined : 'None',
+                    allowClear: true,
+                    minimumInputLength: 0,
+                    width: '100%',
+                    theme: 'bootstrap4',
+                    dropdownParent: $('#createTaskModal'),
+                    matcher: function (params, data) {
+                        if ($.trim(params.term) === '') return data;
+                        if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) return data;
+                        return null;
+                    },
+                });
+
+                // Ensure None stays on top
+                parentDropdown.on('select2:open', function () {
+                    const resultsContainer = parentDropdown.data('select2').$results;
+                    const noneOption = resultsContainer.find('li[data-id=""]');
+                    if (!noneOption.length) {
+                        resultsContainer.prepend(`
+                            <li role="option" class="select2-results__option" aria-selected="false" data-id="">
+                                None
+                            </li>
+                        `);
+                        console.log("Forced None option added during dropdown open.");
+                    }
+                });
+
+                // Ensure None is selectable when deselected
+                parentDropdown.on('change', function () {
+                    const selectedValue = $(this).val();
+                    if (!selectedValue) {
+                        $(this).find('option[value=""]').prop('selected', true);
+                    }
+                });
+
+                console.log('Preloaded tasks added and Select2 initialized.');
+            },
+            error: function (xhr, status, error) {
+                console.error('Error preloading tasks:', error);
+            },
+        });
+    }
+
+    /**
+     * Refreshes the Select2 dropdown when the task type changes.
+     */
+    function refreshParentDropdown() {
+        console.log("Refreshing parent dropdown for task type:", taskTypeSelect?.value);
+
+        if (!parentDropdown.length) {
+            console.error("Parent dropdown element not found for refreshing.");
+            return;
+        }
+
+        // Clear and reload the dropdown with the new task type
+        parentDropdown.val(null).trigger("change"); // Clear selection
+        parentDropdown.select2("destroy"); // Destroy the existing instance
+        initializeParentDropdown(); // Reinitialize
+    }
+
+    // Initialize Select2 when the modal is shown
+    $("#createTaskModal").on("shown.bs.modal", () => {
+        initializeParentDropdown();
+    });
+
+    // Event listener for task type dropdown
+    if (taskTypeSelect) {
+        taskTypeSelect.addEventListener("change", refreshParentDropdown);
+    } else {
+        console.error("Task type select element not found.");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Existing initializations...
+        initializeRowLevels(); // Add hierarchy levels to rows
+        initializeToggleStates(); // Ensure toggle states are synced
+    });
+
+    // Initialize additional functionality
+    initTableSorter();
+    initToggleDetails();
+    initDragAndDrop();
+
+    // Initialize toggle arrow states to match child row visibility
+    initializeToggleStates();
+
+    console.log("All features initialized successfully.");
+});
+
+/**
+ * Initializes TableSorter for task table.
+ */
+function initTableSorter() {
+    const taskTable = $(".table");
+    if (taskTable.length) {
+        taskTable.tablesorter({
+            theme: "bootstrap",
+            widgets: ["zebra"],
+            headers: {
+                0: { sorter: false },
+                1: { sorter: false },
+                8: { sorter: false },
+            },
+        });
+        console.log("TableSorter initialized successfully");
+    } else {
+        console.warn("Task table not found for TableSorter initialization");
+    }
+}
+
+/**
+ * Initializes toggle functionality for parent-child rows.
+ */
+function initToggleDetails() {
+    document.querySelectorAll(".toggle-details").forEach(button => {
+        button.addEventListener("click", function () {
+            const taskId = this.dataset.taskId;
+            const childRows = document.querySelectorAll(`[data-parent-id="${taskId}"]`);
+            const icon = this.querySelector("i");
+
+            if (!childRows.length) {
+                console.warn(`No child rows found for Task ID: ${taskId}`);
+                return;
+            }
+
+            // Check current visibility of the first child row
+            const isCurrentlyHidden = childRows[0].style.display === "none";
+
+            // Toggle child row visibility
+            childRows.forEach(row => {
+                row.style.display = isCurrentlyHidden ? "table-row" : "none";
+            });
+
+            // Update the toggle icon
+            icon.classList.toggle("bi-chevron-down", isCurrentlyHidden);
+            icon.classList.toggle("bi-chevron-right", !isCurrentlyHidden);
+        });
+    });
+}
+
+/**
+ * Recursively toggles visibility of child rows.
+ * Updates icons and ensures consistency across nested tasks.
+ * 
+ * @param {string} parentId - The ID of the parent task.
+ * @param {boolean} show - Whether to show or hide the child rows.
+ */
+function toggleChildRows(parentId, show) {
+    // Select all child rows that belong to the given parent
+    const childRows = document.querySelectorAll(`[data-parent-id="${parentId}"]`);
+
+    childRows.forEach(row => {
+        // Toggle visibility of the row
+        row.style.display = show ? "table-row" : "none";
+
+        // Handle icons for the row
+        const icon = row.querySelector(".toggle-details i");
+        if (icon) {
+            icon.classList.toggle("bi-chevron-down", show); // Show "down" arrow if visible
+            icon.classList.toggle("bi-chevron-right", !show); // Show "right" arrow if hidden
+        }
+
+        // Recursively toggle nested child rows if any
+        const nestedChildId = row.dataset.taskId;
+        if (nestedChildId) {
+            toggleChildRows(nestedChildId, show);
+        }
+    });
+}
+
+/**
+ * Initializes drag-and-drop functionality using SortableJS.
+ */
+function initDragAndDrop() {
+    const tableBody = document.querySelector("tbody");
+    if (!tableBody) {
+        console.warn("Task table body not found for drag-and-drop initialization");
+        return;
+    }
+
+    Sortable.create(tableBody, {
+        handle: ".task-row",
+        animation: 150,
+        filter: ".task-open-link",
+        preventOnFilter: true,
+        onEnd: handleDragEnd,
+    });
+}
+
+/**
+ * Handles the drag-and-drop reordering event.
+ */
+async function handleDragEnd(event) {
+    const rows = Array.from(event.from.querySelectorAll(".task-row"));
+    const order = rows.map((row, index) => ({
+        id: row.dataset.taskId,
+        sort_order: index,
+    }));
+
+    console.log("New task order:", order);
+
+    try {
+        const response = await fetch("/tasks/reorder_subtasks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ordered_ids: order.map(o => o.id) }),
+        });
+
+        if (!response.ok) {
+            const result = await response.json();
+            console.error("Error reordering tasks:", result.error || "Unknown error");
+            alert("Failed to reorder tasks.");
+            return;
+        }
+
+        const data = await response.json();
+        console.log("Task reordering successful:", data);
+    } catch (error) {
+        console.error("Error sending reordering request:", error);
+        alert("An unexpected error occurred while reordering tasks.");
+    }
+}
+
+/**
+ * Prevent click events on the "Open" link from propagating to other handlers.
+ */
+document.addEventListener("click", (event) => {
+    if (event.target.classList.contains("task-open-link")) {
+        event.stopPropagation();
+        console.log(`"Open" link clicked for Task ID: ${event.target.dataset.taskId}`);
+    }
+});

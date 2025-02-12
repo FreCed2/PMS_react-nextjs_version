@@ -1,0 +1,26 @@
+Breakdown of Each Component
+
+Frontend
+	1.	tasks_table_interactions.js
+	•	openModalForEditTask: Initiates the modal population when a task is being edited.
+	•	Sends AJAX requests to fetch and save task data.
+
+Backend - Routes
+	2.	api_routes.py
+	•	def save_task:
+	•	Handles the POST request to save task data.
+	•	Delegates task validation and persistence to the model.
+
+Backend - Models
+	3.	models.py
+	•	Task model:
+	•	Encapsulates task properties and logic for interactions with the database.
+	•	Handles relationships (e.g., parent/child tasks).
+	•	Task.validate_hierarchy:
+	•	Validates the business rules for task hierarchy.
+	•	Checks constraints via queries to the database.
+
+Database
+	4.	SQLAlchemy ORM
+	•	Responsible for converting model interactions into SQL queries and executing them.
+	•	Ensures that any constraints defined in the model (e.g., CheckConstraint) are adhered to.

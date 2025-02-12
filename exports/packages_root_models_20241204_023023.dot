@@ -1,0 +1,56 @@
+digraph "packages_root_models" {
+rankdir=BT
+charset="utf-8"
+"pythonProject" [color="black", label=<pythonProject>, shape="box", style="solid"];
+"pythonProject.all_models" [color="black", label=<pythonProject.all_models>, shape="box", style="solid"];
+"pythonProject.api_routes" [color="black", label=<pythonProject.api_routes>, shape="box", style="solid"];
+"pythonProject.app" [color="black", label=<pythonProject.app>, shape="box", style="solid"];
+"pythonProject.charts" [color="black", label=<pythonProject.charts>, shape="box", style="solid"];
+"pythonProject.charts.burnup_chart" [color="black", label=<pythonProject.charts.burnup_chart>, shape="box", style="solid"];
+"pythonProject.charts.contributor_breakdown_chart" [color="black", label=<pythonProject.charts.contributor_breakdown_chart>, shape="box", style="solid"];
+"pythonProject.charts.project_breakdown_chart" [color="black", label=<pythonProject.charts.project_breakdown_chart>, shape="box", style="solid"];
+"pythonProject.export_schema" [color="black", label=<pythonProject.export_schema>, shape="box", style="solid"];
+"pythonProject.extensions" [color="black", label=<pythonProject.extensions>, shape="box", style="solid"];
+"pythonProject.forms" [color="black", label=<pythonProject.forms>, shape="box", style="solid"];
+"pythonProject.generate_documentation" [color="black", label=<pythonProject.generate_documentation>, shape="box", style="solid"];
+"pythonProject.init_db" [color="black", label=<pythonProject.init_db>, shape="box", style="solid"];
+"pythonProject.logging_config" [color="black", label=<pythonProject.logging_config>, shape="box", style="solid"];
+"pythonProject.models" [color="black", label=<pythonProject.models>, shape="box", style="solid"];
+"pythonProject.page_routes" [color="black", label=<pythonProject.page_routes>, shape="box", style="solid"];
+"pythonProject.tasks" [color="black", label=<pythonProject.tasks>, shape="box", style="solid"];
+"pythonProject.tasks.models" [color="black", label=<pythonProject.tasks.models>, shape="box", style="solid"];
+"pythonProject.tasks.routes" [color="black", label=<pythonProject.tasks.routes>, shape="box", style="solid"];
+"pythonProject.tasks.utils" [color="black", label=<pythonProject.tasks.utils>, shape="box", style="solid"];
+"pythonProject.test_task_operations" [color="black", label=<pythonProject.test_task_operations>, shape="box", style="solid"];
+"pythonProject.test_task_table" [color="black", label=<pythonProject.test_task_table>, shape="box", style="solid"];
+"pythonProject.utils" [color="black", label=<pythonProject.utils>, shape="box", style="solid"];
+"pythonProject.all_models" -> "pythonProject.extensions" [arrowhead="open", arrowtail="none"];
+"pythonProject.all_models" -> "pythonProject.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.api_routes" -> "pythonProject.extensions" [arrowhead="open", arrowtail="none"];
+"pythonProject.api_routes" -> "pythonProject.forms" [arrowhead="open", arrowtail="none"];
+"pythonProject.api_routes" -> "pythonProject.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.api_routes" -> "pythonProject.tasks.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.api_routes" -> "pythonProject.tasks.utils" [arrowhead="open", arrowtail="none"];
+"pythonProject.app" -> "pythonProject.all_models" [arrowhead="open", arrowtail="none"];
+"pythonProject.app" -> "pythonProject.api_routes" [arrowhead="open", arrowtail="none"];
+"pythonProject.app" -> "pythonProject.extensions" [arrowhead="open", arrowtail="none"];
+"pythonProject.app" -> "pythonProject.forms" [arrowhead="open", arrowtail="none"];
+"pythonProject.app" -> "pythonProject.logging_config" [arrowhead="open", arrowtail="none"];
+"pythonProject.app" -> "pythonProject.page_routes" [arrowhead="open", arrowtail="none"];
+"pythonProject.app" -> "pythonProject.tasks.routes" [arrowhead="open", arrowtail="none"];
+"pythonProject.export_schema" -> "pythonProject.app" [arrowhead="open", arrowtail="none"];
+"pythonProject.forms" -> "pythonProject.tasks.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.init_db" -> "pythonProject.app" [arrowhead="open", arrowtail="none"];
+"pythonProject.models" -> "pythonProject.extensions" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.charts.burnup_chart" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.charts.contributor_breakdown_chart" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.charts.project_breakdown_chart" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.forms" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.tasks.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.tasks.utils" [arrowhead="open", arrowtail="none"];
+"pythonProject.page_routes" -> "pythonProject.utils" [arrowhead="open", arrowtail="none"];
+"pythonProject.tasks" -> "pythonProject.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.utils" -> "pythonProject.models" [arrowhead="open", arrowtail="none"];
+"pythonProject.utils" -> "pythonProject.tasks.models" [arrowhead="open", arrowtail="none"];
+}

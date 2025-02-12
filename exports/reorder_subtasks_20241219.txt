@@ -1,0 +1,24 @@
+@startuml
+title Reorder Subtasks Interaction Flow with File Interactions
+
+actor User
+boundary Frontend
+control Controller
+database Database
+
+User -> Frontend: Drag and drop task
+Frontend -> Frontend: Update UI and reorder visually
+Frontend -> Controller: POST /tasks/reorder_subtasks\n(ordered_ids: [task_id1, task_id2, ...])
+Controller -> Controller: Validate ordered_ids and hierarchy
+Controller -> Database: SELECT * FROM tasks WHERE id IN (ordered_ids)
+Controller -> Controller: Validate task types and hierarchy
+alt Validation success
+    Controller -> Database: UPDATE tasks SET sort_order = CASE \nWHEN id = task_id1 THEN 1 \nWHEN id = task_id2 THEN 2 ...
+    Database -> Controller: Update success
+    Controller -> Frontend: 200 OK\n{ "success": true }
+    Frontend -> User: Show success notification
+else Validation failure
+    Controller -> Frontend: 400 Bad Request\n{ "error": "Invalid hierarchy or IDs" }
+    Frontend -> User: Show error message
+end
+@enduml

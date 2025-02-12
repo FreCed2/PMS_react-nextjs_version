@@ -1,0 +1,26 @@
+@startuml
+title Available Tasks Interaction Flow with File Interactions
+
+actor User
+boundary Frontend
+control Controller
+database Database
+
+User -> Frontend: Open "Available Tasks" dropdown
+Frontend -> Controller: GET /tasks/available_tasks?exclude_task_id={id}&project_id={project_id}
+Controller -> Controller: Validate query parameters
+alt Validation success
+    Controller -> Database: SELECT * FROM tasks 
+                          WHERE id != exclude_task_id 
+                          AND (project_id = project_id OR project_id IS NULL)
+                          AND is_archived = false
+                          ORDER BY name ASC
+    Database -> Controller: Return available tasks
+    Controller -> Frontend: 200 OK\n[ { "id": task_id1, "name": "Task 1" }, ... ]
+    Frontend -> Frontend: Populate dropdown with available tasks
+    Frontend -> User: Display "Available Tasks" options
+else Validation failure
+    Controller -> Frontend: 400 Bad Request\n{ "error": "Invalid parameters" }
+    Frontend -> User: Show error message
+end
+@enduml

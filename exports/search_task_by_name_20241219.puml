@@ -1,0 +1,22 @@
+@startuml name
+title Search Tasks Interaction Flow with File Interactions
+
+actor User
+boundary Frontend
+control Controller
+database Database
+
+User -> Frontend: Enter task name in search bar
+Frontend -> Controller: GET /tasks/search?query=task_name
+Controller -> Controller: Validate query parameter
+alt Validation success
+    Controller -> Database: SELECT * FROM tasks WHERE name ILIKE '%task_name%'
+    Database -> Controller: Return matching tasks
+    Controller -> Frontend: 200 OK\n[ { "id": task_id1, "name": "Task Name", ... }, ... ]
+    Frontend -> Frontend: Update task list with search results
+    Frontend -> User: Display matching tasks
+else Validation failure
+    Controller -> Frontend: 400 Bad Request\n{ "error": "Invalid query" }
+    Frontend -> User: Show error message
+end
+@enduml

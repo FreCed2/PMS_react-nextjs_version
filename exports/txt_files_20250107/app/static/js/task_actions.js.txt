@@ -1,0 +1,110 @@
+// task_actions.js
+
+/**
+ * Task Actions Module
+ * Handles task deletion and task modal interactions using SweetAlert2.
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+    // SweetAlert2 Delete Task Confirmation
+    /**
+     * Attach event listeners to delete task buttons.
+     * Confirms task deletion and handles backend calls to delete tasks.
+     */
+    document.querySelectorAll('.delete-task-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const taskId = this.dataset.taskId;
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You can choose to delete its child tasks or keep them.",
+                icon: "warning",
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: "Delete child tasks",
+                denyButtonText: "Keep subtasks",
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#d33",
+                denyButtonColor: "#3085d6",
+                cancelButtonColor: "#6c757d",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteTask(taskId, true);
+                } else if (result.isDenied) {
+                    deleteTask(taskId, false);
+                }
+            });
+        });
+    });
+
+    /**
+     * Sends a DELETE request to the backend to delete a task.
+     * @param {number} taskId - The ID of the task to delete.
+     * @param {boolean} deleteChildren - Whether to delete the task's child tasks.
+     */
+    async function deleteTask(taskId, deleteChildren) {
+        try {
+            const response = await fetch(`/api/tasks/delete/${taskId}?confirm_children=${deleteChildren}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken, // Add CSRF token header
+                },
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                Swal.fire("Deleted!", result.message, "success").then(() => {
+                    location.reload(); // Reload to update task list
+                });
+            } else {
+                const result = await response.json();
+                Swal.fire("Error!", result.error, "error");
+            }
+        } catch (error) {
+            console.error("Error deleting task:", error);
+            Swal.fire("Error!", "An unexpected error occurred.", "error");
+        }
+    }
+
+
+    /**
+     * Handles clicks on task items to populate and show the task modal.
+     * Fetches task details and pre-fills the modal for editing.
+     */
+    document.addEventListener("click", async (event) => {
+        if (event.target.classList.contains("task-open-link")) {
+            event.preventDefault();
+            const taskId = event.target.dataset.taskId;
+
+            try {
+                const response = await fetch(`/api/tasks/${taskId}`);
+                if (!response.ok) {
+                    console.error("Error fetching task details:", await response.text());
+                    alert("Failed to fetch task details. Please try again.");
+                    return;
+                }
+
+                const task = await response.json();
+
+                // Populate modal fields
+                document.getElementById("task-id").value = task.id;
+                document.getElementById("taskTitle").value = task.name;
+                document.getElementById("taskDescription").value = task.description;
+                document.getElementById("taskProject").value = task.project_id || "";
+                document.getElementById("taskType").value = task.task_type || "";
+                document.getElementById("taskEstimation").value = task.story_points || 0;
+                document.getElementById("taskParent").value = task.parent_id || "";
+
+                // Update modal title
+                document.getElementById("createTaskModalLabel").textContent = "Edit Task";
+
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById("createTaskModal"));
+                modal.show();
+            } catch (error) {
+                console.error("Error handling 'Open' click:", error);
+                alert("An unexpected error occurred. Please try again.");
+            }
+        }
+    });
+});

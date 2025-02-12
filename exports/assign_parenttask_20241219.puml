@@ -1,0 +1,23 @@
+@startuml name
+title Assign Parent Task Interaction Flow with File Interactions
+
+actor User
+participant "UI (Web App)" as UI
+participant "Tasks Controller" as Controller
+participant "TaskService" as Service
+database "Database" as DB
+
+User -> UI: Select task and parent task
+UI -> Controller: POST /tasks/assign_parent
+Controller -> Service: assign_parent_task(task_id, parent_id)
+Service -> DB: Fetch task by task_id
+DB --> Service: Task instance
+Service -> DB: Fetch parent task by parent_id
+DB --> Service: Parent Task instance
+Service -> Service: Validate parent-child relationship
+Service -> DB: Update task's parent_id
+DB --> Service: Success
+Service --> Controller: Success Response
+Controller --> UI: Parent task assigned successfully
+
+@enduml

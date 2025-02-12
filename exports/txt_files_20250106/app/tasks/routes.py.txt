@@ -1,0 +1,468 @@
+import logging
+import traceback
+from flask import Blueprint, render_template, request, flash, url_for, redirect, jsonify
+from app.extensions.db import db
+from app.tasks.models import Task
+from app.models import Project
+from app.tasks.utils import TaskService
+from app.models import Contributor
+
+bp = Blueprint("tasks", __name__, template_folder="../templates/tasks")
+logger = logging.getLogger(__name__)
+
+
+@bp.route("/", methods=["GET"])
+def list_tasks():
+    """List tasks globally with filtering, optional hierarchical ordering, and pagination."""
+    logger.info("Entering list_tasks route...")
+
+    # Extract query parameters
+    project_id = request.args.get("project_id", type=int)
+    contributor_id = request.args.get("contributor_id", type=int)
+    show_archived = request.args.get("show_archived", "false").lower() == "true"
+    task_type = request.args.get("task_type", "all")
+    completion_status = request.args.get("completion_status")
+    hierarchical = request.args.get("hierarchical", "false").lower() == "true"
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 70, type=int)
+
+    filters = {
+        "is_archived": show_archived,
+        "contributor_id": contributor_id,
+        "task_type": task_type if task_type != "all" else None,
+        "completion_status": completion_status,
+    }
+
+    try:
+        if project_id:
+            # Fetch all tasks for the project
+            all_tasks = TaskService.fetch_all_tasks(project_id)
+
+            if hierarchical:
+                # Build hierarchy for the tasks
+                task_map = {task.id: task for task in all_tasks}
+                top_level_tasks = [task for task in all_tasks if task.parent_id is None]
+
+                for task in all_tasks:
+                    if task.parent_id:
+                        parent = task_map.get(task.parent_id)
+                        if parent:
+                            parent.children.append(task)
+
+                # Serialize tasks for the hierarchical view
+                tasks = [task.to_dict_with_children() for task in top_level_tasks]
+
+                # Pagination metadata for hierarchical view (mocked)
+                pagination = {
+                    "page": 1,
+                    "per_page": len(top_level_tasks),
+                    "total": len(top_level_tasks),
+                    "pages": 1,
+                    "page_numbers": [1],
+                }
+            else:
+                # Flatten tasks for non-hierarchical view
+                tasks_flat = [task for task in all_tasks]
+                start = (page - 1) * per_page
+                end = start + per_page
+                tasks = [task.to_dict() for task in tasks_flat[start:end]]
+
+                # Pagination metadata for non-hierarchical view
+                pagination = {
+                    "page": page,
+                    "per_page": per_page,
+                    "total": len(tasks_flat),
+                    "pages": (len(tasks_flat) + per_page - 1) // per_page,
+                    "page_numbers": TaskService.generate_page_numbers(
+                        current_page=page,
+                        total_pages=(len(tasks_flat) + per_page - 1) // per_page
+                    ),
+                }
+        else:
+            # Default case when project_id is not provided
+            tasks_query = TaskService.filter_tasks(filters=filters)
+            pagination_obj = tasks_query.paginate(page=page, per_page=per_page, error_out=False)
+            tasks = [task.to_dict() for task in pagination_obj.items]
+            pagination = {
+                "page": pagination_obj.page,
+                "per_page": pagination_obj.per_page,
+                "total": pagination_obj.total,
+                "pages": pagination_obj.pages,
+                "page_numbers": TaskService.generate_page_numbers(
+                    current_page=pagination_obj.page,
+                    total_pages=pagination_obj.pages
+                ),
+            }
+
+        # Fetch additional data for the template
+        task_types = ["all"] + [t[0] for t in db.session.query(Task.task_type).distinct()]
+        projects = Project.query.options(db.lazyload(Project.contributors)).all()
+
+        # Add logic for selected project and contributor for clarity in UI
+        selected_project = Project.query.options(db.joinedload(Project.contributors)).get(project_id) if project_id else None
+        selected_contributor = Contributor.query.get(contributor_id) if contributor_id else None
+        
+        logger.debug(f"Tasks passed to template: {tasks}")
+        logger.debug(f"Task types: {task_types}")
+        logger.debug(f"Projects: {projects}")
+
+        return render_template(
+            "tasks/list.html",
+            tasks=tasks,
+            pagination=pagination,
+            filters=filters,
+            task_types=task_types,
+            projects=projects,
+            selected_project=selected_project,
+            selected_contributor=selected_contributor,
+        )
+    except Exception as e:
+        logger.error(f"Error in list_tasks: {str(e)}")
+        traceback.print_exc()
+        flash("An error occurred while fetching tasks.", "danger")
+
+        return render_template(
+            "tasks/list.html",
+            tasks=[],
+            pagination={"page": 1, "per_page": per_page, "total": 0, "pages": 0},
+            filters=filters,
+            task_types=["all"],
+            projects=[],
+            selected_project=None,
+            selected_contributor=None,
+        )
+    
+    
+@bp.route("/details/<int:task_id>", methods=["GET"])
+def task_details(task_id):
+    """Fetch and display details for a specific task."""
+    logger.info("Entering task_details route...")
+    try:
+        # Fetch task and subtasks
+        task = TaskService.fetch_task_with_logging(task_id)
+        subtasks = Task.query.filter_by(parent_id=task.id).order_by(Task.sort_order).all()
+        
+        return render_template("tasks/details.html", task=task, subtasks=subtasks)
+    except Exception as e:
+        logger.error(f"Error fetching task details: {e}")
+        flash("An error occurred while fetching task details.", "danger")
+        return redirect(url_for("tasks.list_tasks"))
+    
+    
+@bp.route('/api/projects/<int:project_id>/contributors', methods=['GET'])
+def get_project_contributors(project_id):
+    """Fetch contributors for a specific project."""
+    project = Project.query.options(db.joinedload(Project.contributors)).get_or_404(project_id)
+    contributors = [{"id": c.id, "name": c.name} for c in project.contributors]
+    return jsonify(contributors)
+    
+    
+@bp.route('/<int:task_id>/assign_contributor', methods=['POST'])
+def assign_contributor(task_id):
+    """Assign a contributor to a task."""
+    logger.info(f"Assigning contributor to task ID {task_id}")
+    try:
+        data = request.get_json()
+        logger.info(f"Received data: {data}")  # Debugging
+
+        contributor_id = data.get('contributor_id')
+        
+        # Convert contributor_id to an integer
+        try:
+            contributor_id = int(contributor_id)
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Valid Contributor ID is required'}), 400
+        
+        logger.info(f"Contributor ID received: {contributor_id}")  # Debugging
+        
+        
+        # Fetch the task
+        task = Task.query.get(task_id)
+        if not task:
+            return jsonify({'error': f'Task with ID {task_id} not found.'}), 404
+
+        # Fetch the contributor
+        contributor = Contributor.query.get(contributor_id)
+        if not contributor:
+            return jsonify({'error': f'Contributor with ID {contributor_id} not found.'}), 404
+        
+        project = Project.query.options(db.joinedload(Project.contributors)).get(task.project_id)
+        if not project:
+            return jsonify({'error': f'Project for Task {task_id} not found.'}), 404
+
+        # Assign contributor
+        task.contributor_id = contributor_id
+        db.session.commit()
+        return jsonify({'success': True, 'message': f'Contributor {contributor.name} assigned to Task {task.name}.'}), 200
+
+    except Exception as e:
+        logger.error(f"Error assigning contributor: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'An error occurred while assigning the contributor.'}), 500
+
+@bp.route("/archive/<int:task_id>", methods=["POST"])
+def archive_task(task_id):
+    """Archive a task and its subtasks."""
+    logger.info(f"Attempting to archive task with ID {task_id}")
+    try:
+        task = TaskService.fetch_task_with_logging(task_id)
+        if task.is_archived:
+            flash(f"Task '{task.name}' is already archived.", "info")
+            return redirect(url_for("tasks.list_tasks"))
+
+        TaskService.archive_task(task)
+        db.session.commit()
+        flash(f"Task '{task.name}' and its subtasks archived successfully!", "success")
+    except Exception as e:
+        logger.error(f"Error while archiving task '{task_id}': {e}")
+        db.session.rollback()
+        flash(f"An error occurred: {e}", "danger")
+    return redirect(url_for("tasks.list_tasks"))
+
+
+@bp.route("/unarchive/<int:task_id>", methods=["POST"])
+def unarchive_task(task_id):
+    """Unarchive a task and its subtasks."""
+    logger.info(f"Unarchiving task with ID {task_id}")
+    try:
+        task = TaskService.fetch_task_with_logging(task_id)
+        if not task.is_archived:
+            flash(f"Task '{task.name}' is not archived.", "info")
+            return redirect(url_for("tasks.list_tasks"))
+
+        task.is_archived = False
+        db.session.commit()
+        flash(f"Task '{task.name}' and its subtasks unarchived successfully!", "success")
+    except Exception as e:
+        logger.error(f"Error unarchiving task '{task_id}': {e}")
+        db.session.rollback()
+        flash(f"An error occurred: {e}", "danger")
+    return redirect(url_for("tasks.list_tasks"))
+
+
+@bp.route("/disconnect/<int:task_id>", methods=["POST"])
+def disconnect_subtask(task_id):
+    """Remove parent reference from a subtask."""
+    logger.info(f"Disconnecting parent for task ID {task_id}")
+    try:
+        task = TaskService.fetch_task_with_logging(task_id)
+        task.parent_id = None
+        db.session.commit()
+        flash(f"Task '{task.name}' has been disconnected from its parent task.", "success")
+    except Exception as e:
+        logger.error(f"Error disconnecting subtask '{task_id}': {e}")
+        db.session.rollback()
+        flash(f"An error occurred: {e}", "danger")
+    return redirect(url_for("tasks.list_tasks"))
+
+
+@bp.route("/available_tasks", methods=["GET"])
+def available_tasks():
+    """
+    Fetch a list of available tasks, excluding the specified one,
+    while enforcing valid parent-child hierarchy rules.
+    """
+    logger.info("Entering available_tasks route...")
+    try:
+        exclude_task_id = request.args.get("exclude_task_id", type=int)
+        task_type = request.args.get("task_type", type=str)
+        search_term = request.args.get("search", type=str)
+        project_id = request.args.get("project_id", type=int)
+
+        # Base filters
+        filters = {"is_archived": False, "project_id": project_id}
+
+        # Task-specific filtering logic
+        if task_type == "User Story":
+            filters["task_type"] = "Epic"
+        elif task_type == "Subtask":
+            filters["task_type"] = "User Story"
+        elif task_type == "Epic":
+            # Epics should not have any parent tasks
+            return jsonify([])
+
+        if exclude_task_id:
+            filters["exclude_task_id"] = exclude_task_id
+
+        # Fetch tasks
+        tasks = TaskService.filter_tasks(filters=filters)
+
+        # Search filtering
+        if search_term:
+            tasks = [task for task in tasks if search_term.lower() in task.name.lower()]
+
+        # Return serialized task data
+        return jsonify([{"id": task.id, "name": task.name} for task in tasks])
+    except Exception as e:
+        logger.error(f"Error fetching available tasks: {e}")
+        return jsonify({"error": "Failed to fetch tasks"}), 500
+
+
+@bp.route("/assign_parent/<int:task_id>", methods=["POST"])
+def assign_parent_task(task_id):
+    """Assign a parent task to an existing task."""
+    logger.info(f"Assigning parent task for task ID {task_id}")
+    try:
+        task = TaskService.fetch_task_with_logging(task_id)
+        new_parent_id = request.form.get("parent_id", type=int)
+
+        if new_parent_id == task_id:
+            flash("A task cannot be assigned as its own parent.", "danger")
+            return redirect(url_for("tasks.task_details", task_id=task_id))
+
+        new_parent = TaskService.fetch_task_with_logging(new_parent_id)
+        if not new_parent:
+            flash("Parent task not found.", "danger")
+            return redirect(url_for("tasks.task_details", task_id=task_id))
+
+        TaskService.validate_hierarchy(task)
+        task.parent_id = new_parent.id
+        db.session.commit()
+        flash(f"Task '{task.name}' is now a subtask of '{new_parent.name}'.", "success")
+    except ValueError as ve:
+        logger.error(f"Hierarchy validation failed: {ve}")
+        flash(str(ve), "danger")
+    except Exception as e:
+        logger.error(f"Error assigning parent task '{new_parent_id}': {e}")
+        db.session.rollback()
+        flash(f"An error occurred: {e}", "danger")
+    return redirect(url_for("tasks.task_details", task_id=task_id))
+
+
+@bp.route("/subtasks<int:task_id>", methods=['GET'])
+def get_subtasks(task_id):
+    """Fetch subtasks for a given task."""
+    
+    logger.info("Entering get_subtasks route...")
+    traceback.print_stack() 
+    
+    subtasks = Task.query.filter_by(parent_id=task_id).order_by(Task.sort_order).all()
+    return jsonify([
+        {
+            "id": subtask.id,
+            "name": subtask.name,
+            "task_type": subtask.task_type,
+            "sort_order": subtask.sort_order,
+            "completed": subtask.completed
+        }
+        for subtask in subtasks
+    ])
+
+
+@bp.route("/assign_subtasks/<int:task_id>", methods=["POST"])
+def assign_subtasks(task_id):
+    """Assign multiple subtasks to a parent task."""
+    
+    logger.info("Entering assign_subtasks route...")
+    traceback.print_stack() 
+    
+    parent_task = Task.query.get_or_404(task_id)
+    subtask_ids = request.form.getlist("subtask_ids")
+    for subtask_id in subtask_ids:
+        subtask = Task.query.get(subtask_id)
+        if subtask and subtask.project_id == parent_task.project_id:
+            subtask.parent_id = parent_task.id
+            db.session.add(subtask)
+    try:
+        db.session.commit()
+        flash(f"Subtasks assigned to '{parent_task.name}'.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Failed to assign subtasks: {e}", "danger")
+    return redirect(url_for("tasks.task_details", task_id=task_id))
+
+
+@bp.route("/reorder_subtasks", methods=["POST"])
+def reorder_subtasks():
+    """Reorder subtasks globally or reassign them to a different parent."""
+    
+    parent_task_id = request.json.get("parent_task_id", None)
+    ordered_ids = request.json.get("ordered_ids", [])
+
+    # Input validation
+    if not isinstance(ordered_ids, list) or not all(isinstance(i, int) for i in ordered_ids):
+        return jsonify({"error": "Invalid input. 'ordered_ids' must be a list of integers."}), 400
+
+    logger.debug(f"Reordering subtasks for parent task {parent_task_id}: {ordered_ids}")
+
+    # Fetch and update subtasks
+    for order, subtask_id in enumerate(ordered_ids):
+        subtask = Task.query.get(subtask_id)
+        if not subtask:
+            continue
+        # Reassign parent if necessary
+        if parent_task_id and subtask.parent_id != parent_task_id:
+            subtask.parent_id = parent_task_id
+            logger.info(f"Subtask {subtask.id} reassigned to new parent {parent_task_id}")
+        subtask.sort_order = order
+
+    try:
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/batch_update/", methods=["POST"])
+def batch_update_tasks():
+    """Perform batch updates on tasks."""
+    
+    logger.info("Entering batch_update_tasks route...")
+    traceback.print_stack() 
+    
+    task_ids = request.json.get("task_ids", [])
+    action = request.json.get("action")
+    if not task_ids or not action:
+        return jsonify({"error": "Task IDs and action are required"}), 400
+    try:
+        tasks = Task.query.filter(Task.id.in_(task_ids)).all()
+        for task in tasks:
+            if action == "archive":
+                task.is_archived = True
+            elif action == "complete":
+                task.completed = True
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/hierarchy/<int:project_id>", methods=["GET"])
+def task_hierarchy(project_id):
+    """Fetch the task hierarchy for a specific project."""
+    
+    tasks = Task.query.filter_by(project_id=project_id).all()
+    task_map = {task.id: task for task in tasks}
+
+    def build_hierarchy(task_id):
+        
+        logger.info("Entering task_hierarchy route...")
+        task = TaskService.fetch_task_with_logging(task_id)
+        traceback.print_stack() 
+    
+        return {
+            "id": task.id,
+            "name": task.name,
+            "children": [build_hierarchy(t) for t in tasks if t.parent_id == task.id],
+        }
+
+    hierarchy = [build_hierarchy(task) for task in tasks if task.parent_id is None]
+    logger.info(f"Task hierarchy for project {project_id} generated.")
+    return jsonify(hierarchy)
+
+
+@bp.route("/search/", methods=["GET"])
+def search_tasks():
+    """Search tasks by name."""
+    logger.info("Entering search_tasks route...")
+    traceback.print_stack() 
+    
+    query = request.args.get("q", "")
+    if not query:
+        return jsonify({"error": "Search query is required"}), 400
+
+    tasks = Task.query.filter(Task.name.ilike(f"%{query}%")).all()
+    logger.info(f"Search query: {query} - Found {len(tasks)} results.")
+    return jsonify([{"id": task.id, "name": task.name} for task in tasks])

@@ -1,0 +1,15 @@
+@startuml
+title Search Tasks Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Enter search query
+Frontend -> Routes : GET /tasks/search?q=<query> (routes.py: Search tasks)
+Routes -> Database : Filter tasks by name (models.py: Query with ilike)
+Database --> Routes : Return matching tasks (models.py: Query result)
+Routes --> Frontend : Return tasks as JSON (routes.py: Response sent)
+Frontend -> User : Display matching tasks
+@enduml

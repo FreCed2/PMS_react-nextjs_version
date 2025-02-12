@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}
+<h1>Dashboard</h1>
+{% endblock %}
+
+{% block content %}
+    <h1>Create a New Project</h1>
+    <form method="POST" action="/">
+        {{ form.hidden_tag() }}
+        <label for="project_name">Project Name:</label>
+        {{ form.project_name() }}<br>
+        <label for="start_date">Start Date:</label>
+        {{ form.start_date() }}<br>
+        <label for="end_date">End Date:</label>
+        {{ form.end_date() }}<br>
+        {{ form.submit() }}
+    </form>
+
+    <h2>Existing Projects</h2>
+    <ul>
+        {% for project in projects %}
+            <li><a href="{{ url_for('page.project', project_name=project.name) }}">{{ project.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

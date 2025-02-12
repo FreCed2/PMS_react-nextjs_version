@@ -1,0 +1,4 @@
+@startuml
+actor User
+User -> System : Placeholder for add_contributor_sequence
+@enduml

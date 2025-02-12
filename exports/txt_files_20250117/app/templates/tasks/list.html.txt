@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}Global Tasks{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">All Tasks</h1>
+
+    <!-- Filters Section -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label for="project_filter">Filter by Project</label>
+            <select id="project_filter" class="form-control">
+                <option value="">All Projects</option>
+                {% for project in projects %}
+                <option value="{{ project.id }}" {% if filters.project_id == project.id %}selected{% endif %}>
+                    {{ project.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="task_type_filter">Filter by Task Type</label>
+            <select id="task_type_filter" class="form-control">
+                {% for type in task_types %}
+                <option value="{{ type }}" {% if filters.task_type == type %}selected{% endif %}>
+                    {{ type }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="completion_status_filter">Filter by Status</label>
+            <select id="completion_status_filter" class="form-control">
+                <option value="">All</option>
+                <option value="completed" {% if filters.completion_status == "completed" %}selected{% endif %}>
+                    Completed
+                </option>
+                <option value="in_progress" {% if filters.completion_status == "in_progress" %}selected{% endif %}>
+                    In Progress
+                </option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button id="clear_filters" class="btn btn-secondary w-100">Clear Filters</button>
+        </div>
+    </div>
+
+    <!-- New Task Button -->
+    <div>
+        <button class="btn btn-success mb-3" id="newTaskButton" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+            <i class="bi bi-plus"></i> New Task
+        </button>
+    </div>
+
+    <!-- Task List Table -->
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>Toggle</th>
+                <th>Task Title</th>
+                <th>ID</th>
+                <th>Project</th>
+                <th>Assigned To</th>
+                <th>Estimate</th>
+                <th>Task Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% macro render_task(task, tasks, depth=0) %}
+            <tr id="task-{{ task.id }}"
+                class="task-row {% if task.task_type == 'Subtask' %}subtask-row{% elif task.task_type == 'User Story' %}user-story-row{% elif task.task_type == 'Epic' %}epic-row{% endif %}"
+                style="background-color: 
+                {% if task.task_type == 'Subtask' %}
+                    rgba(200, 230, 255, 0.5); /* Light blue for Subtask */
+                {% elif task.task_type == 'User Story' %}
+                    rgba(255, 255, 200, 0.5); /* Light yellow for User Story */
+                {% elif task.task_type == 'Epic' %}
+                    rgba(255, 200, 200, 0.5); /* Light red for Epic */
+                {% else %}
+                    rgba(240, 240, 240, 1); /* Default light gray */
+                {% endif %};"
+                data-task-id="{{ task.id }}"
+                data-parent-id="{{ task.parent_id or '' }}"
+                data-level="{{ depth }}">
+                <td><input type="checkbox" name="batch_update" value="{{ task.id }}"></td>
+                <td>
+                    {% if tasks|selectattr("parent_id", "equalto", task.id)|list %}
+                    <button class="btn btn-sm toggle-details" data-task-id="{{ task.id }}" aria-label="Toggle details for task {{ task.name }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    {% endif %}
+                </td>
+                <td class="fw-medium fs-6 
+                {% if task.task_type == 'Epic' %}
+                    epic-cell
+                {% elif task.task_type == 'User Story' %}
+                    user-story-cell
+                {% elif task.task_type == 'Subtask' %}
+                    subtask-cell
+                {% endif %}" 
+                style="padding-left: {{ depth|default(0) * 20 }}px; position: relative;">
+                <span class="bi fs-6
+                {% if task.task_type == 'Epic' %}
+                    bi-circle-fill
+                {% elif task.task_type == 'User Story' %}
+                    bi-circle-half
+                {% elif task.task_type == 'Subtask' %}
+                    bi-circle
+                {% endif %}">
+                </span>
+                {{ task.name }}
+                <small class="text-muted fw-light">
+                    (Parent-ID: {{ task.parent_id or 'None' }})
+                </small>
+                <!-- Open Link -->
+                <a href="#" class="task-open-link" data-task-id="{{ task.id }}">
+                    <i class="bi bi-arrows-angle-expand" style="font-size: 0.8rem; color: white;"></i>
+                    Open
+                </a>
+            </td>
+                <td class="fw-light fs-6">
+                    <small class>
+                    LAC-{{ task.id }}
+                    </small>
+                </td>
+                <td>
+                    <span class="badge rounded-pill fw-light text-bg-secondary">
+                        {{ task.project if task.project else "Unknown Project" }}
+                    </span>
+                </td>
+                <td class="fs-6" data-contributor-column>{{ task.assigned_to if task.assigned_to else "Unassigned" }}</td>
+                <td class="fs-6">{{ task.story_points }}</td>
+                <td class="fs-6">
+                    <span class="badge rounded-pill fw-light text-bg-light">
+                        {{ task.task_type }}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge rounded-pill fw-light {% if task.completed %}text-bg-success{% else %}text-bg-warning{% endif %}">
+                        {{ "Completed" if task.completed else "In Progress" }}
+                    </span>
+                </td>
+                <td>
+                    <!-- Delete Icon -->
+                    <button class="btn btn-dark btn-sm delete-task-btn" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .2rem; --bs-btn-font-size: .75rem;" data-task-id="{{ task.id }}" aria-label="Deletes task {{ task.id }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            {% for child in tasks if child.parent_id == task.id %}
+                {{ render_task(child, tasks, depth + 1) }}
+            {% endfor %}
+            {% endmacro %}
+            
+            <!-- Render top-level tasks -->
+            {% for task in tasks if not task.parent_id %}
+                {{ render_task(task, tasks) }}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Task pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Previous Button -->
+            {% if pagination.page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('tasks.list_tasks', page=pagination.page - 1, **filters) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span> Previous
+                </a>
+            </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for page_num in pagination.page_numbers %}
+            {% if page_num %}
+            <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('tasks.list_tasks', page=page_num, **filters) }}">{{ page_num }}</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">…</span>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if pagination.page < pagination.pages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('tasks.list_tasks', page=pagination.page + 1, **filters) }}" aria-label="Next">
+                    Next <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+
+<!-- Create/Edit Task Modal -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" style="display: none;">    
+    <div class="modal-dialog modal-lg custom-modal-width custom-modal-height">
+        <div class="modal-content">
+            <div id="success-message" style="display:none; color: green; margin-top: 10px;"></div>
+            <div class="modal-header">
+                <button type="button" class="btn btn-dark-secondary btn-icon" id="toggleModalSize">
+                    <i class="bi bi-arrows-angle-expand" style="font-size: 1.3rem; color: rgb(242, 244, 248);"></i>
+                </button>
+                <h6 class="modal-title" id="createTaskModalLabel">Create Task</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <div class="row">
+                        <!-- Left Column: Title and Description -->
+                        <div class="col-lg-9">
+                            <div class="mb-3">
+                                <label for="taskTitle" class="form-label">Task Title</label>
+                                <input type="text" class="form-control" id="taskTitle" name="title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="taskDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="taskDescription" name="description" rows="20"></textarea>
+                            </div>
+                        </div>
+                        <!-- Right Column: Additional Task Details -->
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <label for="task-id" class="form-label">Task ID</label>
+                                </small>
+                                    <input type="text" class="form-control" id="task-id" name="task_id" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                <label for="taskProject" class="form-label">Project</label>
+                                </small>
+                                <select class="form-control" id="taskProject" name="project_id">
+                                    {% for project in projects %}
+                                    <option value="{{ project.id }}">{{ project.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <label for="taskType" class="form-label">Task Type</label>
+                                </small>
+                                <select class="form-control" id="taskType" name="task_type">
+                                    <option value="Epic">Epic</option>
+                                    <option value="User Story">User Story</option>
+                                    <option value="Subtask">Subtask</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <label for="taskEstimation" class="form-label">Estimation (Story Points)</label>
+                                </small>
+                                <input type="number" class="form-control" id="taskEstimation" name="story_points" min="0" placeholder="Enter story points">
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <label for="taskParent" class="form-label">Parent Task</label>
+                                </small>
+                                <select class="form-control select2" id="taskParent" name="parent_id">
+                                    <option value="">None</option>
+                                    <!-- Options will be dynamically populated via JavaScript -->
+                                </select>
+                            </div>
+                            <div class="mb-3 align-items-center">
+                                <div class="col-auto">
+                                    <small class="text-muted">
+                                        <label for="current-contributor" class="form-label mb-0">Assigned Contributor:</label>
+                                    </small>
+                                </div>
+                                <div class="col">
+                                    <p id="current-contributor" class="form-control-plaintext">Unassigned</p>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contributor-select" class="form-label">Assign Contributor:</label>
+                                <select id="contributor-select" class="form-control">
+                                    <option value="">Select a Contributor</option>
+                                    {% for project in projects %}
+                                        {% for contributor in project.contributors %}
+                                            <option value="{{ contributor.id }}">{{ contributor.name }}</option>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </select>
+                                <button id="assign-contributor-btn" type="button" class="btn btn-success mt-2" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Assign</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Footer for Save Button -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary" form="taskForm">Save Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- External Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script src="{{ url_for('static', filename='js/filters.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modals.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tasks_table_interactions.js') }}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    window.csrfToken = csrfToken;
+    window.modal = new bootstrap.Modal(document.getElementById("createTaskModal"));
+    TaskManager.init(csrfToken);
+});
+</script>
+{% endblock %}

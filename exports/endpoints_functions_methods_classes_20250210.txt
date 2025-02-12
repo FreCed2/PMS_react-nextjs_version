@@ -1,0 +1,1354 @@
+File: ./run.py
+
+File: ./extract_python_variables_from_file.py
+  Functions:
+    - extract_variables_from_file
+      Docstring: Extracts variable names from a Python file.
+
+Args:
+    filepath (str): Path to the Python file.
+
+Returns:
+    dict: Dictionary with variable names categorized by scope (global, class, function).
+    - extract_variables_from_directory
+      Docstring: Recursively extracts variables from all Python files in a directory.
+
+Args:
+    directory (str): Path to the directory.
+
+Returns:
+    dict: Aggregated variable names across all files.
+    - save_variables_to_file
+      Docstring: Saves extracted variables to a file in a readable format.
+
+Args:
+    variables (dict): Dictionary of variables.
+    output_file (str): Path to the output file.
+    - visit_Assign
+    - visit_FunctionDef
+    - visit_ClassDef
+  Classes:
+    - VariableVisitor
+      - visit_Assign
+      - visit_FunctionDef
+      - visit_ClassDef
+
+File: ./extract_javascript_variables_from_files.js
+  JavaScript Functions:
+    - extractVariablesFromFile
+    - to
+    - addVariable
+    - parameters
+    - extractVariablesFromDirectory
+    - mergeVariables
+    - saveVariablesToFile
+  Comments:
+    // Helper function to add variables to the appropriate scope
+    // Walk the AST
+    // Handle function parameters
+    // Example usage
+    // Change to your JS code directory
+
+File: ./init_db.py
+
+File: ./scripts_for_documentation/new_generate_documentation.py
+  Functions:
+    - validate_dependencies
+    - ensure_output_folder
+    - get_timestamp
+    - log_file_action
+    - summarize_outputs
+    - generate_module_interaction
+    - generate_sequence_diagrams
+    - generate_database_schema
+    - generate_all_documentation
+
+File: ./scripts_for_documentation/generate_zip_of_txt_projectfiles.py
+  Functions:
+    - should_exclude
+
+File: ./scripts_for_documentation/WIP_autogenerate_uml_sequence_diagrams.py
+  Functions:
+    - ensure_folder
+      Docstring: Ensure the output folder exists.
+    - get_timestamp
+      Docstring: Generate a timestamp for filenames.
+    - log_file_action
+      Docstring: Log actions performed on files.
+    - render_plantuml
+      Docstring: Render the PlantUML diagram.
+    - parse_logs
+      Docstring: Parse structured logs to extract interactions.
+Expected log format:
+[TIMESTAMP] Caller=Frontend, Callee=Backend, Action=POST /tasks/archive/<task_id>, File=routes.py
+    - parse_routes
+      Docstring: Parse Flask route definitions to infer interactions.
+Example route:
+@bp.route("/tasks/archive/<int:task_id>", methods=["POST"])
+def archive_task():
+    - generate_puml
+      Docstring: Generate a .puml file for the given interaction steps.
+    - generate_sequence_diagrams
+      Docstring: Generate sequence diagrams by analyzing logs and routes.
+
+File: ./scripts_for_documentation/split_text_into_parts.py
+  Functions:
+    - split_text_into_parts
+      Docstring: Splits a text file into approximately equal parts and saves them as separate files.
+
+:param file_path: Path to the original text file
+:param num_parts: Number of parts to divide the text into
+
+File: ./scripts_for_documentation/WIP_newnew_generate_documentation.py
+  Functions:
+    - validate_dependencies
+    - ensure_output_folder
+    - get_timestamp
+    - log_file_action
+    - summarize_outputs
+    - generate_module_interaction
+    - generate_sequence_diagrams
+    - generate_database_schema
+    - generate_all_documentation
+
+File: ./scripts_for_documentation/WIP_generate_documentation.py
+  Functions:
+    - validate_dependencies
+      Docstring: Ensure required tools (pyreverse, dot, plantuml) are installed and accessible in the PATH.
+    - ensure_output_folder
+      Docstring: Ensure the output folder exists; create it if it does not.
+    - get_timestamp
+      Docstring: Generate a timestamp for filenames.
+    - log_file_action
+      Docstring: Log actions performed on files (move, rename, generate, etc.).
+    - summarize_outputs
+      Docstring: Print a summary of all generated files saved in the output folder.
+    - find_dot_files
+      Docstring: Recursively search for .dot files and log their locations.
+    - generate_module_interaction
+      Docstring: Generate module interaction diagrams using Pyreverse and save the output in the specified folder.
+    - generate_database_schema
+      Docstring: Extract and save the database schema from the PostgreSQL database.
+    - generate_sequence_diagrams
+      Docstring: Generate UML sequence diagrams for specified interactions.
+    - parse_logs_for_sequence
+      Docstring: Parse logs and generate a sequence diagram from file interactions.
+    - generate_all_documentation
+      Docstring: Main function to generate all documentation artifacts for the project.
+
+File: ./scripts_for_documentation/generate_project_structure.py
+  Functions:
+    - generate_project_structure
+
+File: ./scripts_for_documentation/create_list_of_all_endp_func_classes_jsfunction_jsfiles.py
+  Functions:
+    - parse_python_file
+      Docstring: Parse a Python file and extract endpoints, functions, classes, and their docstrings.
+    - parse_javascript_file
+      Docstring: Parse a JavaScript file and extract functions and comments.
+    - scan_project
+      Docstring: Scan the project directory for Python and JavaScript files, extract their structure and docstrings, skipping excluded folders and files.
+    - save_results_to_file
+      Docstring: Save the parsed results to a file.
+
+File: ./scripts_for_documentation/Convert_JSON_to_DOT2.py
+  Functions:
+    - prompt_for_file
+      Docstring: Prompt the user for a file name and return the full path.
+    - generate_dot_file
+      Docstring: Convert JSON data to a DOT file for visualization.
+    - write_edges
+
+File: ./scripts_for_documentation/Convert_JSON_to_DOT.py
+  Functions:
+    - json_to_dot
+      Docstring: Convert a JSON representation of a directory structure into a DOT file.
+    - add_nodes_and_edges
+      Docstring: Recursively add nodes and edges to the DOT graph.
+
+File: ./scripts_for_documentation/generate_folder_structure.py
+  Functions:
+    - generate_project_structure
+      Docstring: Generate a textual representation of the project's folder structure as a tree, excluding files.
+
+File: ./scripts_for_documentation/generate_folder_structure_incl_files.py
+  Functions:
+    - generate_project_structure
+      Docstring: Generate a textual and JSON representation of the project's folder and file structure.
+    - build_tree
+    - write_text_tree
+
+File: ./scripts_for_documentation/generate_list_all_endp_func_meth.py
+  Functions:
+    - parse_file
+      Docstring: Parse a Python file and extract endpoints, functions, classes, and their docstrings.
+    - scan_project
+      Docstring: Scan the Python project directory for files, extract their structure and docstrings, skipping excluded folders and files.
+    - save_results_to_file
+      Docstring: Save the parsed results to a file.
+
+File: ./scripts_for_documentation/create_database_schema/run_export_schema.py
+
+File: ./scripts_for_documentation/create_database_schema/export_schema.py
+  Endpoints:
+    - constrained_columns (Methods: get)
+    - nullable (Methods: get)
+    - default (Methods: get)
+    - unique (Methods: get)
+  Functions:
+    - export_database_schema
+      Docstring: Export database schema in the specified format.
+
+File: ./app/__init__.py
+  Endpoints:
+    - ENV (Methods: get)
+    - ENV (Methods: get)
+    - SQLALCHEMY_RECORD_QUERIES (Methods: get)
+  Functions:
+    - create_app
+      Docstring: Application factory function to initialize the Flask app.
+
+File: ./app/tasks/models.py
+  Functions:
+    - validate_status
+      Docstring: Validates that the status is one of the allowed values.
+    - __init__
+    - validate_task_changes
+      Docstring: Validates changes to 'parent_id' and 'task_type'.
+Ensures hierarchy validity and checks for circular references.
+    - _validate_hierarchy_change
+      Docstring: Validates hierarchy changes based on task_type and parent_id.
+This method avoids setting attributes and focuses only on validation.
+    - check_circular_reference
+      Docstring: Iteratively checks for circular references in the task hierarchy.
+Prevents stack overflow on deep hierarchies.
+    - _validate_no_circular_references
+      Docstring: Validates that there are no circular references in the task hierarchy.
+
+Args:
+    new_parent_id (int): The new parent ID to validate.
+
+Raises:
+    ValueError: If a circular reference is detected.
+    - to_dict
+    - validate_hierarchy
+    - save
+      Docstring: Saves the task to the database after validation.
+
+Raises:
+    ValueError: If validation fails.
+    - delete_with_children
+      Docstring: Deletes the task and optionally its children if 'confirm' is True.
+    - archive
+      Docstring: Archives the task and its subtasks.
+    - unarchive
+      Docstring: Unarchives the task and its subtasks.
+    - mark_completed
+      Docstring: Marks the task as completed.
+    - to_dict_with_children
+      Docstring: Converts the Task instance into a dictionary, including its children.
+Ensures that the hierarchy is serialized properly.
+    - __repr__
+  Classes:
+    - Task
+      - validate_status
+        Docstring: Validates that the status is one of the allowed values.
+      - __init__
+      - validate_task_changes
+        Docstring: Validates changes to 'parent_id' and 'task_type'.
+Ensures hierarchy validity and checks for circular references.
+      - _validate_hierarchy_change
+        Docstring: Validates hierarchy changes based on task_type and parent_id.
+This method avoids setting attributes and focuses only on validation.
+      - check_circular_reference
+        Docstring: Iteratively checks for circular references in the task hierarchy.
+Prevents stack overflow on deep hierarchies.
+      - _validate_no_circular_references
+        Docstring: Validates that there are no circular references in the task hierarchy.
+
+Args:
+    new_parent_id (int): The new parent ID to validate.
+
+Raises:
+    ValueError: If a circular reference is detected.
+      - to_dict
+      - validate_hierarchy
+      - save
+        Docstring: Saves the task to the database after validation.
+
+Raises:
+    ValueError: If validation fails.
+      - delete_with_children
+        Docstring: Deletes the task and optionally its children if 'confirm' is True.
+      - archive
+        Docstring: Archives the task and its subtasks.
+      - unarchive
+        Docstring: Unarchives the task and its subtasks.
+      - mark_completed
+        Docstring: Marks the task as completed.
+      - to_dict_with_children
+        Docstring: Converts the Task instance into a dictionary, including its children.
+Ensures that the hierarchy is serialized properly.
+      - __repr__
+
+File: ./app/tasks/__init__.py
+
+File: ./app/tasks/utils.py
+  Endpoints:
+    - parent_id (Methods: get)
+  Functions:
+    - filter_tasks
+      Docstring: Dynamically filters tasks based on criteria provided in a dictionary, 
+with optimized loading for related models.
+
+Args:
+    filters (dict): A dictionary of filtering criteria.
+    page (int, optional): The page number for pagination.
+    per_page (int, optional): The number of items per page.
+
+Returns:
+    Query or Pagination: A SQLAlchemy query object or paginated results.
+    - debug_parent_child_relationships
+      Docstring: Generates a debug map of parent-child relationships for all tasks.
+
+Args:
+    project_id (int, optional): Restrict to tasks from a specific project.
+
+Returns:
+    dict: A dictionary mapping parent IDs to their child task IDs.
+    - validate_parent_child_relationships
+      Docstring: Validates all parent-child relationships in the database to ensure they conform to hierarchy rules.
+
+Raises:
+    ValueError: If invalid relationships are detected.
+    - get_all_task_ids_with_parents
+      Docstring: Returns a flat list of tasks with their parent IDs for debugging.
+
+Returns:
+    list: A list of tuples (task_id, parent_id).
+    - calculate_total_story_points
+      Docstring: Calculates the total story points for a project.
+    - calculate_completed_story_points
+      Docstring: Calculates the total completed story points for a project.
+    - calculate_completion_percentage
+      Docstring: Calculates the completion percentage of a project.
+    - delete_project_and_tasks
+      Docstring: Deletes a project and all its associated tasks.
+    - contributor_has_assigned_tasks
+      Docstring: Checks if a contributor has tasks assigned in a project.
+    - fetch_task_with_logging
+      Docstring: Fetch a task with detailed logging, including parent task information.
+    - archive_task
+      Docstring: Archive a task and all its subtasks, preventing infinite recursion.
+
+Args:
+    task (Task): The task to be archived.
+    visited (set): A set of task IDs already processed (for recursion guard).
+    - validate_hierarchy
+      Docstring: Validates the hierarchy of a task or returns valid parent types.
+
+Args:
+    task (Task): The task instance to validate (optional).
+    parent_id (int): The ID of the parent task to validate against (optional).
+    task_type (str): The type of the task to determine valid parents (optional).
+
+Returns:
+    list: If no task and parent_id are provided, returns valid parent types for the task's type.
+
+Raises:
+    ValueError: If the hierarchy rules are violated during validation.
+    - fetch_all_tasks
+      Docstring: Fetches all tasks for a specific project, including project, contributor, and child task relationships.
+
+Args:
+    project_id (int): The ID of the project whose tasks need to be fetched.
+
+Returns:
+    list: A list of Task objects with their relationships loaded.
+    - fetch_all_tasks_as_dicts
+      Docstring: Fetches a list of tasks based on optional filters and serializes them into dictionaries.
+
+Args:
+    filters (dict, optional): A dictionary of filters to apply to the task query.
+
+Returns:
+    list[dict]: A list of serialized task dictionaries.
+    - fetch_task_as_dict
+      Docstring: Fetches a task by ID and returns it as a dictionary.
+
+Args:
+    task_id (int): The ID of the task to fetch.
+
+Returns:
+    dict: A dictionary representation of the task.
+
+Raises:
+    ValueError: If the task is not found.
+    - generate_page_numbers
+      Docstring: Generates a list of page numbers for pagination, including ellipses.
+
+Args:
+    current_page (int): The current page number.
+    total_pages (int): Total number of pages.
+    left_edge (int): Number of pages to show at the left edge.
+    right_edge (int): Number of pages to show at the right edge.
+    left_current (int): Number of pages to show to the left of the current page.
+    right_current (int): Number of pages to show to the right of the current page.
+
+Returns:
+    list: A list of page numbers or None for ellipses.
+  Classes:
+    - TaskService
+      - filter_tasks
+        Docstring: Dynamically filters tasks based on criteria provided in a dictionary, 
+with optimized loading for related models.
+
+Args:
+    filters (dict): A dictionary of filtering criteria.
+    page (int, optional): The page number for pagination.
+    per_page (int, optional): The number of items per page.
+
+Returns:
+    Query or Pagination: A SQLAlchemy query object or paginated results.
+      - debug_parent_child_relationships
+        Docstring: Generates a debug map of parent-child relationships for all tasks.
+
+Args:
+    project_id (int, optional): Restrict to tasks from a specific project.
+
+Returns:
+    dict: A dictionary mapping parent IDs to their child task IDs.
+      - validate_parent_child_relationships
+        Docstring: Validates all parent-child relationships in the database to ensure they conform to hierarchy rules.
+
+Raises:
+    ValueError: If invalid relationships are detected.
+      - get_all_task_ids_with_parents
+        Docstring: Returns a flat list of tasks with their parent IDs for debugging.
+
+Returns:
+    list: A list of tuples (task_id, parent_id).
+      - calculate_total_story_points
+        Docstring: Calculates the total story points for a project.
+      - calculate_completed_story_points
+        Docstring: Calculates the total completed story points for a project.
+      - calculate_completion_percentage
+        Docstring: Calculates the completion percentage of a project.
+      - delete_project_and_tasks
+        Docstring: Deletes a project and all its associated tasks.
+      - contributor_has_assigned_tasks
+        Docstring: Checks if a contributor has tasks assigned in a project.
+      - fetch_task_with_logging
+        Docstring: Fetch a task with detailed logging, including parent task information.
+      - archive_task
+        Docstring: Archive a task and all its subtasks, preventing infinite recursion.
+
+Args:
+    task (Task): The task to be archived.
+    visited (set): A set of task IDs already processed (for recursion guard).
+      - validate_hierarchy
+        Docstring: Validates the hierarchy of a task or returns valid parent types.
+
+Args:
+    task (Task): The task instance to validate (optional).
+    parent_id (int): The ID of the parent task to validate against (optional).
+    task_type (str): The type of the task to determine valid parents (optional).
+
+Returns:
+    list: If no task and parent_id are provided, returns valid parent types for the task's type.
+
+Raises:
+    ValueError: If the hierarchy rules are violated during validation.
+      - fetch_all_tasks
+        Docstring: Fetches all tasks for a specific project, including project, contributor, and child task relationships.
+
+Args:
+    project_id (int): The ID of the project whose tasks need to be fetched.
+
+Returns:
+    list: A list of Task objects with their relationships loaded.
+      - fetch_all_tasks_as_dicts
+        Docstring: Fetches a list of tasks based on optional filters and serializes them into dictionaries.
+
+Args:
+    filters (dict, optional): A dictionary of filters to apply to the task query.
+
+Returns:
+    list[dict]: A list of serialized task dictionaries.
+      - fetch_task_as_dict
+        Docstring: Fetches a task by ID and returns it as a dictionary.
+
+Args:
+    task_id (int): The ID of the task to fetch.
+
+Returns:
+    dict: A dictionary representation of the task.
+
+Raises:
+    ValueError: If the task is not found.
+      - generate_page_numbers
+        Docstring: Generates a list of page numbers for pagination, including ellipses.
+
+Args:
+    current_page (int): The current page number.
+    total_pages (int): Total number of pages.
+    left_edge (int): Number of pages to show at the left edge.
+    right_edge (int): Number of pages to show at the right edge.
+    left_current (int): Number of pages to show to the left of the current page.
+    right_current (int): Number of pages to show to the right of the current page.
+
+Returns:
+    list: A list of page numbers or None for ellipses.
+
+File: ./app/tasks/routes.py
+  Endpoints:
+    - / (Methods: route)
+    - /details/<int:task_id> (Methods: route)
+    - /task_row/<int:task_id> (Methods: route)
+    - /api/projects/<int:project_id>/contributors (Methods: route)
+    - /<int:task_id>/assign_contributor (Methods: route)
+    - /archive/<int:task_id> (Methods: route)
+    - /unarchive/<int:task_id> (Methods: route)
+    - /disconnect/<int:task_id> (Methods: route)
+    - /available_tasks (Methods: route)
+    - /assign_parent/<int:task_id> (Methods: route)
+    - /subtasks/<int:task_id> (Methods: route)
+    - /assign_subtasks/<int:task_id> (Methods: route)
+    - /reorder_subtasks (Methods: route)
+    - /debug/csrf-token (Methods: route)
+    - /batch_update/ (Methods: route)
+    - /hierarchy/<int:project_id> (Methods: route)
+    - /search/ (Methods: route)
+    - project_id (Methods: get)
+    - contributor_id (Methods: get)
+    - task_type (Methods: get)
+    - completion_status (Methods: get)
+    - page (Methods: get)
+    - per_page (Methods: get)
+    - task_ids (Methods: get)
+    - action (Methods: get)
+    - q (Methods: get)
+    - contributor_id (Methods: get)
+    - exclude_task_id (Methods: get)
+    - task_type (Methods: get)
+    - term (Methods: get)
+    - project_id (Methods: get)
+    - limit (Methods: get)
+    - page (Methods: get)
+    - parent_id (Methods: get)
+    - parent_id (Methods: get)
+    - ordered_tasks (Methods: get)
+    - show_archived (Methods: get)
+    - hierarchical (Methods: get)
+    - row_only (Methods: get)
+    - check_only (Methods: get)
+  Functions:
+    - list_tasks
+      Docstring: List tasks globally with filtering, optional hierarchical ordering, and pagination.
+    - task_details
+      Docstring: Fetch and display details for a specific task.
+    - get_task_row
+      Docstring: Return the HTML for a single task row or modal content.
+This endpoint is used to dynamically update the task table and modal.
+    - get_project_contributors
+      Docstring: Fetch contributors for a specific project.
+    - assign_contributor
+      Docstring: Assign a contributor to a task.
+    - archive_task
+      Docstring: Archive a task and its subtasks.
+    - unarchive_task
+      Docstring: Unarchive a task and its subtasks.
+    - disconnect_subtask
+      Docstring: Remove parent reference from a subtask.
+    - available_tasks
+      Docstring: Fetch a list of available tasks, excluding the specified one,
+while enforcing valid parent-child hierarchy rules.
+    - assign_parent_task
+      Docstring: Assign a parent task to an existing task.
+    - get_subtasks
+      Docstring: Fetch subtasks for a given task or check if subtasks exist.
+    - assign_subtasks
+      Docstring: Assign multiple subtasks to a parent task.
+    - reorder_subtasks
+      Docstring: Reorder subtasks globally or reassign them to a different parent.
+
+Steps:
+- Parse and validate input from the frontend.
+- Update parent-child relationships and sort order in the database.
+- Commit changes and return a success response.
+- Handle errors gracefully and provide detailed logs for debugging.
+    - debug_csrf_token
+    - batch_update_tasks
+      Docstring: Perform batch updates on tasks.
+    - build_hierarchy
+    - task_hierarchy
+      Docstring: Fetch the task hierarchy for a specific project.
+    - search_tasks
+      Docstring: Search tasks by name.
+
+File: ./app/forms/__init__.py
+
+File: ./app/forms/forms.py
+  Functions:
+    - get_task_model
+    - validate
+      Docstring: Override the default validate method to include logging.
+    - validate_parent_id
+    - validate_new_parent_id
+    - validate_parent_id
+  Classes:
+    - ProjectForm
+    - AddContributorForm
+      - validate
+        Docstring: Override the default validate method to include logging.
+    - ProgressEditForm
+    - AddProgressForm
+    - DeleteProjectForm
+    - TaskForm
+      - validate_parent_id
+    - ArchiveTaskForm
+    - FilterTasksForm
+    - ReassignSubtaskForm
+      - validate_new_parent_id
+    - AssignSubtaskForm
+      - validate_parent_id
+
+File: ./app/charts/contributor_breakdown_chart.py
+  Functions:
+    - generate_contributor_breakdown_chart
+    - format_autopct
+
+File: ./app/charts/__init__.py
+
+File: ./app/charts/burnup_chart.py
+  Functions:
+    - generate_burnup_chart
+
+File: ./app/charts/project_breakdown_chart.py
+  Functions:
+    - generate_project_breakdown_chart
+    - format_autopct
+
+File: ./app/utils/logging_config.py
+  Functions:
+    - setup_logging
+      Docstring: Configure logging for the application, including rotating file logs and
+development/production environment adjustments.
+
+File: ./app/utils/__init__.py
+
+File: ./app/utils/common_utils.py
+  Functions:
+    - log_interaction
+      Docstring: Logs interaction details for debugging and sequence generation.
+        :param caller: The calling entity or module.
+        :param callee: The receiving entity or module.
+        :param action: The action being logged.
+        :param data: Optional data payload.
+        :param result: Optional result of the action.
+        :param error: Optional error message.
+    - count_ongoing_projects
+      Docstring: Count ongoing projects based on their story points completion.
+    - count_completed_projects
+      Docstring: Count completed projects where all story points are finished.
+    - count_unstarted_projects
+      Docstring: Count unstarted projects where no story points are completed.
+    - count_all_projects
+      Docstring: Count all projects in the database.
+    - count_all_contributors
+      Docstring: Count all contributors in the database.
+    - count_assigned_contributors
+      Docstring: Count contributors assigned to at least one project.
+    - count_unassigned_contributors
+      Docstring: Count contributors not assigned to any project.
+
+File: ./app/models/models.py
+  Functions:
+    - contributors
+      Docstring: Define the many-to-many relationship for contributors dynamically.
+    - add_contributor
+      Docstring: Add a contributor to the project.
+    - remove_contributor
+      Docstring: Remove a contributor from the project.
+    - update_story_points
+      Docstring: Recalculate the completed story points for the project.
+    - total_story_points
+      Docstring: Fetch the total story points for all tasks associated with this project.
+    - completion_percentage
+      Docstring: Calculate the completion percentage of the project based on story points.
+    - __repr__
+    - __repr__
+  Classes:
+    - Project
+      Docstring: Represents a project entity.
+      - contributors
+        Docstring: Define the many-to-many relationship for contributors dynamically.
+      - add_contributor
+        Docstring: Add a contributor to the project.
+      - remove_contributor
+        Docstring: Remove a contributor from the project.
+      - update_story_points
+        Docstring: Recalculate the completed story points for the project.
+      - total_story_points
+        Docstring: Fetch the total story points for all tasks associated with this project.
+      - completion_percentage
+        Docstring: Calculate the completion percentage of the project based on story points.
+      - __repr__
+    - Contributor
+      Docstring: Represents a contributor entity.
+      - __repr__
+
+File: ./app/models/__init__.py
+
+File: ./app/extensions/db.py
+
+File: ./app/extensions/__init__.py
+
+File: ./app/static/__init__.py
+
+File: ./app/static/custom.js
+
+File: ./app/static/js/alerts.js
+  Comments:
+    // Allow specific overrides
+    // Now, any call to `Swal.fire` will use the default styles
+
+File: ./app/static/js/tasks_table_interactions.js
+  JavaScript Functions:
+    - updateTableAfterStatusChange
+    - showToast
+    - to
+    - updateTaskStatus
+    - handleTaskOpenClick
+    - initializeToggleStates
+    - initializeRowLevels
+    - initTableSorter
+    - initToggleDetails
+    - getHierarchyLevel
+    - updateTaskParentMap
+    - toggleChildRows
+    - is
+    - setupTooltips
+    - is
+    - setupThemeToggle
+    - is
+    - refreshTaskRow
+    - is
+    - setupDeleteTaskLogic
+    - is
+    - deleteTask
+  Comments:
+    // Log to confirm the script's execution
+    /**
+ * Updates the task table after a status change.
+ * Ensures correct sorting and filtering behavior.
+ * @param {number} taskId - The ID of the updated task.
+ * @param {string} newStatus - The new status of the task.
+ */
+    // 🚀 **Check if filtering is applied**
+    // Hide task if it no longer matches filter
+    // 🔄 **Check if sorting is applied**
+    // Call your existing sorting function
+    /**
+ * Displays a toast notification.
+ * @param {string} message - The message to display.
+ */
+    // Auto-remove after 3 seconds
+    /** Now, any call to `Swal.fire` will use the default styles
+Swal.fire({
+    title: "Global Styled Alert",
+    text: "This alert always has global styles!",
+    icon: "success",
+}*/
+    /* ======================== Document Initialization ======================== */
+    // Step 1: Retrieve CSRF token for secure requests
+    // Attach delete logic
+    // Stop initialization if token is missing      
+    /**const originalSwal = Swal.fire;
+    Swal.fire = function (options) {
+        return originalSwal({
+            ...options,
+            customClass: {
+                popup: "myswal-popup-class",
+                title: "myswal-title-class",
+                content: "myswal-content-class",
+                confirmButton: "myswal-confirm-button",
+                cancelButton: "myswal-cancel-button",
+                ...options.customClass, // Allow specific overrides
+            },
+            buttonsStyling: false,
+        });
+    }*/
+    // Delegated event listener for status dropdown
+    // Prevent further execution if data is invalid
+    // Step 2: Prevent drag-and-drop behavior when interacting with buttons inside task rows
+    // event.stopPropagation(); // Prevents drag-and-drop behavior
+    // Stops default browser behavior
+    //       button.addEventListener("click", event => {
+    //           event.stopPropagation(); // Prevents click event from bubbling up
+    //           event.preventDefault(); // Ensure button click works correctly
+    //           const taskId = event.currentTarget.dataset.taskId;
+    //           console.log(`Delete button clicked for Task ID: ${taskId}`);  
+    //       });
+    // Prevents the button from being draggable
+    // Stops default drag behavior
+    // Prevents unwanted selection when focusing button
+    // Step 3: Initialize TaskManager if not already initialized
+    // Mark as initialized
+    // Step 4: Initialize drag-and-drop functionality through TaskManager
+    // Correctly call the drag-and-drop initialization
+    // Step 5: Initialize task modal features if not already initialized
+    // Setup modal lifecycle
+    // Setup specific modal events
+    // Setup lifecycle-related events
+    // Prevent redundant re-initialization
+    // Step 6: Build parent-child relationships map
+    // Delegate this logic to TaskManager
+    // Step 7: Initialize toggle states for chevrons
+    // Step 8: Global setup for save task button and task form
+    // Bind TaskManager.handleTaskSave to the TaskManager context
+    // Remove any previously attached click event listener to avoid duplicates
+    // Attach the bound function to the click event
+    // Pass the event to the bound function
+    // Step 9: Add event listener for "Open Task" links
+    // Step 10: Setup "Create Task" button
+    // Step 11: Initialize event listeners for toggling child rows
+    // Toggle child rows
+    // Update toggle icon
+    // Ensure proper error handling for related code if needed
+    // Ensure CSRF token is available
+    /**
+     * Sends a PATCH request to update task status and handles dropdown rollback on failure.
+     * @param {number} taskId - The ID of the task to update.
+     * @param {string} newStatus - The new status ("Not Started", "In Progress", "Completed", "Archived").
+     */
+    // Backup in case of failure
+    // Update dropdown value and data attributes
+    // Backend-confirmed status
+    // Reflect status in the UI dropdown
+    // Refresh the task row UI
+    // Scroll and highlight
+    // Reapply sorting/filtering if needed
+    // Rollback on failure
+    // Rollback on network error
+    /* ======================== Event Handlers ======================== */
+    /**
+ * Handles clicks on "Open" task links.
+ * Prevents click events from propagating to other handlers and opens the modal.
+ * @param {Event} event - The click event.
+ */
+    // Flag to prevent multiple modals
+    // Prevent propagation to other click handlers
+    // Prevent default link behavior
+    // Prevent multiple modals from opening simultaneously
+    // Attempt to open the task modal
+    // Reset the flag
+    /* ======================== Initialization Functions ======================== */
+    /**
+ * Initializes toggle arrows to match the visibility state of child task rows.
+ * Ensures icons reflect the visibility of their associated child rows.
+ */
+    // Determine the visibility of any child row
+    // Update the toggle icon to reflect the visibility state
+    /**
+ * Adds a data-level attribute to each row based on its hierarchy.
+ * The data-level attribute is used for styling nested tasks.
+ */
+    /**
+ * Initializes the TableSorter plugin for the task table.
+ * Configures the plugin for sorting task columns with specific settings.
+ */
+    // Apply Bootstrap theme to the table
+    // Add zebra striping for better visibility
+    // Disable sorting for the first column
+    // Disable sorting for the second column
+    // Disable sorting for the actions column
+    /**
+ * Initializes toggle functionality for parent-child rows.
+ * Sets up event listeners for toggle buttons to expand or collapse child rows.
+ */
+    // Check the current visibility state of the first child row
+    // Toggle child row visibility
+    // Update the toggle icon to reflect the visibility state
+    /* ======================== Utility Functions ======================== */
+    /**
+ * Determines the hierarchy level of a task row.
+ * Used for styling and enforcing nesting rules dynamically.
+ * @param {HTMLElement} row - The task row to analyze.
+ * @returns {number} - The hierarchy level (1 for top-level, 2 for nested, etc.).
+ */
+    // Default level for top-level tasks
+    /**
+ * Updates the `taskParentMap` dynamically when a task's parent changes.
+ * Ensures the map remains consistent with the DOM structure.
+ * @param {number} taskId - ID of the task being updated.
+ * @param {number|null} parentId - New parent ID, or `null` if no parent.
+ */
+    /**
+ * Toggles the visibility of child rows when a parent row is toggled.
+ * @param {string} parentId - The ID of the parent task.
+ * @param {boolean} show - Whether to show or hide the child rows.
+ */
+    // Recursively toggle nested child rows
+    /**
+ * Sets up tooltips on elements with the `data-bs-toggle="tooltip"` attribute.
+ * Initializes Bootstrap tooltips for elements with tooltip attributes.
+ * This function is called after the page loads to ensure consistency.
+ */
+    /**
+ * Configures theme toggle functionality.
+ * This function is called after the page loads to ensure consistency.
+ * The theme is stored as a data attribute on the HTML element.
+ */
+    /* ======================== Modal Management ======================== */
+    /**
+ * Refreshes the specific row from the backend.
+ * Updates contributor and other relevant fields dynamically.
+ * This function is called after a task is saved or updated.
+ * It fetches the latest task data from the backend.
+ * It updates the contributor field in the task row.
+ * IT DOES NOT CONTAIN ANY LOGIC FOR UPDATING THE PARENT TASK FIELD.
+ * IT DOES NOT WORK 
+ * @param {number} taskId - The ID of the task to refresh.
+ */
+    /**
+ * Refreshes the specific row from the backend and updates the dropdown.
+ * @param {number} taskId - The ID of the task to refresh.
+ */
+    // ✅ Check if parent_id & contributor_id are present
+    // Update status dropdown
+    // Update contributor field
+    // Ensure parent task relationship is updated
+    /* ======================== Task Deletion Workflow ======================== */
+    /**
+ * Configures task deletion with SweetAlert2 confirmation.
+ * Displays a modal to choose whether to delete child tasks.
+ * MUST REMOVE THE VERY ANNOYING ANIMATION OF SWEETALERT2
+ * Sends a DELETE request to the backend to delete the task.
+ * This function is called after the page loads to ensure consistency.
+ * The task deletion logic sends a DELETE request to the backend, 
+ * updates the task list after deletion and displays a success or error message.
+ */
+    // Fetch task details to check if it has children
+    // Ensure the backend returns this key
+    // Display a single SweetAlert with three options
+    // Only show the Deny button if the task has children
+    // Delete task and child tasks
+    // Delete task but keep child tasks
+    // Cancel deletion
+    /**
+ * This function is called when the user confirms the deletion.
+ * It sends a DELETE request to the backend to delete the task.
+ * The task is deleted along with its children if specified.
+ * The `taskId` parameter is the ID of the task to delete.
+ * The `deleteChildren` parameter determines whether to delete children.
+ * The `csrfToken` parameter is used to send requests securely.
+ */
+    // Determine the appropriate message
+    /*---------------------------------TaskManager---------------------------------*/
+    // Store CSRF token globally in TaskManager
+    // Bind handleTaskSave
+    /*initTaskInteraction: function () {
+         document.addEventListener("click", async (event) => {
+            if (event.target.classList.contains("task-open-link")) {
+                event.preventDefault();
+                const taskId = event.target.dataset.taskId;
+                try {
+                    await openTaskModal(taskId); // Ensure `openTaskModal` is defined and imported
+                } catch (error) {
+                    console.error("Error opening task modal:", error);
+                }
+            }
+        }); 
+    },*/
+    // Use `this` to refer to TaskManager
+    /**
+     * Highlights a task row temporarily to indicate successful changes.
+     * Useful for visual feedback after save or reorder operations.
+     * @param {string|number} taskId - ID of the task to highlight.
+     */
+    // Apply a slight delay to ensure scrolling is completed
+    // Highlight duration extended to 3 seconds
+    // Delay to start highlighting after scroll
+    // Validate taskData object
+    // Attempt to find the existing row
+    // Assign appropriate class
+    // Apply row-specific styles
+    // Light red
+    // Light yellow
+    // Light blue
+    // Highlight the updated or newly added task row
+    // Debugging
+    // Check the current state of listeners
+    // Remove existing event listener and reattach to avoid duplicates
+    // Check listeners after addition
+    // Prevent default button behavior
+    // track calls
+    // Correctly reference the form element
+    // Ensure this ID matches your form
+    // Update the save button text based on the task ID field
+    // Construct form data and prepare payload
+    // Frontend Validation
+    // Ensure numeric fields are set correctly
+    // Default to 0 if empty
+    // Default to 0 if empty
+    // Proceed with payload processing
+    // Update the task table
+    // Highlight the task after the table refresh
+    // Reset modal fields only for new task creation
+    // Explanation: If both `payload.id` and `payload.task_id` are not present,
+    // it indicates that this is a new task being created, not an existing task being edited.
+    // Highlight the newly created/edited task
+    // Close the modal
+    // Read the raw response text
+    /* ======================== Drag and Drop section ======================== */
+    /**
+     * Initializes the `taskParentMap` from the DOM.
+     */
+    // Clear the map to ensure a fresh start
+    // Iterate over all task rows to populate the map
+    /**
+     * Dynamically updates the `taskParentMap` when a task's parent changes.
+     * @param {number} taskId - ID of the task to update.
+     * @param {number|null} parentId - New parent ID, or `null` if no parent.
+     */
+    /**
+     * Rebuilds the `taskParentMap` to reflect dynamic changes in the DOM.
+     * This should be called after drag-and-drop or task deletion.
+     */
+    // Initialize Sortable.js for drag-and-drop functionality
+    // Only draggable via `.task-row` elements
+    // Smooth animation
+    // Prevent dragging on task links
+    // Prevent drag if filtered element is clicked
+    // The row that was dragged
+    // Assumes parent is the previous sibling
+    // Update TaskParentMap only
+    // Prepare and send the payload
+    // Remove this? const rows = Array.from(event.from.querySelectorAll(".task-row"));
+    // End of onEnd callback
+    // End of TaskManager
+
+File: ./app/static/js/filters.js
+  Comments:
+    // filters.js
+    /**
+ * Filters Module
+ * Handles dynamic filtering and clearing of task filters.
+ */
+    /**
+     * Attach event listeners to filter dropdowns to dynamically update the task list.
+     */
+    // Update URL and reload with new filter
+    /**
+     * Attach an event listener to the clear filters button to reset filters.
+     */
+    // Redirect to the unfiltered task list
+
+File: ./app/static/js/modals.js
+  JavaScript Functions:
+    - getModal
+    - fetchTaskDetails
+    - to
+    - by
+    - to
+    - debounce
+    - later
+  Comments:
+    /**
+ * Modals Module
+ * Handles modal lifecycle events, dropdowns, contributor assignments, and field resets.
+ */
+    /* ======================== Utility Functions ======================== */
+    /**
+ * Retrieves the modal element and instance, initializing it if necessary.
+ * @returns {object} - { modalElement, modalInstance }
+ */
+    // Initialize the modal instance if not already initialized
+    /**
+ * Fetches task details from the backend.
+ * @param {string} taskId - The ID of the task to fetch.
+ * @returns {Promise<object|null>} - The task data or null on failure.
+ */
+    /**
+ * Closes the "Create/Edit Task" modal.
+ */
+    // Trigger Bootstrap's modal hide functionality
+    // Ensure focus is removed from any active element inside the modal
+    // Reset modal state if the modal is being closed
+    // Log modal closure
+    /* ======================== Dropdown Management ======================== */
+    /**
+ * Initializes the Select2 dropdown for parent tasks.
+ */
+    //let dropdownInitialized = false;
+    // Reinitialize only if Select2 is not already initialized
+    /**
+ * Refreshes the Select2 dropdown when the task type changes.
+ */
+    // Check if Select2 is initialized before destroying
+    // Reinitialize Select2
+    /* ======================== Modal Lifecycle Events ======================== */
+    /**
+ * Configures modal lifecycle events for the "Create/Edit Task" modal.
+ */
+    /**window.setupModalLifecycleEvents = function () {
+    const { modalElement } = getModal();
+    if (!modalElement) return;
+
+    // Remove any previously attached handlers to prevent duplication
+    $(modalElement).off("shown.bs.modal hidden.bs.modal");
+
+    // Handle the modal being shown
+    $(modalElement).on("shown.bs.modal", () => {
+        $(modalElement).attr("aria-hidden", "false"); // Set aria-hidden to false
+        console.log("Modal is now fully visible.");
+        initializeParentDropdown(); // Initialize or refresh dropdown
+        if (!currentlyOpenedTaskId) {
+            console.log("Dropdown initialized for a new task.");
+        } else {
+            console.log(`Dropdown not initialized as Task ID ${currentlyOpenedTaskId} is being edited.`);
+        }
+    });
+
+    // Handle the modal being hidden
+    $(modalElement).on("hidden.bs.modal", () => {
+        $(modalElement).attr("aria-hidden", "true"); // Set aria-hidden to true
+        console.log("Modal hidden. Resetting fields if no task was being edited.");
+        if (!currentlyOpenedTaskId) {
+            resetModalFields(); // Reset only for new tasks
+        }
+
+        // Clean up the modal state
+        $("body").removeClass("modal-open");
+        $(".modal-backdrop").remove();
+        document.body.style.overflow = "auto"; // Restore scrolling
+
+        // Explicitly remove aria-hidden attribute
+        $(modalElement).removeAttr("aria-hidden");
+
+        // Reset fields for new tasks only
+        if (!currentlyOpenedTaskId) {
+            resetModalFields();
+        }
+    });
+};*/
+    // Remove any previously attached handlers to prevent duplication
+    // Handle the modal being shown
+    // Initialize or refresh dropdown
+    // Set focus to the first input field
+    // Handle the modal being hidden
+    // Reset fields when modal is hidden
+    // Remove focus from any active element
+    // Reset the modal title and button text for the next task
+    // Clean up modal state managed by Bootstrap
+    // Restore scrolling
+    // Handle the modal being hidden but before fully closing
+    // Prevent the modal from closing
+    /**
+ * Configures modal lifecycle events for the "Create/Edit Task" modal.
+ */
+    /* ======================== Modal Actions ======================== */
+    /**
+ * Resets all fields in the modal.
+ */
+    /**
+ * Resets all fields in the modal.
+ * @param {boolean} forceReset - Whether to force a reset even if a task is being edited.
+ */
+    // Check if reset is required (skip for task edits unless forced)
+    // Define selectors for fields to reset
+    // Hidden field for task ID
+    // Task title input
+    // Task description textarea
+    // Project dropdown
+    // Task type dropdown
+    // Story points input
+    // Parent task dropdown
+    // Current contributor display field
+    // Reset each field
+    // Handle dropdowns and text inputs separately
+    // Clear selection for dropdown
+    // Trigger change for Select2 if initialized
+    // Clear text inputs
+    // Handle special case for contributor dropdown
+    // Clear contributor dropdown
+    // Update Select2 if applicable
+    // Reset Parent Task Select2 dropdown
+    // Reset value and refresh
+    // Update modal title to "Create Task" (default state)
+    // Reset button text to "Save Task"
+    // Clear task-specific state variables
+    // Clear the current task ID
+    // Reset save initialization flag
+    /**
+ * Debounce function to delay invocation of a function by a specified time.
+ * Prevents frequent calls in quick succession.
+ * @param {Function} func - The function to debounce.
+ * @param {number} wait - Delay in milliseconds.
+ * @returns {Function} - Debounced function.
+ */
+    /**
+ * Attaches a debounced click event handler to the "Save Task" button.
+ * Prevents duplicate submissions using a guard flag and ensures save operations are serialized.
+ */
+    // Guard flag to track ongoing save operations
+    // Task save handler
+    // Ensure TaskManager.handleTaskSave is asynchronous
+    // Update task row and highlight saved task
+    // Reset the modal for the next task
+    // Reset guard flag
+    // Attach the debounced click handler to #saveTaskButton
+    /**
+ * Opens the "Create/Edit Task" modal and populates it with task data.
+ * @param {number} taskId - The ID of the task to fetch.
+ */
+    // Track currently opened task ID to prevent redundant calls
+    // Prevent duplicate modal opens
+    // Set the currently opened task ID
+    // Populate fields with task data
+    // Set modal title
+    // Reset after operation completes
+    /**
+ * Populates the modal fields with the provided task data.
+ * @param {object} task - The task data to populate the modal fields.
+ */
+    // Populate fields
+    // Ensure parent task option exists in dropdown
+    // Fallback display text
+    // Update the modal title
+    // Update the "Save Task" button text
+    // Ensure dropdowns are refreshed
+    // Show the modal
+    /**
+ * Assigns contributors in the "Create/Edit Task" modal.
+ */
+    /**
+ * Toggles the modal size between full-page and default size.
+ */
+    /**
+ * Resets the "Create Task" modal for creating a new task.
+ */
+    // Clear task ID to indicate new task
+    // Reset the flag for task editing
+    /**
+ * Initializes the task modal logic.
+ */
+    // Properly dispose of the modal
+    // Make it globally accessible if needed
+
+File: ./app/routes/save_task_route_21 jan_1041.py
+  Endpoints:
+    - /tasks (Methods: route)
+    - name (Methods: get)
+    - title (Methods: get)
+    - id (Methods: get)
+    - task_id (Methods: get)
+    - description (Methods: get)
+    - contributor_id (Methods: get)
+    - completed (Methods: get)
+    - description (Methods: get)
+    - contributor_id (Methods: get)
+    - completed (Methods: get)
+    - sort_order (Methods: get)
+  Functions:
+    - save_task
+      Docstring: API route to create a new task or update an existing one.
+Handles validation, parent-child hierarchy rules, and database interactions.
+
+File: ./app/routes/__init__.py
+
+File: ./app/routes/api_routes.py
+  Endpoints:
+    - /calculate_completion_percentage/<int:project_id> (Methods: route)
+    - /delete_project/<int:project_id> (Methods: route)
+    - /tasks/<int:task_id> (Methods: route)
+    - /tasks (Methods: route)
+    - /tasks/<int:task_id>/status (Methods: route)
+    - /tasks/delete/<int:task_id> (Methods: route)
+    - description (Methods: get)
+    - parent_id (Methods: get)
+    - project_id (Methods: get)
+    - story_points (Methods: get)
+    - task_type (Methods: get)
+    - contributor_id (Methods: get)
+    - completed (Methods: get)
+    - sort_order (Methods: get)
+    - id (Methods: get)
+    - task_id (Methods: get)
+    - name (Methods: get)
+    - story_points (Methods: get)
+    - parent_id (Methods: get)
+    - parent_id (Methods: get)
+    - project_id (Methods: get)
+    - story_points (Methods: get)
+    - sort_order (Methods: get)
+    - description (Methods: get)
+    - contributor_id (Methods: get)
+    - completed (Methods: get)
+    - sort_order (Methods: get)
+    - name (Methods: get)
+    - check_children_only (Methods: get)
+    - confirm_children (Methods: get)
+    - name (Methods: get)
+    - title (Methods: get)
+  Functions:
+    - calculate_completion_percentage_api
+      Docstring: API endpoint to calculate the completion percentage of a project.
+    - api_delete_project
+      Docstring: API endpoint to delete a project and its related tasks.
+    - get_task_details
+      Docstring: Fetch task details by ID and return as JSON using the TaskService utility method.
+    - validate_task_payload
+      Docstring: Validates task payload for required fields and hierarchy rules.
+    - save_task
+      Docstring: API route to create a new task or update an existing one.
+Handles validation, parent-child hierarchy rules, and database interactions.
+    - update_task_status_route
+      Docstring: API route to update the status of a task.
+Handles status updates independently of other fields.
+    - update_task
+      Docstring: Updates an existing task, including status updates.
+    - create_task
+      Docstring: Creates a new task.
+    - delete_task
+      Docstring: API endpoint to delete a task. Optionally, delete its child tasks as well.
+:param task_id: ID of the task to be deleted.
+:return: JSON response with success or error message.
+
+File: ./app/routes/page_routes.py
+  Endpoints:
+    - / (Methods: route)
+    - /base (Methods: route)
+    - /test-flash (Methods: route)
+    - /dashboard (Methods: route)
+    - /project/<project_name> (Methods: route)
+    - /create_project (Methods: route)
+    - /add_contributor/<project_name> (Methods: route)
+    - /remove_contributor/<project_name> (Methods: route)
+    - /delete_project/<int:project_id> (Methods: route)
+    - contributor_name (Methods: get)
+    - contributor_name (Methods: get)
+  Functions:
+    - index
+      Docstring: Renders the homepage with project details and a form to add new projects.
+    - base
+      Docstring: Renders the base.html template.
+    - test_flash
+      Docstring: Adds a test flash message and redirects to the base page.
+    - dashboard
+      Docstring: Renders the dashboard page with project and contributor stats and charts.
+    - project
+      Docstring: Displays project details and allows interaction such as adding contributors or viewing charts.
+    - create_project
+      Docstring: Handles the creation of a new project.
+    - add_contributor
+      Docstring: Adds a contributor to a specified project. Logs all interactions for tracing and debugging.
+    - remove_contributor
+      Docstring: Removes a contributor from a specified project. Prevents removal if the contributor has assigned tasks.
+Logs all interactions for tracing and debugging.
+
+:param project_name: The name of the project from which the contributor will be removed.
+    - delete_project
+      Docstring: Deletes a project and all its tasks. Handles errors during deletion.
+

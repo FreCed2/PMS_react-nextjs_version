@@ -1,0 +1,20 @@
+@startuml
+title Disconnect Parent Task Interaction Flow with File Interactions
+
+actor User
+participant "UI" as UI
+participant "API Endpoint" as API
+participant "TaskService" as Service
+database "Database" as DB
+
+User -> UI: Initiates task disconnection
+UI -> API: POST /tasks/disconnect
+API -> Service: disconnect_task(task_id)
+Service -> DB: Fetch Task by ID
+DB --> Service: Task Object
+Service -> DB: Update Task: parent_id = NULL
+Service -> DB: Commit changes
+DB --> Service: Success
+Service --> API: Task disconnected response
+API --> UI: Disconnection success notification
+@enduml

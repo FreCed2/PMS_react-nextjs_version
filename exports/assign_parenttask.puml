@@ -1,0 +1,16 @@
+@startuml
+title Assign Parent Task Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Select parent task and submit form
+Frontend -> Routes : POST /tasks/assign_parent/<task_id> (routes.py: Handles request)
+Routes -> Database : Retrieve parent and subtask (models.py: Query tasks)
+Routes -> Routes : Validate parent-child relationship (routes.py: Validation logic)
+Routes -> Database : Update subtask (models.py: Set parent_id=parent_task.id)
+Database --> Routes : Save changes (models.py: Commit changes)
+Routes --> Frontend : Redirect to task details (routes.py: Response sent)
+@enduml

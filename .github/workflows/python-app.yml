@@ -1,0 +1,60 @@
+
+name: Python application test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.12'
+
+    - name: Install xmllint
+      run: sudo apt-get install -y libxml2-utils
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+
+    - name: Run tests and save results
+      id: pytest
+      run: |
+        pytest --junitxml=results.xml
+
+    # Extract failure message from results.xml if tests fail
+    - name: Extract Failure Message
+      if: failure()
+      run: |
+        TEST_FAILURE_COUNT=$(xmllint --xpath 'string(//testsuite/@failures)' results.xml)
+        FIRST_FAILURE_MESSAGE=$(xmllint --xpath 'string(//failure/@message)' results.xml | head -c 200)
+        jq -n --arg failures "$TEST_FAILURE_COUNT" --arg message "$FIRST_FAILURE_MESSAGE" '{"failures":$failures, "message":$message}' > failure_summary.json
+
+    # Notify Slack if tests fail
+    - name: Notify Slack on Failure
+      if: failure()
+      run: |
+        FAILURE_SUMMARY=$(cat failure_summary.json | jq -r @json)
+        curl -X POST -H 'Content-type: application/json' \
+        --data "{\"text\":\"❌ GitHub Actions Workflow Failed for Project_Management_SaaS: \nNumber of Failures: $(jq -r '.failures' failure_summary.json)\nFailure Message: $(jq -r '.message' failure_summary.json)\"}" \
+        ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Debug Slack Payload
+      if: failure()
+      run: |
+        FAILURE_MESSAGE=$(cat results.xml | head -c 500)
+        echo "{\"text\":\"❌ GitHub Actions Workflow Failed for Project_Management_SaaS: See details here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} \nDetails: \`\`\`$FAILURE_MESSAGE\`\`\`\"}"

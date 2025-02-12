@@ -1,0 +1,15 @@
+@startuml
+title Reorder Subtasks Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Drag and drop subtasks
+Frontend -> Routes : POST /tasks/reorder_subtasks/<task_id> (routes.py: Handles request)
+Routes -> Database : Update subtasks (models.py: Set sort_order=new_order)
+Database --> Routes : Save changes (models.py: Commit changes)
+Routes --> Frontend : Return success as JSON (routes.py: Response sent)
+Frontend -> User : Update UI with new order
+@enduml

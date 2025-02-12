@@ -1,0 +1,16 @@
+@startuml
+title Task Hierarchy Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Open task hierarchy view
+Frontend -> Routes : GET /tasks/hierarchy/<project_id> (routes.py: Fetch task hierarchy)
+Routes -> Database : Query tasks and relationships (models.py: Fetch project tasks)
+Routes -> Routes : Build hierarchy tree (routes.py: Parent-child relationships)
+Database --> Routes : Return task data (models.py: Query result)
+Routes --> Frontend : Return hierarchy as JSON (routes.py: Response sent)
+Frontend -> User : Render hierarchy view
+@enduml

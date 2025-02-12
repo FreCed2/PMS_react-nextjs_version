@@ -1,0 +1,15 @@
+@startuml
+title Assign Multiple Child Tasks Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Select multiple subtasks and submit form
+Frontend -> Routes : POST /tasks/assign_subtasks/<task_id> (routes.py: Handles request)
+Routes -> Database : Retrieve parent task and subtasks (models.py: Query tasks)
+Routes -> Database : Update each subtask (models.py: Set parent_id=parent_task.id)
+Database --> Routes : Save changes (models.py: Commit changes)
+Routes --> Frontend : Redirect to task details (routes.py: Response sent)
+@enduml

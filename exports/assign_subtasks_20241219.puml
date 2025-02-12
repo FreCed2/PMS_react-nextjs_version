@@ -1,0 +1,23 @@
+@startuml name
+title Assign Multiple Child Tasks Interaction Flow with File Interactions
+
+actor User
+participant "UI (Web App)" as UI
+participant "Tasks Controller" as Controller
+participant "TaskService" as Service
+database "Database" as DB
+
+User -> UI: Select parent task and subtasks
+UI -> Controller: POST /tasks/assign_subtasks
+Controller -> Service: assign_subtasks(parent_task_id, subtask_ids)
+Service -> DB: Fetch parent task by parent_task_id
+DB --> Service: Parent Task instance
+Service -> DB: Fetch all subtasks by subtask_ids
+DB --> Service: Subtask instances
+Service -> Service: Validate subtask assignment
+Service -> DB: Update subtasks' parent_id
+DB --> Service: Success
+Service --> Controller: Success Response
+Controller --> UI: Subtasks assigned successfully
+
+@enduml

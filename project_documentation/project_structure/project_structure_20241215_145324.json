@@ -1,0 +1,107 @@
+{
+    ".DS_Store": null,
+    ".env": null,
+    ".github": {
+        ".DS_Store": null,
+        "workflows": {
+            "artifact-upload.yml": null,
+            "create_plain_text_project files and upload to gdrive.yml": null,
+            "python-app.yml": null,
+            "qodana_code_quality.yml": null
+        }
+    },
+    ".gitignore": null,
+    "Projects.session.sql": null,
+    "app": {
+        ".DS_Store": null,
+        "__init__.py": null,
+        "charts": {
+            "__init__.py": null,
+            "burnup_chart.py": null,
+            "contributor_breakdown_chart.py": null,
+            "project_breakdown_chart.py": null
+        },
+        "config.py": null,
+        "extensions": {
+            "__init__.py": null,
+            "db.py": null
+        },
+        "forms": {
+            "__init__.py": null,
+            "forms.py": null
+        },
+        "models": {
+            "__init__.py": null,
+            "models.py": null
+        },
+        "routes": {
+            "__init__.py": null,
+            "api_routes.py": null,
+            "page_routes.py": null
+        },
+        "static": {
+            "__init__.py": null,
+            "custom.css": null,
+            "custom.js": null
+        },
+        "tasks": {
+            "__init__.py": null,
+            "models.py": null,
+            "routes.py": null,
+            "utils.py": null
+        },
+        "templates": {
+            ".DS_Store": null,
+            "base.html": null,
+            "dashboard.html": null,
+            "includes": {
+                "macros.html": null
+            },
+            "index.html": null,
+            "progress_overview.html": null,
+            "project.html": null,
+            "tasks": {
+                "details.html": null,
+                "list.html": null
+            }
+        },
+        "utils": {
+            "__init__.py": null,
+            "common_utils.py": null,
+            "logging_config.py": null
+        }
+    },
+    "app.log": null,
+    "error.log": null,
+    "init_db.py": null,
+    "logfile": null,
+    "logs": {
+        "app.log": null,
+        "app.log.1": null,
+        "app.log.2": null,
+        "app.log.3": null,
+        "app.log.4": null,
+        "app.log.5": null
+    },
+    "migrations": {
+        "README": null,
+        "alembic.ini": null,
+        "env.py": null,
+        "script.py.mako": null,
+        "versions": {
+            "000000000001.py": null,
+            "9d14fd48e6cd_make_scope_nullable_in_project_model.py": null
+        }
+    },
+    "project_structure_tree.txt": null,
+    "project_structure_tree_20241215_144421.txt": null,
+    "qodana.sarif.json": null,
+    "qodana.yaml": null,
+    "requirements.txt": null,
+    "run.py": null,
+    "tests": {
+        "__init__.py": null,
+        "test_app.py": null
+    },
+    "workflow-requirements.txt": null
+}

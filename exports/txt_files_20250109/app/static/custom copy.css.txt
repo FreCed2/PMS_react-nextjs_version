@@ -1,0 +1,317 @@
+/*#alertModal {
+    display: block !important;
+    visibility: visible !important;
+}*/
+
+.modal-backdrop.show {
+    z-index: 1040;
+}
+
+.modal.show {
+    z-index: 1050;
+}
+
+/* Adjust padding and spacing for the modal */
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-body h5 {
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+textarea#taskDescription {
+    resize: vertical; /* Allow resizing of the description field */
+}
+
+@media (max-width: 768px) {
+    .modal-lg .modal-body {
+        flex-direction: column; /* Stack columns on smaller screens */
+    }
+}
+
+.custom-modal-width {
+    max-width: 90%; /* Adjust the percentage as needed */
+}
+
+.custom-modal-height .modal-content {
+    height: 80vh; /* 80% of the viewport height */
+}
+
+.custom-modal-height .modal-body {
+    overflow-y: auto; /* Add scroll if content exceeds the modal height */
+    height: calc(80vh - 56px - 56px); /* Subtract the modal header and footer height */
+}
+
+.full-page-modal .modal-dialog {
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.full-page-modal .modal-content {
+    height: 100vh;
+    border-radius: 0; /* Remove rounded corners */
+}
+
+.full-page-modal .modal-body {
+    overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+/* Border and background styling for the dropdown */
+.select2-container--default .select2-selection--single {
+    border: 1px solid #6c757d !important; /* Add border */
+    border-radius: 4px !important; /* Rounded corners */
+    background-color: #2a2a2a !important; /* Dark background */
+    color: #ffffff !important; /* White text */
+    padding: 6px 12px; /* Spacing inside the input */
+}
+
+/* Style the dropdown on focus */
+.select2-container--default .select2-selection--single:focus {
+    border-color: #495057 !important; /* Highlighted border color */
+    box-shadow: 0 0 0 2px rgba(73, 80, 87, 0.5); /* Subtle shadow */
+}
+
+/* Style the dropdown options */
+.select2-results__option {
+    background-color: #2a2a2a !important; /* Dark background */
+    color: #ffffff !important; /* White text */
+    padding: 6px !important; /* Add padding */
+    border-radius: 4px !important; /* Optional: Rounded corners */
+    cursor: pointer !important; /* Pointer cursor */
+}
+
+/* Highlight the currently selected or hovered option */
+.select2-results__option--highlighted {
+    background-color: #495057 !important; /* Highlighted background */
+    color: #ffffff !important; /* Ensure text contrast */
+    font-weight: bold !important; /* Emphasize the option */
+}
+
+/* Highlight the selected or hovered option */
+.select2-container--default .select2-results__option--highlighted {
+    background-color: #495057 !important; /* Darker highlight */
+    color: #ffffff !important; /* Ensure text contrast */
+    font-weight: bold !important; /* Emphasize the option */
+}
+
+/* Search input box in dropdown */
+.select2-container--default .select2-search__field {
+    background-color: #212529 !important; /* Match dropdown background */
+    color: #ffffff !important; /* White text */
+    border: 1px solid #6c757d !important; /* Subtle border */
+    border-radius: 4px !important; /* Rounded corners */
+    padding: 6px !important; /* Input padding */
+}
+
+/* Placeholder styling for the search input */
+.select2-container--default .select2-search__field::placeholder {
+    color: #adb5bd !important; /* Light gray placeholder */
+}
+
+/* Scrollbar styling (optional, modern appearance) */
+.select2-container--default .select2-results > .select2-results__options {
+    max-height: 200px !important; /* Set max height for scrolling */
+    overflow-y: auto !important; /* Enable scrolling */
+}
+
+.select2-container--default .select2-results > .select2-results__options::-webkit-scrollbar {
+    width: 6px !important; /* Narrow scrollbar */
+}
+
+.select2-container--default .select2-results > .select2-results__options::-webkit-scrollbar-thumb {
+    background-color: #6c757d !important; /* Subtle color for the scrollbar */
+    border-radius: 3px !important; /* Rounded corners */
+}
+
+.select2-container--default .select2-results > .select2-results__options::-webkit-scrollbar-thumb:hover {
+    background-color:#495057!important; /* Highlight on hover */
+}
+
+.img border-success {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    --bs-border-opacity: .5;
+}
+
+.bg-custom {
+    background-color: rgba(47, 47, 47, 0.9); /* Example background color with opacity */
+   /* background-image: url('path/to/your/image.png');*/ /* Optional: Set a background image */
+    background-size: cover;  /* Adjusts how the background image is displayed */
+    background-repeat: no-repeat;  /* Prevents background image repetition */
+    background-position: center;  /* Centers the background image */
+}
+
+.border-custom {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;      /* Rounded corners */
+}
+
+.transparent-input {
+    background-color: rgba(255, 255, 255, 0); /* Transparent background */
+    border: none; /* Optional: Remove border */
+    color: white; /* Ensures text visibility */
+    outline: none; /* Optional: Remove outline */
+    /*width: auto; /* Automatically adjusts width based on content */
+    padding: 0; /* Optional: Adjust padding if necessary */
+    display: inline-block; /* Allows input to shrink to fit content */
+}
+
+.transparent-input-border {
+    background-color: rgba(255, 255, 255, 0); /* Fully transparent background */
+    border: 1px solid dimgray; /* Grey border */
+    color: white; /* White text color */
+    padding: 0.5rem; /* Padding for better spacing */
+    border-radius: 5px; /* Rounded corners (adjust as needed) */
+    outline: none; /* Removes default outline on focus */
+    transition: border-color 0.3s ease, color 0.3s ease; /* Smooth transition for border and text color changes */
+}
+
+/* Ensures text color remains white on focus */
+.transparent-input-border:focus {
+    border-color: #cccccc; /* Light gray border on focus for better visibility */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Optional shadow on focus */
+    color: white; /* Ensure text color remains white */
+    background-color: rgba(255, 255, 255, 0); /* Maintain transparent background */
+}
+
+.fontxl {
+    font-size: 4.5rem;
+}
+
+.custom-table {
+    background-color: transparent;
+    border: none;
+}
+.custom-table th {
+    color: #ffffff; /* Ensure text color is visible */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Optional line under headers */
+    background-color: transparent;
+}
+.custom-table tr {
+    background-color: transparent; /* Transparent rows */
+}
+.custom-table td {
+    background-color: transparent; /* Transparent rows */
+}
+
+
+
+.list-group-item {
+    padding: 20px 20px 20px 20px;
+    background-color: rgba(4, 1, 1, 0.164); /* Example background color with opacity */
+    border: 0.5px solid rgba(148, 154, 159, 0.339);
+    border-radius: 15px;
+    margin:15px 5px 5px 0px;
+}
+
+.list-group-item-action {
+    cursor: pointer;
+    transition: background-color 0.1s ease-in-out, transform 0.0s ease-in-out;
+}
+
+.list-group-item-action:hover {
+    transform: scale(1.002); /* Subtle zoom effect */
+    background-color: rgba(4, 0, 0, 0.2); /* Light gray background on hover */
+    
+}
+
+.text-decoration-none:hover {
+    text-decoration: none; /* Ensure no underline on hover */
+}
+
+.modal-body h4 {
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+.modal-body p {
+    margin-bottom: 0.5rem;
+}
+
+.btn-icon {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin-right: 15px; /* Space between icon and title */
+    font-size: 1.2rem; /* Adjust icon size */
+    font-weight: 600; /* Optional: Adjust icon weight */
+    color: #6c757d; /* Match Bootstrap's muted color */
+    cursor: pointer;
+}
+
+.btn-icon:hover {
+    color: #343a40; /* Slightly darker color on hover */
+}
+
+
+.task-row {
+    padding: 0;
+    margin: 0;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.task-row:hover {
+    background-color: #f9f9f9;
+}
+.details-row {
+    background-color: #f1f1f1;
+}
+.task-row.sortable-chosen {
+    background-color: #e1e5f2;
+    border: 1px solid #ccc;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.task-row {
+    display: table-row;
+}
+.subtask-row {
+    display: table-row;
+}
+
+/* Ensure table rows and cells have proper alignment */
+table tr {
+    height: 50px; /* Adjust this value to fit your design */
+}
+
+table td, table th {
+    vertical-align: middle; /* Center content vertically */
+    padding: 10px; /* Optional: Adjust padding for spacing */
+    text-align: left; /* Optional: Adjust horizontal alignment */
+}
+
+/* Optional: Remove extra line-height in case it conflicts */
+.task-row, .subtask-row, .details-row {
+    line-height: 1.2; /* Ensure consistent text spacing */
+}
+
+.task-open-link {
+    opacity: 0; /* Make the link invisible initially */
+    visibility: hidden; /* Prevent interaction when hidden */
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    color: #ffffff;
+    text-decoration: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+}
+
+.task-row:hover .task-open-link {
+    visibility: visible; /* Make it visible */
+    opacity: 1; /* Fade in */
+    transition-delay: 0.1s; /* Add a delay before becoming visible */
+}
+
+/* Flash animation for task highlighting */
+.task-row.highlight {
+    --bs-table-bg: initial; /* Removes the variable's effect */
+    background-color: rgba(252, 247, 247, 0.3) !important;
+    transition: background-color 0.5s ease-in-out; /* Controls duration and easing */
+}
+

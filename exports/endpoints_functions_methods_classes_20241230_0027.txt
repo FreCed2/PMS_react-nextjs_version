@@ -1,0 +1,458 @@
+File: ./run.py
+
+File: ./init_db.py
+
+File: ./app/__init__.py
+  Endpoints:
+    - ENV (Methods: get)
+    - ENV (Methods: get)
+    - SQLALCHEMY_RECORD_QUERIES (Methods: get)
+  Functions:
+    - create_app
+      Docstring: Application factory function to initialize the Flask app.
+
+File: ./app/tasks/models.py
+  Functions:
+    - __init__
+    - validate_task_changes
+      Docstring: Validates changes to 'parent_id' and 'task_type'.
+Ensures hierarchy validity and checks for circular references.
+    - _validate_hierarchy_change
+      Docstring: Validates hierarchy changes based on task_type and parent_id.
+This method avoids setting attributes and focuses only on validation.
+    - check_circular_reference
+      Docstring: Iteratively checks for circular references in the task hierarchy.
+Prevents stack overflow on deep hierarchies.
+    - to_dict
+      Docstring: Converts the Task instance into a dictionary for JSON serialization.
+    - validate_hierarchy
+      Docstring: Ensures valid parent-task relationships using TaskService.
+
+Raises:
+    ValueError: If the hierarchy rules are violated.
+    - save
+      Docstring: Saves the task to the database after validation.
+
+Raises:
+    ValueError: If validation fails.
+    - delete_with_children
+      Docstring: Deletes the task and optionally its children if 'confirm' is True.
+    - archive
+      Docstring: Archives the task and its subtasks.
+    - unarchive
+      Docstring: Unarchives the task and its subtasks.
+    - mark_completed
+      Docstring: Marks the task as completed.
+    - __repr__
+  Classes:
+    - Task
+      - __init__
+      - validate_task_changes
+        Docstring: Validates changes to 'parent_id' and 'task_type'.
+Ensures hierarchy validity and checks for circular references.
+      - _validate_hierarchy_change
+        Docstring: Validates hierarchy changes based on task_type and parent_id.
+This method avoids setting attributes and focuses only on validation.
+      - check_circular_reference
+        Docstring: Iteratively checks for circular references in the task hierarchy.
+Prevents stack overflow on deep hierarchies.
+      - to_dict
+        Docstring: Converts the Task instance into a dictionary for JSON serialization.
+      - validate_hierarchy
+        Docstring: Ensures valid parent-task relationships using TaskService.
+
+Raises:
+    ValueError: If the hierarchy rules are violated.
+      - save
+        Docstring: Saves the task to the database after validation.
+
+Raises:
+    ValueError: If validation fails.
+      - delete_with_children
+        Docstring: Deletes the task and optionally its children if 'confirm' is True.
+      - archive
+        Docstring: Archives the task and its subtasks.
+      - unarchive
+        Docstring: Unarchives the task and its subtasks.
+      - mark_completed
+        Docstring: Marks the task as completed.
+      - __repr__
+
+File: ./app/tasks/__init__.py
+
+File: ./app/tasks/utils.py
+  Functions:
+    - filter_tasks
+      Docstring: Dynamically filters tasks based on criteria provided in a dictionary.
+        :param filters: Dictionary of filtering criteria.
+        :param page: Page number for pagination (optional).
+        :param per_page: Number of items per page (optional).
+        :return: Query object or paginated results.
+    - calculate_total_story_points
+      Docstring: Calculates the total story points for a project.
+    - calculate_completed_story_points
+      Docstring: Calculates the total completed story points for a project.
+    - calculate_completion_percentage
+      Docstring: Calculates the completion percentage of a project.
+    - delete_project_and_tasks
+      Docstring: Deletes a project and all its associated tasks.
+    - contributor_has_assigned_tasks
+      Docstring: Checks if a contributor has tasks assigned in a project.
+    - fetch_task_with_logging
+      Docstring: Helper function to fetch a task with logging.
+    - archive_task
+      Docstring: Archive a task and all its subtasks, preventing infinite recursion.
+
+Args:
+    task (Task): The task to be archived.
+    visited (set): A set of task IDs already processed (for recursion guard).
+    - validate_hierarchy
+      Docstring: Validates the hierarchy of a task to ensure valid parent-child relationships.
+
+Args:
+    task (Task): The task instance to validate.
+
+Raises:
+    ValueError: If the hierarchy rules are violated.
+    - fetch_all_tasks_as_dicts
+      Docstring: Fetches a list of tasks based on optional filters and serializes them into dictionaries.
+
+Args:
+    filters (dict, optional): A dictionary of filters to apply to the task query.
+
+Returns:
+    list[dict]: A list of serialized task dictionaries.
+    - fetch_task_as_dict
+      Docstring: Fetches a task by ID and returns it as a dictionary.
+
+Args:
+    task_id (int): The ID of the task to fetch.
+
+Returns:
+    dict: A dictionary representation of the task.
+
+Raises:
+    ValueError: If the task is not found.
+    - to_dict
+      Docstring: Converts the Task object into a dictionary for JSON responses.
+
+Returns:
+    dict: A dictionary representation of the Task object.
+  Classes:
+    - TaskService
+      - filter_tasks
+        Docstring: Dynamically filters tasks based on criteria provided in a dictionary.
+        :param filters: Dictionary of filtering criteria.
+        :param page: Page number for pagination (optional).
+        :param per_page: Number of items per page (optional).
+        :return: Query object or paginated results.
+      - calculate_total_story_points
+        Docstring: Calculates the total story points for a project.
+      - calculate_completed_story_points
+        Docstring: Calculates the total completed story points for a project.
+      - calculate_completion_percentage
+        Docstring: Calculates the completion percentage of a project.
+      - delete_project_and_tasks
+        Docstring: Deletes a project and all its associated tasks.
+      - contributor_has_assigned_tasks
+        Docstring: Checks if a contributor has tasks assigned in a project.
+      - fetch_task_with_logging
+        Docstring: Helper function to fetch a task with logging.
+      - archive_task
+        Docstring: Archive a task and all its subtasks, preventing infinite recursion.
+
+Args:
+    task (Task): The task to be archived.
+    visited (set): A set of task IDs already processed (for recursion guard).
+      - validate_hierarchy
+        Docstring: Validates the hierarchy of a task to ensure valid parent-child relationships.
+
+Args:
+    task (Task): The task instance to validate.
+
+Raises:
+    ValueError: If the hierarchy rules are violated.
+      - fetch_all_tasks_as_dicts
+        Docstring: Fetches a list of tasks based on optional filters and serializes them into dictionaries.
+
+Args:
+    filters (dict, optional): A dictionary of filters to apply to the task query.
+
+Returns:
+    list[dict]: A list of serialized task dictionaries.
+      - fetch_task_as_dict
+        Docstring: Fetches a task by ID and returns it as a dictionary.
+
+Args:
+    task_id (int): The ID of the task to fetch.
+
+Returns:
+    dict: A dictionary representation of the task.
+
+Raises:
+    ValueError: If the task is not found.
+      - to_dict
+        Docstring: Converts the Task object into a dictionary for JSON responses.
+
+Returns:
+    dict: A dictionary representation of the Task object.
+
+File: ./app/tasks/routes.py
+  Endpoints:
+    - / (Methods: route)
+    - /tasks/details/<int:task_id> (Methods: route)
+    - /tasks/archive/<int:task_id> (Methods: route)
+    - /tasks/unarchive/<int:task_id> (Methods: route)
+    - /tasks/disconnect/<int:task_id> (Methods: route)
+    - /tasks/available_tasks (Methods: route)
+    - /tasks/assign_parent/<int:task_id> (Methods: route)
+    - /subtasks<int:task_id> (Methods: route)
+    - /tasks/assign_subtasks/<int:task_id> (Methods: route)
+    - /tasks/reorder_subtasks (Methods: route)
+    - /tasks/batch_update/ (Methods: route)
+    - /tasks/hierarchy/<int:project_id> (Methods: route)
+    - /tasks/search/ (Methods: route)
+    - project_id (Methods: get)
+    - contributor_id (Methods: get)
+    - task_type (Methods: get)
+    - completion_status (Methods: get)
+    - page (Methods: get)
+    - per_page (Methods: get)
+    - project_id (Methods: get)
+    - task_type (Methods: get)
+    - exclude_task_id (Methods: get)
+    - project_id (Methods: get)
+    - parent_id (Methods: get)
+    - parent_task_id (Methods: get)
+    - ordered_ids (Methods: get)
+    - task_ids (Methods: get)
+    - action (Methods: get)
+    - q (Methods: get)
+    - completion_status (Methods: get)
+    - completion_status (Methods: get)
+    - show_archived (Methods: get)
+    - hierarchical (Methods: get)
+  Functions:
+    - list_tasks
+      Docstring: List tasks globally with filtering, optional hierarchical ordering, and pagination.
+    - task_details
+      Docstring: Fetch and display details for a specific task.
+    - archive_task
+      Docstring: Archive a task and its subtasks.
+    - unarchive_task
+      Docstring: Unarchive a task and its subtasks.
+    - disconnect_subtask
+      Docstring: Remove parent reference from a subtask.
+    - available_tasks
+      Docstring: Fetch a list of available tasks, excluding the specified one.
+    - assign_parent_task
+      Docstring: Assign a parent task to an existing task.
+    - get_subtasks
+      Docstring: Fetch subtasks for a given task.
+    - assign_subtasks
+      Docstring: Assign multiple subtasks to a parent task.
+    - reorder_subtasks
+      Docstring: Reorder subtasks globally or reassign them to a different parent.
+    - batch_update_tasks
+      Docstring: Perform batch updates on tasks.
+    - task_hierarchy
+      Docstring: Fetch the task hierarchy for a specific project.
+    - search_tasks
+      Docstring: Search tasks by name.
+    - build_hierarchy
+
+File: ./app/forms/__init__.py
+
+File: ./app/forms/forms.py
+  Functions:
+    - get_task_model
+    - validate
+      Docstring: Override the default validate method to include logging.
+    - validate_parent_id
+    - validate_new_parent_id
+    - validate_parent_id
+  Classes:
+    - ProjectForm
+    - AddContributorForm
+      - validate
+        Docstring: Override the default validate method to include logging.
+    - ProgressEditForm
+    - AddProgressForm
+    - DeleteProjectForm
+    - TaskForm
+      - validate_parent_id
+    - ArchiveTaskForm
+    - FilterTasksForm
+    - ReassignSubtaskForm
+      - validate_new_parent_id
+    - AssignSubtaskForm
+      - validate_parent_id
+
+File: ./app/charts/contributor_breakdown_chart.py
+  Functions:
+    - generate_contributor_breakdown_chart
+    - format_autopct
+
+File: ./app/charts/__init__.py
+
+File: ./app/charts/burnup_chart.py
+  Functions:
+    - generate_burnup_chart
+
+File: ./app/charts/project_breakdown_chart.py
+  Functions:
+    - generate_project_breakdown_chart
+    - format_autopct
+
+File: ./app/utils/logging_config.py
+  Functions:
+    - setup_logging
+      Docstring: Configure logging for the application, including rotating file logs and
+development/production environment adjustments.
+
+File: ./app/utils/__init__.py
+
+File: ./app/utils/common_utils.py
+  Functions:
+    - log_interaction
+      Docstring: Logs interaction details for debugging and sequence generation.
+        :param caller: The calling entity or module.
+        :param callee: The receiving entity or module.
+        :param action: The action being logged.
+        :param data: Optional data payload.
+        :param result: Optional result of the action.
+        :param error: Optional error message.
+    - count_ongoing_projects
+      Docstring: Count ongoing projects based on their story points completion.
+    - count_completed_projects
+      Docstring: Count completed projects where all story points are finished.
+    - count_unstarted_projects
+      Docstring: Count unstarted projects where no story points are completed.
+    - count_all_projects
+      Docstring: Count all projects in the database.
+    - count_all_contributors
+      Docstring: Count all contributors in the database.
+    - count_assigned_contributors
+      Docstring: Count contributors assigned to at least one project.
+    - count_unassigned_contributors
+      Docstring: Count contributors not assigned to any project.
+
+File: ./app/models/models.py
+  Functions:
+    - contributors
+      Docstring: Define the many-to-many relationship for contributors dynamically.
+    - add_contributor
+      Docstring: Add a contributor to the project.
+    - remove_contributor
+      Docstring: Remove a contributor from the project.
+    - update_story_points
+      Docstring: Recalculate the completed story points for the project.
+    - total_story_points
+      Docstring: Fetch the total story points for all tasks associated with this project.
+    - completion_percentage
+      Docstring: Calculate the completion percentage of the project based on story points.
+    - __repr__
+    - __repr__
+  Classes:
+    - Project
+      Docstring: Represents a project entity.
+      - contributors
+        Docstring: Define the many-to-many relationship for contributors dynamically.
+      - add_contributor
+        Docstring: Add a contributor to the project.
+      - remove_contributor
+        Docstring: Remove a contributor from the project.
+      - update_story_points
+        Docstring: Recalculate the completed story points for the project.
+      - total_story_points
+        Docstring: Fetch the total story points for all tasks associated with this project.
+      - completion_percentage
+        Docstring: Calculate the completion percentage of the project based on story points.
+      - __repr__
+    - Contributor
+      Docstring: Represents a contributor entity.
+      - __repr__
+
+File: ./app/models/__init__.py
+
+File: ./app/extensions/db.py
+
+File: ./app/extensions/__init__.py
+
+File: ./app/static/__init__.py
+
+File: ./app/routes/__init__.py
+
+File: ./app/routes/api_routes.py
+  Endpoints:
+    - /calculate_completion_percentage/<int:project_id> (Methods: route)
+    - /delete_project/<int:project_id> (Methods: route)
+    - /tasks/<int:task_id> (Methods: route)
+    - /tasks (Methods: route)
+    - /tasks/delete/<int:task_id> (Methods: route)
+    - name (Methods: get)
+    - title (Methods: get)
+    - id (Methods: get)
+    - task_id (Methods: get)
+    - description (Methods: get)
+    - contributor_id (Methods: get)
+    - completed (Methods: get)
+    - story_points (Methods: get)
+    - parent_id (Methods: get)
+    - description (Methods: get)
+    - contributor_id (Methods: get)
+    - completed (Methods: get)
+    - sort_order (Methods: get)
+    - confirm_children (Methods: get)
+  Functions:
+    - calculate_completion_percentage_api
+      Docstring: API endpoint to calculate the completion percentage of a project.
+    - api_delete_project
+      Docstring: API endpoint to delete a project and its related tasks.
+    - get_task_details
+      Docstring: Fetch task details by ID and return as JSON using the TaskService utility method.
+    - validate_task_payload
+      Docstring: Validates task payload for required fields and hierarchy rules.
+    - save_task
+      Docstring: Create a new task or update an existing one.
+    - delete_task
+      Docstring: API endpoint to delete a task. Optionally, delete its child tasks as well.
+:param task_id: ID of the task to be deleted.
+:return: JSON response with success or error message.
+
+File: ./app/routes/page_routes.py
+  Endpoints:
+    - / (Methods: route)
+    - /base (Methods: route)
+    - /test-flash (Methods: route)
+    - /dashboard (Methods: route)
+    - /project/<project_name> (Methods: route)
+    - /create_project (Methods: route)
+    - /add_contributor/<project_name> (Methods: route)
+    - /remove_contributor/<project_name> (Methods: route)
+    - /delete_project/<int:project_id> (Methods: route)
+    - contributor_name (Methods: get)
+    - contributor_name (Methods: get)
+  Functions:
+    - index
+      Docstring: Renders the homepage with project details and a form to add new projects.
+    - base
+      Docstring: Renders the base.html template.
+    - test_flash
+      Docstring: Adds a test flash message and redirects to the base page.
+    - dashboard
+      Docstring: Renders the dashboard page with project and contributor stats and charts.
+    - project
+      Docstring: Displays project details and allows interaction such as adding contributors or viewing charts.
+    - create_project
+      Docstring: Handles the creation of a new project.
+    - add_contributor
+      Docstring: Adds a contributor to a specified project. Logs all interactions for tracing and debugging.
+    - remove_contributor
+      Docstring: Removes a contributor from a specified project. Prevents removal if the contributor has assigned tasks.
+Logs all interactions for tracing and debugging.
+
+:param project_name: The name of the project from which the contributor will be removed.
+    - delete_project
+      Docstring: Deletes a project and all its tasks. Handles errors during deletion.
+

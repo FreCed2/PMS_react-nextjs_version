@@ -1,0 +1,30 @@
+__pycache__/
+*.pyc
+Projects.session.sql
+# Virtual Environments
+venv/
+.venv/
+
+# Logs
+*.log
+
+# Environment Variables
+.env
+
+# Migrations
+migrations/
+
+# Pytest
+.cache/
+.coverage
+
+# IDE/Editor
+.vscode/
+.idea/
+
+# OS-Specific
+.DS_Store
+Thumbs.db
+
+# db.sqlite3
+instance/

@@ -1,0 +1,556 @@
+/**
+ * Modals Module
+ * Handles modal lifecycle events, dropdowns, contributor assignments, and field resets.
+ */
+
+/* ======================== Utility Functions ======================== */
+
+
+/**
+ * Retrieves the modal element and instance, initializing it if necessary.
+ * @returns {object} - { modalElement, modalInstance }
+ */
+function getModal() {
+    const modalElement = document.getElementById("createTaskModal");
+    if (!modalElement) {
+        console.error("Modal element #createTaskModal not found.");
+        return { modalElement: null, modalInstance: null };
+    }
+
+    let modalInstance = bootstrap.Modal.getInstance(modalElement);
+    if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(modalElement); // Initialize the modal instance if not already initialized
+    }
+
+    return { modalElement, modalInstance };
+}
+
+/**
+ * Fetches task details from the backend.
+ * @param {string} taskId - The ID of the task to fetch.
+ * @returns {Promise<object|null>} - The task data or null on failure.
+ */
+async function fetchTaskDetails(taskId) {
+    try {
+        const response = await fetch(`/api/tasks/${taskId}`);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error("Failed to fetch task details:", await response.text());
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching task details:", error);
+        alert("An unexpected error occurred while fetching task details.");
+        return null;
+    }
+};
+
+/**
+ * Closes the "Create/Edit Task" modal.
+ */
+window.closeTaskModal = function () {
+    const { modalElement, modalInstance } = getModal();
+    if (!modalInstance || !modalElement) return;
+
+    // Trigger Bootstrap's modal hide functionality
+    modalInstance.hide();
+
+    // Ensure focus is removed from any active element inside the modal
+    $(modalElement).find(":focus").trigger("blur");
+
+    // Reset modal state if the modal is being closed
+    if (!currentlyOpenedTaskId) {
+        resetModalFields();
+    }
+
+    // Log modal closure
+    console.log("Modal instance closed.");
+};
+
+/* ======================== Dropdown Management ======================== */
+
+/**
+ * Initializes the Select2 dropdown for parent tasks.
+ */
+//let dropdownInitialized = false;
+
+window.initializeParentDropdown = function () {
+    const parentDropdown = $("#taskParent");
+
+    if (!parentDropdown.length) {
+        console.error("Parent dropdown element not found.");
+        alert("Parent dropdown could not be loaded. Please try refreshing the page.");
+        return;
+    }
+
+    // Reinitialize only if Select2 is not already initialized
+    if (!parentDropdown.hasClass("select2-hidden-accessible")) {
+        parentDropdown.select2({
+            ajax: {
+                url: "available_tasks",
+                dataType: "json",
+                delay: 250,
+                data: params => ({
+                    term: params.term || "",
+                    page: params.page || 1,
+                    limit: 30,
+                    task_type: $("#taskType").val(),
+                    exclude_task_id: $("#task-id").val() || null,
+                }),
+                processResults: (data, params) => ({
+                    results: data.tasks.map(task => ({
+                        id: task.id,
+                        text: `${task.name} (ID: ${task.id})`,
+                    })),
+                    pagination: { more: data.has_more },
+                }),
+                cache: true,
+            },
+            placeholder: "Parent task",
+            allowClear: true,
+            minimumInputLength: 0,
+            width: "100%",
+            theme: "bootstrap4",
+            dropdownParent: $("#createTaskModal"),
+        });
+
+        console.log("Parent dropdown initialized successfully.");
+    } else {
+        console.log("Parent dropdown is already initialized.");
+    }
+};
+
+/**
+ * Refreshes the Select2 dropdown when the task type changes.
+ */
+window.refreshParentDropdown = function () {
+    console.log("Refreshing parent dropdown for task type:", $("#taskType").val());
+
+    const parentDropdown = $("#taskParent");
+    // Check if Select2 is initialized before destroying
+    if (parentDropdown.hasClass("select2-hidden-accessible")) {
+        parentDropdown.val(null).trigger("change");
+        parentDropdown.select2("destroy");
+    }
+
+    // Reinitialize Select2
+    initializeParentDropdown();
+};
+
+/* ======================== Modal Lifecycle Events ======================== */
+
+/**
+ * Configures modal lifecycle events for the "Create/Edit Task" modal.
+ */
+/**window.setupModalLifecycleEvents = function () {
+    const { modalElement } = getModal();
+    if (!modalElement) return;
+
+    // Remove any previously attached handlers to prevent duplication
+    $(modalElement).off("shown.bs.modal hidden.bs.modal");
+
+    // Handle the modal being shown
+    $(modalElement).on("shown.bs.modal", () => {
+        $(modalElement).attr("aria-hidden", "false"); // Set aria-hidden to false
+        console.log("Modal is now fully visible.");
+        initializeParentDropdown(); // Initialize or refresh dropdown
+        if (!currentlyOpenedTaskId) {
+            console.log("Dropdown initialized for a new task.");
+        } else {
+            console.log(`Dropdown not initialized as Task ID ${currentlyOpenedTaskId} is being edited.`);
+        }
+    });
+
+    // Handle the modal being hidden
+    $(modalElement).on("hidden.bs.modal", () => {
+        $(modalElement).attr("aria-hidden", "true"); // Set aria-hidden to true
+        console.log("Modal hidden. Resetting fields if no task was being edited.");
+        if (!currentlyOpenedTaskId) {
+            resetModalFields(); // Reset only for new tasks
+        }
+
+        // Clean up the modal state
+        $("body").removeClass("modal-open");
+        $(".modal-backdrop").remove();
+        document.body.style.overflow = "auto"; // Restore scrolling
+
+        // Explicitly remove aria-hidden attribute
+        $(modalElement).removeAttr("aria-hidden");
+
+        // Reset fields for new tasks only
+        if (!currentlyOpenedTaskId) {
+            resetModalFields();
+        }
+    });
+};*/
+
+window.setupModalLifecycleEvents = function () {
+    let unsavedChanges = false;
+    const { modalElement } = getModal();
+    if (!modalElement) return;
+
+    // Remove any previously attached handlers to prevent duplication
+    $(modalElement).off("shown.bs.modal hidden.bs.modal hide.bs.modal");
+
+    // Handle the modal being shown
+    $(modalElement).on("shown.bs.modal", () => {
+        console.log("Modal is now fully visible.");
+        initializeParentDropdown(); // Initialize or refresh dropdown
+        $(modalElement).find("#taskTitle").focus(); // Set focus to the first input field
+        if (!currentlyOpenedTaskId) {
+            console.log("Dropdown initialized for a new task.");
+        } else {
+            console.log(`Dropdown not initialized as Task ID ${currentlyOpenedTaskId} is being edited.`);
+        }
+    });
+
+    // Handle the modal being hidden
+    $(modalElement).on("hidden.bs.modal", () => {
+        resetModalFields(); // Reset fields when modal is hidden
+        console.log("Modal hidden and fields reset.");
+        $(modalElement).find(":focus").trigger("blur"); // Remove focus from any active element
+    
+        // Clean up modal state managed by Bootstrap
+        $("body").removeClass("modal-open");
+        $(".modal-backdrop").remove();
+        document.body.style.overflow = "auto"; // Restore scrolling
+    });
+
+    // Handle the modal being hidden but before fully closing
+    $(modalElement).on("hide.bs.modal", (event) => {
+        if (unsavedChanges) {
+            const confirmClose = confirm("You have unsaved changes. Do you really want to close?");
+            if (!confirmClose) {
+                event.preventDefault(); // Prevent the modal from closing
+            }
+        }
+    });
+};
+
+/**
+ * Configures modal lifecycle events for the "Create/Edit Task" modal.
+ */
+window.setupModalEvents = function () {
+    const { modalElement } = getModal();
+    if (!modalElement) return;
+
+    const toggleButton = document.getElementById("toggleModalSize");
+    if (toggleButton) {
+        toggleButton.addEventListener("click", () => {
+            const isFullPage = modalElement.classList.toggle("full-page-modal");
+            toggleButton.innerHTML = `<i class="bi bi-arrows-${isFullPage ? "collapse" : "angle-expand"}"></i>`;
+            console.log(`Modal ${isFullPage ? "expanded" : "reset"} to default size.`);
+        });
+    }
+};
+
+/* ======================== Modal Actions ======================== */
+
+/**
+ * Resets all fields in the modal.
+ */
+/**
+ * Resets all fields in the modal.
+ * @param {boolean} forceReset - Whether to force a reset even if a task is being edited.
+ */
+window.resetModalFields = function(forceReset = false) {
+    // Check if reset is required (skip for task edits unless forced)
+    if (!window.currentlyOpenedTaskId && !forceReset) {
+        console.log("No reset required for an ongoing task edit.");
+        return;
+    }
+
+    // Define selectors for fields to reset
+    const fieldsToReset = [
+        "#task-id",          // Hidden field for task ID
+        "#taskTitle",        // Task title input
+        "#taskDescription",  // Task description textarea
+        "#taskProject",      // Project dropdown
+        "#taskType",         // Task type dropdown
+        "#taskEstimation",   // Story points input
+        "#taskParent",       // Parent task dropdown
+        "#current-contributor" // Current contributor display field
+    ];
+
+    // Reset each field
+    fieldsToReset.forEach(selector => {
+        const element = document.querySelector(selector);
+        if (element) {
+            // Handle dropdowns and text inputs separately
+            if (element.tagName === "SELECT") {
+                element.value = ""; // Clear selection for dropdown
+                $(element).trigger("change"); // Trigger change for Select2 if initialized
+            } else {
+                element.value = ""; // Clear text inputs
+            }
+        }
+    });
+
+    // Handle special case for contributor dropdown
+    const contributorSelect = document.getElementById("contributor-select");
+    if (contributorSelect) {
+        contributorSelect.value = ""; // Clear contributor dropdown
+        $(contributorSelect).trigger("change"); // Update Select2 if applicable
+    }
+
+    // Reset Parent Task Select2 dropdown
+    const parentDropdown = $("#taskParent");
+    if (parentDropdown.length && parentDropdown.hasClass("select2-hidden-accessible")) {
+        parentDropdown.val(null).trigger("change"); // Reset value and refresh
+    }
+
+    // Update modal title to "Create Task" (default state)
+    const modalLabel = document.getElementById("createTaskModalLabel");
+    if (modalLabel) {
+        modalLabel.textContent = "Create Task";
+    }
+
+    // Clear task-specific state variables
+    window.currentlyOpenedTaskId = null; // Clear the current task ID
+    TaskManager.saveTaskInitialized = false; // Reset save initialization flag
+
+    console.log("Modal fields and state reset successfully.");
+};
+
+/**
+ * Debounce function to delay invocation of a function by a specified time.
+ * Prevents frequent calls in quick succession.
+ * @param {Function} func - The function to debounce.
+ * @param {number} wait - Delay in milliseconds.
+ * @returns {Function} - Debounced function.
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func.apply(this, args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Attaches a debounced click event handler to the "Save Task" button.
+ * Prevents duplicate submissions using a guard flag and ensures save operations are serialized.
+ */
+window.setupSaveTaskButton = function () {
+    let isSaving = false; // Guard flag to track ongoing save operations
+
+    // Task save handler
+    const saveTaskHandler = async function () {
+        if (isSaving) {
+            console.warn("Save in progress. Skipping duplicate submission.");
+            return;
+        }
+        isSaving = true;
+
+        console.log("Save Task button clicked");
+        try {
+            const result = await TaskManager.handleTaskSave(); // Ensure TaskManager.handleTaskSave is asynchronous
+            console.log("Task saved successfully:", result);
+
+            // Update task row and highlight saved task
+            if (result && result.task) {
+                TaskManager.updateTaskRow(result.task);
+                TaskManager.highlightTask(result.task.id);
+            }
+
+            // Reset the modal for the next task
+            resetModalFields();
+            closeTaskModal();
+
+            console.log("Task modal reset and closed after save.");
+        } catch (error) {
+            console.error("Error saving task:", error);
+            alert("An error occurred while saving the task. Please try again.");
+        } finally {
+            isSaving = false; // Reset guard flag
+        }
+    };
+
+    // Attach the debounced click handler to #saveTaskButton
+    $("#saveTaskButton").off("click").on("click", debounce(saveTaskHandler, 300));
+};
+
+
+/**
+ * Opens the "Create/Edit Task" modal and populates it with task data.
+ * @param {number} taskId - The ID of the task to fetch.
+ */
+
+// Track currently opened task ID to prevent redundant calls
+let currentlyOpenedTaskId = null;
+
+window.openTaskModal = async function (taskId) {
+    if (currentlyOpenedTaskId === taskId) {
+        console.warn(`Task modal is already open for Task ID: ${taskId}`);
+        return; // Prevent duplicate modal opens
+    }
+
+    currentlyOpenedTaskId = taskId; // Set the currently opened task ID
+
+    console.log(`Opening task modal for Task ID: ${taskId}`);
+
+    try {
+        const task = await fetchTaskDetails(taskId);
+        if (task) {
+            populateTaskModal(task); // Populate fields with task data
+            document.getElementById("createTaskModalLabel").textContent = "Edit Task"; // Set modal title
+            console.log("Task details loaded successfully.");
+        } else {
+            alert("Failed to load task details. Please refresh the page and try again.");
+            console.error("Task details could not be retrieved.");
+        }
+    } catch (error) {
+        console.error("Error occurred while opening the task modal:", error);
+        alert("An unexpected error occurred while loading the task. Please try again.");
+    } finally {
+        currentlyOpenedTaskId = null; // Reset after operation completes
+    }
+};
+
+/**
+ * Populates the modal fields with the provided task data.
+ * @param {object} task - The task data to populate the modal fields.
+ */
+/**
+ * Populates the modal fields with the provided task data.
+ * @param {object} task - The task data to populate the modal fields.
+ */
+window.populateTaskModal = function (task) {
+    console.log("Populating task modal with task data:", task);
+    const { modalElement, modalInstance } = getModal();
+    if (!modalElement) return;
+
+    // Populate fields
+    const modalFields = {
+        "task-id": task.id,
+        "taskTitle": task.name,
+        "taskDescription": task.description,
+        "taskProject": task.project_id || "",
+        "taskType": task.task_type || "",
+        "taskEstimation": task.story_points || 0,
+        "taskParent": task.parent_id || "",
+        "contributor-select": task.contributor_id || "",
+    };
+
+    Object.entries(modalFields).forEach(([fieldId, value]) => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            if (fieldId === "taskParent" && $(element).hasClass("select2-hidden-accessible")) {
+                // Ensure parent task option exists in dropdown
+                if (value && !$(element).find(`option[value="${value}"]`).length) {
+                    const optionText = `Parent Task (ID: ${value})`; // Fallback display text
+                    $(element).append(new Option(optionText, value, true, true));
+                }
+                $(element).val(value).trigger("change.select2");
+            } else if (element.tagName === "SELECT") {
+                $(element).val(value).trigger("change");
+            } else {
+                element.value = value;
+            }
+        } else {
+            console.warn(`Element with ID "${fieldId}" not found.`);
+        }
+    });
+
+    // Update the modal title
+    document.getElementById("createTaskModalLabel").textContent = task.id ? "Edit Task" : "Create Task";
+
+    // Ensure dropdowns are refreshed
+    refreshParentDropdown();
+
+    // Show the modal
+    modalInstance.show();
+    console.log("Task modal is now visible.");
+};
+
+/**
+ * Assigns contributors in the "Create/Edit Task" modal.
+ */
+window.setupContributorAssignment = function () {
+    document.body.addEventListener("click", async event => {
+        if (event.target.id === "assign-contributor-btn") {
+            const taskId = document.getElementById("task-id")?.value;
+            const contributorId = document.getElementById("contributor-select")?.value;
+
+            if (!contributorId || !taskId) {
+                alert("Task and contributor must be selected before assigning.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/${taskId}/assign_contributor`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ contributor_id: parseInt(contributorId, 10) }),
+                });
+
+                if (response.ok) {
+                    console.log("Contributor assigned successfully.");
+                    TaskManager.highlightTask(taskId);
+                } else alert("Error assigning contributor.");
+            } catch (error) {
+                console.error("Error assigning contributor:", error);
+                alert("An unexpected error occurred.");
+            }
+        }
+    });
+}
+
+/**
+ * Toggles the modal size between full-page and default size.
+ */
+window.toggleModalSize = function (modalElement) {
+    const toggleButton = document.getElementById("toggleModalSize");
+
+    if (!toggleButton) return;
+
+    toggleButton.addEventListener("click", () => {
+        const isFullPage = modalElement.classList.toggle("full-page-modal");
+        toggleButton.innerHTML = `<i class="bi bi-arrows-${isFullPage ? "collapse" : "angle-expand"}"></i>`;
+        console.log(`Modal ${isFullPage ? "expanded" : "reset"} to default size.`);
+    });
+}
+
+/**
+ * Resets the "Create Task" modal for creating a new task.
+ */
+window.initNewTaskModal = function () {
+    console.log("Resetting modal for creating a new task.");
+    const { modalElement } = getModal();
+    if (!modalElement) return;
+
+    const taskForm = document.getElementById("taskForm");
+    const taskIdField = document.getElementById("task-id");
+    const modalLabel = document.getElementById("createTaskModalLabel");
+
+    if (taskForm) taskForm.reset();
+    if (taskIdField) taskIdField.value = ""; // Clear task ID to indicate new task
+    if (modalLabel) modalLabel.textContent = "Create Task";
+
+    currentlyOpenedTaskId = null; // Reset the flag for task editing
+    console.log("Modal reset complete for new task creation.");
+};
+
+/**
+ * Initializes the task modal logic.
+ */
+window.initializeTaskModal = function () {
+    console.log("Initializing task modal.");
+    const { modalElement, modalInstance } = getModal();
+    if (!modalElement) return;
+
+    modalElement.addEventListener("hidden.bs.modal", () => {
+        modalInstance.dispose(); // Properly dispose of the modal
+    });
+
+    window.modal = modalInstance; // Make it globally accessible if needed
+
+    setupModalLifecycleEvents();
+};
+
+

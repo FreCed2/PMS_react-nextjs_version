@@ -1,0 +1,128 @@
+.
+├── Database Schema Graphical Representation.png
+├── High-Level Project Architecture Diagram.png
+├── Projects.session.sql
+├── api_routes.py
+├── app.log.1
+├── app.log.2
+├── app.log.3
+├── app.log.4
+├── app.log.5
+├── app.py
+├── charts
+│   ├── --init--.py
+│   ├── burnup_chart.py
+│   ├── contributor_breakdown_chart.py
+│   └── project_breakdown_chart.py
+├── export_schema.py
+├── exports
+│   ├── database_schema.svg
+│   ├── generate_zip_of_txt_projectfiles.py
+│   ├── module_interaction_mapping
+│   │   ├── app.svg
+│   │   ├── module_documentation_README.md
+│   │   ├── module_interactions.dot
+│   │   └── module_interactions.svg
+│   ├── schema_output.txt
+│   ├── txt_files
+│   │   ├── api_routes.py.txt
+│   │   ├── app.py.txt
+│   │   ├── charts
+│   │   │   ├── --init--.py.txt
+│   │   │   ├── burnup_chart.py.txt
+│   │   │   ├── contributor_breakdown_chart.py.txt
+│   │   │   └── project_breakdown_chart.py.txt
+│   │   ├── export_schema.py.txt
+│   │   ├── forms.py.txt
+│   │   ├── init_db.py.txt
+│   │   ├── logging_config.py.txt
+│   │   ├── migrations
+│   │   │   ├── env.py.txt
+│   │   │   └── versions
+│   │   │       ├── 006ad9dc6cbc_add_timestamps_to_task.py.txt
+│   │   │       ├── 123456789abc_add_task_attributes.py.txt
+│   │   │       ├── 2f5c1cd0c15b_fixing_many_to_many_relationship_.py.txt
+│   │   │       ├── 56e17981b3ce_add_created_at_and_updated_at_fields_to_.py.txt
+│   │   │       └── 8b50059860ab_use_timezone_aware_datetimes_for_.py.txt
+│   │   ├── models.py.txt
+│   │   ├── page_routes.py.txt
+│   │   ├── project_structure.txt
+│   │   ├── qodana.sarif.json.txt
+│   │   ├── qodana.yaml.txt
+│   │   ├── requirements.txt
+│   │   ├── schema_output.txt
+│   │   ├── static
+│   │   │   └── custom.css.txt
+│   │   ├── templates
+│   │   │   ├── base.html.txt
+│   │   │   ├── dashboard.html.txt
+│   │   │   ├── includes
+│   │   │   │   └── macros.html.txt
+│   │   │   ├── index.html.txt
+│   │   │   ├── progress_overview.html.txt
+│   │   │   ├── project.html.txt
+│   │   │   └── tasks
+│   │   │       ├── details.html.txt
+│   │   │       └── list.html.txt
+│   │   ├── test_task_operations.py.txt
+│   │   ├── test_task_table.py.txt
+│   │   ├── tests
+│   │   │   └── test_app.py.txt
+│   │   ├── utils.py.txt
+│   │   └── workflow-requirements.txt
+│   └── uml_diagrams
+│       ├── add_contributor_sequence.puml
+│       ├── add_progress_sequence.puml
+│       ├── architectural_diagram.puml
+│       ├── delete_project_sequence.puml
+│       ├── managing_project_contributors_sequence.puml
+│       ├── remove_contributor_sequence.puml
+│       ├── view_burnup_chart_sequence.puml
+│       ├── view_dashboard_sequence.puml
+│       └── view_project_details_sequence.puml
+├── forms.py
+├── init_db.py
+├── instance
+│   ├── projects.db
+│   ├── projects_backup.db
+│   └── yourdatabase.db
+├── logging_config.py
+├── migrations
+│   ├── README
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions
+│       ├── 006ad9dc6cbc_add_timestamps_to_task.py
+│       ├── 123456789abc_add_task_attributes.py
+│       ├── 2f5c1cd0c15b_fixing_many_to_many_relationship_.py
+│       ├── 56e17981b3ce_add_created_at_and_updated_at_fields_to_.py
+│       └── 8b50059860ab_use_timezone_aware_datetimes_for_.py
+├── models.py
+├── page_routes.py
+├── project_structure.txt
+├── qodana.sarif.json
+├── qodana.yaml
+├── requirements.txt
+├── schema_output.txt
+├── static
+│   └── custom.css
+├── templates
+│   ├── base.html
+│   ├── dashboard.html
+│   ├── includes
+│   │   └── macros.html
+│   ├── index.html
+│   ├── progress_overview.html
+│   ├── project.html
+│   └── tasks
+│       ├── details.html
+│       └── list.html
+├── test_task_operations.py
+├── test_task_table.py
+├── tests
+│   └── test_app.py
+├── utils.py
+└── workflow-requirements.txt
+
+22 directories, 104 files

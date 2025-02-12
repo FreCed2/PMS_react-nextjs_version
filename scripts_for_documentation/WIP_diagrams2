@@ -1,0 +1,76 @@
+import os
+import datetime
+import subprocess
+from collections import defaultdict
+
+PLANTUML_JAR_PATH = "/Users/fredrik_cederborg/CodingProjects/exports/plantuml.jar"
+OUTPUT_FOLDER = "exports"
+
+def get_timestamp():
+    """Get a timestamp for file names."""
+    return datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+def ensure_output_folder(folder_path):
+    """Ensure the output folder exists."""
+    os.makedirs(folder_path, exist_ok=True)
+
+def analyze_log_file(log_file_path):
+    """Analyze logs to extract sequences."""
+    sequences = defaultdict(list)
+    with open(log_file_path, "r") as log_file:
+        for line in log_file:
+            if "User Action:" in line:  # Customize based on your log format
+                action = line.split(":")[1].strip()
+                sequences[action].append(line.strip())
+            elif "->" in line:  # Captures transitions
+                sequences[action].append(line.strip())
+    return sequences
+
+def generate_puml(action, steps, output_path):
+    """Generate a PlantUML sequence diagram."""
+    puml_lines = ["@startuml"]
+    puml_lines.append(f"title {action} Interaction Flow")
+
+    # Add actors and components
+    puml_lines.append("actor User")
+    puml_lines.append("participant Frontend")
+    puml_lines.append("participant Backend")
+    
+    # Add sequence steps
+    for step in steps:
+        puml_lines.append(step)
+
+    puml_lines.append("@enduml")
+
+    with open(output_path, "w") as puml_file:
+        puml_file.write("\n".join(puml_lines))
+    print(f"[GENERATED] {output_path}")
+
+def render_puml_to_svg(puml_path):
+    """Render a PlantUML file to an SVG."""
+    svg_path = puml_path.replace(".puml", ".svg")
+    try:
+        subprocess.run(
+            ["java", "-jar", PLANTUML_JAR_PATH, "-tsvg", puml_path],
+            check=True
+        )
+        print(f"[RENDERED] {svg_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to render {puml_path}: {e}")
+
+def generate_sequence_diagrams_from_logs(log_file_path, output_folder):
+    """Generate sequence diagrams for all actions in the log file."""
+    ensure_output_folder(output_folder)
+    sequences = analyze_log_file(log_file_path)
+
+    for action, steps in sequences.items():
+        timestamp = get_timestamp()
+        puml_file = os.path.join(output_folder, f"{action.replace(' ', '_')}_{timestamp}.puml")
+        generate_puml(action, steps, puml_file)
+        render_puml_to_svg(puml_file)
+
+if __name__ == "__main__":
+    LOG_FILE_PATH = "app.log"  # Path to your application log file
+    ensure_output_folder(OUTPUT_FOLDER)
+    generate_sequence_diagrams_from_logs(LOG_FILE_PATH, OUTPUT_FOLDER)
+    print(f"[INFO] Sequence diagrams generated in: {OUTPUT_FOLDER}")

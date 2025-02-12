@@ -1,0 +1,14 @@
+@startuml
+title Batch Update Tasks Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Submit selected tasks and action
+Frontend -> Routes : POST /tasks/batch_update (routes.py: Handles request)
+Routes -> Database : Retrieve tasks and perform updates (models.py: Apply action)
+Database --> Routes : Save changes (models.py: Commit changes)
+Routes --> Frontend : Return success as JSON (routes.py: Response sent)
+@enduml

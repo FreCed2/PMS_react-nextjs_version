@@ -1,0 +1,146 @@
+import os
+import subprocess
+from datetime import datetime
+
+# ---------------------------
+# Helper Functions
+# ---------------------------
+
+def ensure_folder_exists(folder_path):
+    """
+    Ensure the output folder exists; create it if it does not.
+    """
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+def get_timestamp():
+    """
+    Generate a timestamp for filenames.
+    """
+    return datetime.now().strftime("%Y%m%d_%H%M%S")
+
+def log_action(action, path):
+    """
+    Log actions for tracking file generation or errors.
+    """
+    print(f"[{action.upper()}] {path}")
+
+# ---------------------------
+# Sequence Diagram Generation
+# ---------------------------
+
+def parse_logs_for_sequence_diagrams(log_file, output_folder):
+    """
+    Parse logs and generate sequence diagrams for meaningful interactions.
+    """
+    ensure_folder_exists(output_folder)
+    timestamp = get_timestamp()
+
+    interactions = []
+    try:
+        with open(log_file, "r") as logs:
+            for line in logs:
+                if "Caller" in line and "Callee" in line:
+                    parts = line.strip().split(", ")
+                    caller = parts[1].split(": ")[1]
+                    callee = parts[2].split(": ")[1]
+                    action = parts[3].split(": ")[1]
+                    interactions.append((caller, callee, action))
+
+        if not interactions:
+            print("[INFO] No meaningful interactions found in logs.")
+            return
+
+        for idx, (caller, callee, action) in enumerate(interactions):
+            title = f"Interaction_{idx + 1}"
+            puml_content = [
+                "@startuml",
+                f"title {title} Interaction Flow",
+                "",
+                f"actor {caller}",
+                f"participant {callee}",
+                "",
+                f"{caller} -> {callee} : {action}",
+                "",
+                "@enduml",
+            ]
+
+            puml_file = os.path.join(output_folder, f"{title}_{timestamp}.puml")
+            with open(puml_file, "w") as f:
+                f.write("\n".join(puml_content))
+            log_action("created", puml_file)
+
+            # Convert to SVG
+            svg_file = puml_file.replace(".puml", ".svg")
+            subprocess.run(["plantuml", "-tsvg", puml_file, "-o", output_folder])
+            log_action("generated svg", svg_file)
+
+    except FileNotFoundError:
+        print(f"[ERROR] Log file {log_file} not found.")
+    except Exception as e:
+        print(f"[ERROR] An error occurred while parsing logs: {e}")
+
+# ---------------------------
+# Class Diagram Generation
+# ---------------------------
+
+def generate_class_diagrams(modules, output_folder):
+    """
+    Generate class diagrams using Pyreverse.
+    """
+    ensure_folder_exists(output_folder)
+    timestamp = get_timestamp()
+
+    for module, prefix in modules:
+        try:
+            subprocess.run(["pyreverse", module, "-o", "dot", "-p", prefix])
+            log_action("pyreverse run", module)
+
+            for diagram_type in ["classes", "packages"]:
+                dot_file = f"{diagram_type}_{prefix}.dot"
+                dot_path = os.path.abspath(dot_file)
+
+                if os.path.exists(dot_path):
+                    dest_file = os.path.join(output_folder, f"{dot_file.replace('.dot', '')}_{timestamp}.dot")
+                    os.rename(dot_path, dest_file)
+                    log_action("moved", dest_file)
+
+                    # Convert to SVG
+                    svg_file = dest_file.replace(".dot", ".svg")
+                    subprocess.run(["dot", "-Tsvg", dest_file, "-o", svg_file])
+                    log_action("generated svg", svg_file)
+                else:
+                    print(f"[ERROR] {dot_file} not found.")
+        except Exception as e:
+            print(f"[ERROR] Failed to generate class diagrams for {module}: {e}")
+
+# ---------------------------
+# Main Driver Function
+# ---------------------------
+
+def generate_documentation():
+    """
+    Main function to generate documentation for the project.
+    """
+    base_output_folder = "project_documentation"
+    log_file = "app.log"  # Adjust the log file path as needed
+
+    # Organize outputs into subfolders
+    sequence_output_folder = os.path.join(base_output_folder, "sequence_diagrams")
+    class_output_folder = os.path.join(base_output_folder, "class_diagrams")
+
+    print("[INFO] Generating Sequence Diagrams...")
+    parse_logs_for_sequence_diagrams(log_file, sequence_output_folder)
+
+    print("[INFO] Generating Class Diagrams...")
+    modules = [(".", "root_models"), ("app.tasks", "tasks_models")]
+    generate_class_diagrams(modules, class_output_folder)
+
+    print("[INFO] Documentation generation complete.")
+
+# ---------------------------
+# Entry Point
+# ---------------------------
+
+if __name__ == "__main__":
+    generate_documentation()

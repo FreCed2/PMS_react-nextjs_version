@@ -1,0 +1,17 @@
+@startuml
+title Archive Task Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "utils.py" as Service
+participant "models.py" as Database
+
+User -> Frontend : Click "Archive Task" button
+Frontend -> Routes : POST /tasks/archive/<task_id> -> (routes.py: Handles request)
+Routes -> Service : TaskService.archive_task(task) -> (utils.py: Archive logic)
+Service -> Database : Update task and subtasks -> (models.py: Set is_archived=True)
+Database --> Service : Save changes -> (models.py: Commit changes)
+Service --> Routes : Return success -> (utils.py: Business logic complete)
+Routes --> Frontend : Redirect to task list (routes.py: Response sent)
+@enduml

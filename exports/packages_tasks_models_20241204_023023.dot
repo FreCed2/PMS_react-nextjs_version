@@ -1,0 +1,9 @@
+digraph "packages_tasks_models" {
+rankdir=BT
+charset="utf-8"
+"pythonProject.tasks" [color="black", label=<pythonProject.tasks>, shape="box", style="solid"];
+"pythonProject.tasks.models" [color="black", label=<pythonProject.tasks.models>, shape="box", style="solid"];
+"pythonProject.tasks.routes" [color="black", label=<pythonProject.tasks.routes>, shape="box", style="solid"];
+"pythonProject.tasks.utils" [color="black", label=<pythonProject.tasks.utils>, shape="box", style="solid"];
+"pythonProject.tasks" -> "pythonProject.tasks.models" [arrowhead="open", arrowtail="none"];
+}

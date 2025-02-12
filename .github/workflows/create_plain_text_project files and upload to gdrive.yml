@@ -1,0 +1,122 @@
+name: Creating Plain Text Project Files and Uploading to Google Drive for GPT Code Assistant
+
+on:
+  push:
+    branches:
+      - main  # Adjust this to match your default branch as needed
+
+jobs:
+  create-txt-artifacts:
+    runs-on: ubuntu-latest
+
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Cache dependencies for faster builds
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('workflow-requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # Install Graphviz and Development Libraries (important for pygraphviz)
+      - name: Install Graphviz and Development Libraries
+        run: sudo apt-get update && sudo apt-get install -y graphviz graphviz-dev
+
+      # Set up Python and Install Dependencies
+      - name: Set up Python and Install Dependencies
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r workflow-requirements.txt
+
+      # Generate Module Dependency Graph using pydeps
+      - name: Generate Module Dependency Graph (as .dot)
+        run: |
+          source venv/bin/activate
+          mkdir -p exports/module_interaction_mapping
+          pydeps app.py --noshow --max-bacon=2 -o exports/module_interaction_mapping/module_interactions.dot -T dot
+
+      # Convert .dot to .svg using Graphviz
+      - name: Convert .dot to .svg
+        run: |
+          dot -Tsvg exports/module_interaction_mapping/module_interactions.dot -o exports/module_interaction_mapping/module_interactions.svg
+
+      # Verify Contents of Exports Directory
+      - name: List Exports Directory
+        run: ls -R exports
+
+      # Generate Database Schema Diagram using ERAlchemy
+      - name: Generate Database Schema Diagram
+        run: |
+          source venv/bin/activate
+          eralchemy -i sqlite:///instance/projects.db -o exports/database_schema.svg
+
+
+      - name: List Current Directory Structure
+        run: ls -R
+
+      # Create a directory for .txt versions of files
+      - name: Create txt versions directory
+        run: mkdir -p exports/txt_files
+
+      # Check if the exports directory exists
+      - name: Check Exports Directory
+        run: |
+          if [ -d "exports" ]; then
+            echo "Exports directory exists."
+          else
+            echo "Exports directory does not exist."
+          fi
+      
+      # Create a directory for .txt versions of files
+      - name: List Current Directory Structure
+        run: ls -R
+
+      # Convert text-based files to .txt copies
+      - name: Convert text-based files to .txt copies
+        run: |
+          extensions="py js html css json md yaml yml txt sh xml"
+          for ext in $extensions; do
+            find . -name "*.${ext}" ! -path "./.git/*" ! -path "./exports/*" ! -path "./__pycache__/*" ! -path "./venv/*" -exec sh -c '
+              for file; do
+                relative_dir=$(dirname "$file")
+                mkdir -p "exports/txt_files/$relative_dir"
+                if [ "${file##*.}" = "txt" ]; then
+                  cp "$file" "exports/txt_files/$file"
+                else
+                  cp "$file" "exports/txt_files/$file.txt"
+                fi
+              done
+            ' sh {} +
+          done
+
+      # Create a zip file from exports directory
+      - name: Create zip file
+        id: create_zip
+        run: |
+          zip_name="project-text_files.zip"
+          cd exports && zip -r ../$zip_name . && cd ..
+          echo "zip_name=$zip_name" >> $GITHUB_OUTPUT
+
+      # Upload the zip file to Google Drive
+      - name: Upload to Google Drive
+        uses: adityak74/google-drive-upload-git-action@main
+        with:
+          credentials: ${{ secrets.GSA_CREDENTIALS }}
+          filename: ${{ steps.create_zip.outputs.zip_name }}
+          folderId: ${{ secrets.PROJECTFILES }}
+          overwrite: "true"
+
+      # Upload the text files as an artifact to GitHub
+      - name: Upload text files as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Project-text-files
+          path: exports/txt_files/**

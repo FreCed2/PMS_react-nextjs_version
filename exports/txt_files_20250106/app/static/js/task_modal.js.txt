@@ -1,0 +1,152 @@
+// task_modal.js
+
+/**
+ * Task Modal Module
+ * Manages task creation and editing using a Bootstrap modal.
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Store the modal element in a variable to avoid duplication
+    const modalElement = document.getElementById("createTaskModal");
+
+    if (!modalElement) {
+        console.error("Modal element not found.");
+        return;
+    }
+
+    const modal = new bootstrap.Modal(modalElement);
+
+    console.log("Modal element exists:", modalElement);
+
+    // Event listener for modal lifecycle events
+    modalElement.addEventListener("show.bs.modal", () => {
+        console.log("show.bs.modal event triggered");
+    });
+
+    modalElement.addEventListener("hide.bs.modal", () => {
+        console.log("hide.bs.modal event triggered");
+    });
+
+    console.log("Modal element (hidden.bs.modal):", modalElement);
+    modalElement.addEventListener("hidden.bs.modal", () => {
+        console.log("hidden.bs.modal event triggered");
+
+        const updatedTaskId = localStorage.getItem("updatedTaskId");
+        console.log("Updated Task ID retrieved:", updatedTaskId);
+
+        if (updatedTaskId) {
+            console.log("Calling highlightTask with ID:", updatedTaskId);
+            setTimeout(() => {
+                highlightTask(updatedTaskId);
+                localStorage.removeItem("updatedTaskId");
+                console.log("Removed updatedTaskId from localStorage after highlighting");
+            }, 500); // Adjust delay if necessary
+        } else {
+            console.warn("No updatedTaskId found in localStorage");
+        }
+    });
+
+    /**
+     * Toggle the modal's fullscreen mode when the toggle button is clicked.
+     */
+    const toggleButton = document.getElementById("toggleModalSize");
+    if (toggleButton) {
+        toggleButton.addEventListener("click", () => {
+            if (modalElement.classList.contains("full-page-modal")) {
+                modalElement.classList.remove("full-page-modal");
+                toggleButton.innerHTML = `<i class="bi bi-arrows-angle-expand"></i>`;
+            } else {
+                modalElement.classList.add("full-page-modal");
+                toggleButton.innerHTML = `<i class="bi bi-arrows-collapse"></i>`;
+            }
+        });
+    }
+
+    /**
+     * Initialize Save Task button functionality.
+     */
+    initSaveTaskButton(modal);
+});
+
+/**
+ * Initializes the Save Task button to handle task creation and updates.
+ * @param {Object} modal - Bootstrap modal instance.
+ */
+function initSaveTaskButton(modal) {
+    const taskForm = document.getElementById("taskForm");
+    if (!taskForm) {
+        console.error("Task form not found.");
+        return;
+    }
+
+    taskForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(taskForm); // Gather form data
+        const payload = {}; // Convert FormData to a plain object
+        formData.forEach((value, key) => {
+            payload[key] = value;
+        });
+
+        // Ensure 'name' is derived from 'title'
+        if (payload['title']) {
+            payload['name'] = payload['title'];
+        }
+
+        // Extract task ID from the payload (if available)
+        const taskId = payload['task_id'] || null;
+
+        console.log("Payload before sending:", payload);
+
+        try {
+            const response = await fetch("/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Set correct content type
+                    "X-CSRFToken": getCsrfToken(),      // Add CSRF token dynamically
+                },
+                body: JSON.stringify(payload),        // Send JSON payload
+            });
+
+            if (response.ok) {
+                console.log("Task saved successfully!");
+
+                // Store updatedTaskId in localStorage
+                if (taskId) {
+                    localStorage.setItem("updatedTaskId", taskId);
+                    console.log("Stored updatedTaskId in localStorage:", taskId);
+                }
+
+                // Close the modal
+                if (modal) {
+                    modal.hide();
+                } else {
+                    console.error("Modal instance is not defined.");
+                }
+
+                // Optionally, reload the page or update the UI
+                location.reload(); // Uncomment if you want to refresh the page
+            } else {
+                const result = await response.json();
+                console.error("Error saving task:", result.error || "Unknown error.");
+                alert(`Error: ${result.error || "Unable to save task."}`);
+            }
+        } catch (error) {
+            console.error("Unexpected error while saving task:", error);
+            alert("Unexpected error occurred while saving the task.");
+        }
+    });
+}
+
+/**
+ * Retrieves the CSRF token from the meta tag in the HTML head.
+ * @returns {string} CSRF token value.
+ */
+function getCsrfToken() {
+    const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfMetaTag) {
+        console.error("CSRF token meta tag not found.");
+        return "";
+    }
+    return csrfMetaTag.getAttribute("content");
+}

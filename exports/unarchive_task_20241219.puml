@@ -1,0 +1,20 @@
+@startuml name
+title Unarchive Task Interaction Flow with File Interactions
+
+actor User
+participant "UI" as UI
+participant "API Endpoint" as API
+participant "TaskService" as Service
+database "Database" as DB
+
+User -> UI: Initiates task unarchiving
+UI -> API: POST /tasks/unarchive/<task_id>
+API -> Service: unarchive_task(task_id)
+Service -> DB: Fetch Task by ID
+DB --> Service: Task Object
+Service -> DB: Update Task: is_archived = False
+Service -> DB: Commit changes
+DB --> Service: Success
+Service --> API: Task unarchived response
+API --> UI: Unarchiving success notification
+@enduml

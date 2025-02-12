@@ -1,0 +1,14 @@
+@startuml
+title Disconnect Parent Task Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Click "Disconnect Parent" button
+Frontend -> Routes : POST /tasks/disconnect/<task_id> (routes.py: Handles request)
+Routes -> Database : Update subtask (models.py: Set parent_id=NULL)
+Database --> Routes : Save changes (models.py: Commit changes)
+Routes --> Frontend : Redirect to task list (routes.py: Response sent)
+@enduml

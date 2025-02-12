@@ -1,0 +1,228 @@
+{
+    ".DS_Store": null,
+    ".env": null,
+    ".github": {
+        ".DS_Store": null,
+        "workflows": {
+            "artifact-upload.yml": null,
+            "create_plain_text_project files and upload to gdrive.yml": null,
+            "python-app.yml": null,
+            "qodana_code_quality.yml": null
+        }
+    },
+    ".gitignore": null,
+    "Projects.session.sql": null,
+    "app": {
+        ".DS_Store": null,
+        "__init__.py": null,
+        "charts": {
+            "__init__.py": null,
+            "burnup_chart.py": null,
+            "contributor_breakdown_chart.py": null,
+            "project_breakdown_chart.py": null
+        },
+        "config.py": null,
+        "extensions": {
+            "__init__.py": null,
+            "db.py": null
+        },
+        "forms": {
+            "__init__.py": null,
+            "forms.py": null
+        },
+        "models": {
+            "__init__.py": null,
+            "models.py": null
+        },
+        "routes": {
+            "__init__.py": null,
+            "api_routes.py": null,
+            "page_routes.py": null,
+            "save_task_route_21 jan_1041.py": null
+        },
+        "static": {
+            ".DS_Store": null,
+            "__init__.py": null,
+            "custom.css": null,
+            "custom.js": null,
+            "favicon.ico": null,
+            "images": {
+                "background.svg": null
+            },
+            "js": {
+                ".DS_Store": null,
+                "alerts.js": null,
+                "filters.js": null,
+                "modals.js": null,
+                "tasks_table_interactions.js": null
+            }
+        },
+        "tasks": {
+            "__init__.py": null,
+            "models.py": null,
+            "routes.py": null,
+            "utils.py": null
+        },
+        "templates": {
+            ".DS_Store": null,
+            "base.html": null,
+            "dashboard.html": null,
+            "includes": {
+                "macros.html": null
+            },
+            "project.html": null,
+            "prototypes": {
+                "lean_canvas_prototype.html": null
+            },
+            "tasks": {
+                ".DS_Store": null,
+                "list.html": null,
+                "list_compare.html": null
+            }
+        },
+        "utils": {
+            "__init__.py": null,
+            "common_utils.py": null,
+            "logging_config.py": null
+        }
+    },
+    "app.log": null,
+    "app.log.1": null,
+    "app.log.2": null,
+    "app.log.3": null,
+    "app.log.4": null,
+    "app.log.5": null,
+    "db_backups": {
+        "backup.log": null
+    },
+    "error.log": null,
+    "extract_javascript_variables_from_files.js": null,
+    "extract_python_variables_from_file.py": null,
+    "extracted_variables.txt": null,
+    "images": {
+        "background.svg": null
+    },
+    "init_db.py": null,
+    "js_variables.txt": null,
+    "kill_process_on_port_5000.py": null,
+    "list_all_routes.py": null,
+    "list_routes.py": null,
+    "logfile": null,
+    "logs": {
+        "app.log": null,
+        "app.log.1": null,
+        "app.log.2": null,
+        "app.log.3": null,
+        "app.log.4": null,
+        "app.log.5": null
+    },
+    "migrations": {
+        "README": null,
+        "alembic.ini": null,
+        "env.py": null,
+        "script.py.mako": null,
+        "versions": {
+            "000000000001.py": null,
+            "204c35f60d27_add_status_column_to_task_table.py": null,
+            "9d14fd48e6cd_make_scope_nullable_in_project_model.py": null,
+            "d31ed1dd2dee_add_status_column_to_task_table.py": null
+        }
+    },
+    "node_modules": {
+        ".bin": {
+            "acorn": null
+        },
+        ".package-lock.json": null,
+        "acorn": {
+            "CHANGELOG.md": null,
+            "LICENSE": null,
+            "bin": {
+                "acorn": null
+            },
+            "dist": {
+                "acorn.d.mts": null,
+                "acorn.d.ts": null,
+                "acorn.js": null,
+                "acorn.mjs": null,
+                "bin.js": null
+            },
+            "package.json": null
+        },
+        "acorn-walk": {
+            "CHANGELOG.md": null,
+            "LICENSE": null,
+            "dist": {
+                "walk.d.mts": null,
+                "walk.d.ts": null,
+                "walk.js": null,
+                "walk.mjs": null
+            },
+            "package.json": null
+        },
+        "sortablejs": {
+            "LICENSE": null,
+            "Sortable.js": null,
+            "Sortable.min.js": null,
+            "modular": {
+                "sortable.complete.esm.js": null,
+                "sortable.core.esm.js": null,
+                "sortable.esm.js": null
+            },
+            "package.json": null,
+            "src": {
+                "Animation.js": null,
+                "BrowserInfo.js": null,
+                "EventDispatcher.js": null,
+                "PluginManager.js": null,
+                "Sortable.js": null,
+                "utils.js": null
+            }
+        }
+    },
+    "package-lock.json": null,
+    "package.json": null,
+    "project_structure_20250204_104000.json": null,
+    "project_structure_20250207_140932.json": null,
+    "project_structure_tree_20250204_104000.txt": null,
+    "project_structure_tree_20250207_140932.txt": null,
+    "qodana.sarif.json": null,
+    "qodana.yaml": null,
+    "requirements.txt": null,
+    "run.py": null,
+    "schema.sql": null,
+    "scripts_for_documentation": {
+        "Convert_JSON_to_DOT.py": null,
+        "Convert_JSON_to_DOT2.py": null,
+        "README_for all_endp_func_meth": null,
+        "WIP_autogenerate_uml_sequence_diagrams.py": null,
+        "WIP_diagrams1": null,
+        "WIP_diagrams2": null,
+        "WIP_generate_documentation.py": null,
+        "WIP_newnew_generate_documentation.py": null,
+        "create_database_schema": {
+            "DB schema export tool - configuration options.txt": null,
+            "export_schema.py": null,
+            "run_export_schema.py": null
+        },
+        "create_list_of_all_endp_func_classes_jsfunction_jsfiles.py": null,
+        "generate_folder_structure.py": null,
+        "generate_folder_structure_incl_files.py": null,
+        "generate_list_all_endp_func_meth.py": null,
+        "generate_project_structure.py": null,
+        "generate_uml_sequence_diagrams": null,
+        "generate_zip_of_txt_projectfiles.py": null,
+        "new_generate_documentation.py": null,
+        "split_text_into_parts.py": null
+    },
+    "static": {
+        "images": {
+            "background.svg": null
+        }
+    },
+    "tests": {
+        "__init__.py": null,
+        "confirm_status_field_is_present_in_the_dictionary_and_has_correct_value.py": null,
+        "test_app.py": null
+    },
+    "workflow-requirements.txt": null
+}

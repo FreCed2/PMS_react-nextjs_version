@@ -1,0 +1,15 @@
+@startuml
+title Available Tasks Interaction Flow with File Interactions
+
+actor User
+participant "Frontend (HTML/JS)" as Frontend
+participant "routes.py" as Routes
+participant "models.py" as Database
+
+User -> Frontend : Open task picker
+Frontend -> Routes : GET /tasks/available_tasks (routes.py: Fetch available tasks)
+Routes -> Database : Query tasks (models.py: Exclude current task)
+Database --> Routes : Return filtered tasks (models.py: Query result)
+Routes --> Frontend : Return tasks as JSON (routes.py: Response sent)
+Frontend -> User : Display available tasks
+@enduml

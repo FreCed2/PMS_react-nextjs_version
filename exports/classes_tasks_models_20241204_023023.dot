@@ -1,0 +1,5 @@
+digraph "classes_tasks_models" {
+rankdir=BT
+charset="utf-8"
+"pythonProject.tasks.models.Task" [color="black", fontcolor="black", label=<{Task|completed<br ALIGN="LEFT"/>completed_date<br ALIGN="LEFT"/>contributor<br ALIGN="LEFT"/>contributor_id<br ALIGN="LEFT"/>created_at<br ALIGN="LEFT"/>description<br ALIGN="LEFT"/>id<br ALIGN="LEFT"/>is_archived<br ALIGN="LEFT"/>name<br ALIGN="LEFT"/>parent<br ALIGN="LEFT"/>parent_id<br ALIGN="LEFT"/>project<br ALIGN="LEFT"/>project_id<br ALIGN="LEFT"/>sort_order<br ALIGN="LEFT"/>story_points<br ALIGN="LEFT"/>task_type<br ALIGN="LEFT"/>updated_at<br ALIGN="LEFT"/>|archive()<br ALIGN="LEFT"/>filter_tasks(show_archived, completion_status, task_types)<br ALIGN="LEFT"/>mark_completed()<br ALIGN="LEFT"/>unarchive()<br ALIGN="LEFT"/>validate_hierarchy()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+}

@@ -1,0 +1,28 @@
+@startuml
+title Task Hierarchy Interaction Flow with File Interactions
+
+actor User
+boundary Frontend
+control Controller
+database Database
+
+User -> Frontend: Navigate to "Task Hierarchy" page
+Frontend -> Controller: GET /tasks/hierarchy?project_id={project_id}&hierarchical=true
+Controller -> Controller: Validate query parameters
+alt Validation success
+    Controller -> Database: SELECT * FROM tasks 
+                          WHERE project_id = {project_id} 
+                          AND is_archived = false 
+                          ORDER BY 
+                              CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END ASC, 
+                              parent_id ASC, 
+                              sort_order ASC
+    Database -> Controller: Return tasks in hierarchical order
+    Controller -> Frontend: 200 OK\n[ { "id": task_id1, "parent_id": null }, ... ]
+    Frontend -> Frontend: Render task hierarchy\nGroup by parent-child relationships
+    Frontend -> User: Display task hierarchy view
+else Validation failure
+    Controller -> Frontend: 400 Bad Request\n{ "error": "Invalid parameters" }
+    Frontend -> User: Show error message
+end
+@enduml

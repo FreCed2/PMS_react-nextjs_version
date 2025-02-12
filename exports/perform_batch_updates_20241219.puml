@@ -1,0 +1,23 @@
+@startuml name
+title Batch Update Tasks Interaction Flow with File Interactions
+
+actor User
+participant "UI" as UI
+participant "API Endpoint" as API
+participant "TaskService" as Service
+database "Database" as DB
+
+User -> UI: Selects tasks and initiates batch update
+UI -> API: POST /tasks/batch_update
+API -> Service: batch_update_tasks(payload)
+Service -> DB: Begin transaction
+loop For each task in payload
+    Service -> DB: Fetch Task by ID
+    DB --> Service: Task Object
+    Service -> DB: Update Task fields
+end
+Service -> DB: Commit transaction
+DB --> Service: Success
+Service --> API: Batch update success response
+API --> UI: Update success notification
+@enduml

@@ -1,0 +1,93 @@
+@startuml EditSaveTask
+actor User as U
+participant "tasks_table_interactions.js\n(openModalForEditTask)" as JS
+participant "Flask Backend\n(api_routes.py:save_task)" as FlaskBackend
+participant "Task Model\n(models.py:Task)" as TaskModel
+participant "Task Validation\n(models.py:validate_hierarchy)" as TaskValidation
+participant "TaskService\n(models.py:check_circular_reference)" as TaskService
+participant "Logger\n(utils.py:log_interaction)" as Logger
+database "Database\n(SQLAlchemy)" as DB
+
+'UML Interaction for Task Edit
+U -> JS: Click "Edit Task"
+note right of JS
+File: tasks_table_interactions.js
+Function: openModalForEditTask(taskId)
+Description: Initiates the edit task modal and fetches task data.
+end note
+JS -> JS: openModalForEditTask(taskId)
+JS -> FlaskBackend: GET /api/tasks/<taskId>
+note right of FlaskBackend
+File: api_routes.py
+Function: get_task
+Description: Fetches task data for the given ID.
+end note
+FlaskBackend -> TaskModel: Task.query.get(taskId)
+note right of TaskModel
+File: models.py
+Description: ORM fetch operation to retrieve a task by ID.
+end note
+TaskModel -> DB: SELECT * FROM task WHERE id=taskId
+DB --> TaskModel: Task Instance
+TaskModel --> FlaskBackend: Task Data (JSON)
+FlaskBackend --> JS: Response (Task JSON)
+JS -> JS: Populate modal fields
+
+'UML Interaction for Task Save
+U -> JS: Submit "Save Task" form
+JS -> FlaskBackend: POST /api/tasks (Task Data)
+note right of FlaskBackend
+File: api_routes.py
+Function: save_task
+Description: Handles POST request to create or update a task.
+end note
+FlaskBackend -> TaskModel: Task(**data)
+note right of TaskModel
+File: models.py
+Description: ORM object creation or update logic.
+end note
+TaskModel -> TaskValidation: validate_hierarchy()
+note right of TaskValidation
+File: models.py
+Function: validate_hierarchy
+Description: Ensures task hierarchy constraints are respected.
+end note
+TaskValidation -> TaskService: check_circular_reference(task_id, parent_id)
+note right of TaskService
+File: models.py
+Function: check_circular_reference
+Description: Checks for circular dependencies in the task hierarchy.
+end note
+TaskService -> DB: Perform recursive parent-child checks
+DB --> TaskService: Hierarchy Validation Result
+TaskService --> TaskValidation: Validation Passed
+TaskValidation --> TaskModel: Hierarchy Valid
+TaskModel -> DB: INSERT/UPDATE Task
+note right of DB
+File: models.py
+Action: Commit database changes.
+end note
+DB --> TaskModel: Affected Rows
+TaskModel -> Logger: log_interaction("Task Saved", taskId)
+note right of Logger
+File: utils.py
+Function: log_interaction
+Description: Logs the save event for auditing.
+end note
+Logger --> TaskModel: Log Successful
+TaskModel --> FlaskBackend: Task Saved Response
+FlaskBackend --> JS: Response (Success/Failure)
+JS -> JS: Update UI or show error
+
+'UML Error Handling
+JS -> FlaskBackend: Handle Error (if Response Status != 200)
+note left of FlaskBackend
+Files: api_routes.py, models.py
+Actions:
+- Rollback DB changes.
+- Return appropriate error message.
+end note
+FlaskBackend --> JS: Error Message
+JS -> JS: Show Error Alert to User
+
+@enduml

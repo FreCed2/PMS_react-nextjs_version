@@ -1,0 +1,76 @@
+import sys
+import os
+from flask import url_for
+from bs4 import BeautifulSoup
+import pytest
+
+# Adding the project root directory to the system path so pytest can find app.py
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
+
+from app import app  # Importing the Flask app
+
+@pytest.fixture
+def client():
+    # Set up the Flask app in testing mode, and create a test client
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client  # Return the test client to use in the test cases
+        
+        
+def test_fetch_task_as_dict(app, db_session, task_factory):
+    # Create a sample task
+    task = task_factory(name="Sample Task", task_type="Subtask")
+    db_session.add(task)
+    db_session.commit()
+
+    # Fetch the task as a dictionary
+    task_dict = TaskService.fetch_task_as_dict(task.id)
+
+    # Assertions
+    assert task_dict['id'] == task.id
+    assert task_dict['name'] == "Sample Task"
+    assert task_dict['task_type'] == "Subtask"
+    assert "created_at" in task_dict
+    assert "updated_at" in task_dict
+
+def test_fetch_task_as_dict_not_found(app):
+    # Test with an invalid task ID
+    with pytest.raises(ValueError) as excinfo:
+        TaskService.fetch_task_as_dict(99999)  # Non-existent task ID
+    assert "Task with ID 99999 not found" in str(excinfo.value)
+
+# Helper function to extract CSRF token from HTML responses
+def get_csrf_token(response):
+    # Parse the HTML response using BeautifulSoup to locate the CSRF token input field
+    soup = BeautifulSoup(response.data, 'html.parser')
+    csrf_token_input = soup.find('input', {'name': 'csrf_token'})
+    if csrf_token_input:
+        return csrf_token_input['value']  # Return the value of the CSRF token
+    else:
+        raise ValueError("CSRF token not found in the response")
+
+# Test case for creating a project
+def test_create_project(client):
+    # Step 1: Send GET request to the home page to retrieve the form
+    response = client.get('/')
+    csrf_token = get_csrf_token(response)  # Extract CSRF token from the form
+
+    # Step 2: Submit the form with project details using a POST request
+    response = client.post('/', data={
+        'csrf_token': csrf_token,  # Include the CSRF token in the POST request
+        'project_name': 'Test Project',  # Name of the project
+        'start_date': '2024-09-24',  # Project start date
+        'end_date': '2024-12-31',  # Project end date
+        'scope': 100  # Scope of the project (story points)
+    }, follow_redirects=True)
+
+    # Debugging output for inspecting response content
+    print(response.data.decode())
+
+    # Step 3: Check that the project was created successfully (status code 200)
+    # and that the project name appears in the response
+    assert response.status_code == 200
+    assert b'Project: Test Project' in response.data
+
+
