@@ -1,0 +1,120 @@
+/* custom.css */
+
+/* Fixed Navigation Bar */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1f2937; /* Gray-800 */
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+  }
+  
+  /* Ensure main content doesn’t overlap navbar */
+  .main-container {
+    padding-top: 4rem; /* Adjusted for fixed navbar */
+  }
+  
+  /* Background */
+  .page-background {
+    background-image: url('/background.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+  }
+
+
+  .new-task-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.55rem;
+    background-color: #2563eb; /* Blue-600 */
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 1.6rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .task-row {
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem;
+    border-radius: 0rem;
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
+  }
+
+  .task-row:hover {
+    background-color: rgba(21,22,34,1.0); /* Gray-100 */
+  }
+  .task-type-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .task-type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.55rem;
+    width: 6rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .task-type-badge--bug {
+    background-color: #f87171; /* Red-400 */
+    color: #fff;
+  }
+
+  .task-type-badge--feature {
+    background-color: #60a5fa; /* Blue-400 */
+    color: #fff;
+  }
+
+  .task-type-badge--enhancement {
+    background-color: #fbbf24; /* Yellow-400 */
+    color: #fff;
+  }
+
+  .task-type-badge--documentation {
+    background-color: #34d399; /* Green-400 */
+    color: #fff;
+  }
+
+  .task-type-badge--epic {
+    background-color: #d1d5db; /* Gray-300 */
+    color: #111827; /* Gray-900 */
+  }
+
+  .task-type-badge--user-story {
+    background-color: #6b7280; /* Gray-500 */
+    color: #fff;
+  }
+
+  .task-type-badge--subtask {
+    background-color: #f9fafb; /* Gray-50 */
+    color: #111827; /* Gray-900 */
+  }
+
+  .task-status-dropdown {
+    width: 8rem;
+    height: 1.7rem;
+    line-height: 1.0rem;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.8rem 0.2rem 0.8rem;
+    background-color: transparent;
+    border: 1px solid rgba(150,150,150,0.5);
+  }
+
