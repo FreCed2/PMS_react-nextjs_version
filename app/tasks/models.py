@@ -2,6 +2,8 @@ import logging
 from datetime import datetime, timezone
 from sqlalchemy import func, cast, CheckConstraint
 from sqlalchemy.orm import validates
+from sqlalchemy.types import Enum
+from sqlalchemy.dialects.postgresql import ENUM
 from app.extensions.db import db
 from app.models import Project, Contributor
 from app.utils.common_utils import log_interaction
@@ -9,6 +11,11 @@ from app.utils.common_utils import log_interaction
 logger = logging.getLogger(__name__)  # Logger for this module
 
 ALLOWED_TASK_TYPES = ["Epic", "User Story", "Subtask"]
+
+# Define allowed priority levels
+TASK_PRIORITY_ENUM = ENUM("Unset", "Low", "Medium", "High", "Critical", name="task_priority", create_type=False)
+EPIC_PRIORITY_ENUM = ENUM("Unset", "P0", "P1", "P2", "P3", "P4", name="epic_priority", create_type=False)
+
 
 class Task(db.Model):
     __tablename__ = "task"
@@ -18,6 +25,22 @@ class Task(db.Model):
     sort_order = db.Column(db.Integer, default=0)
     description = db.Column(db.Text)
     task_type = db.Column(db.String(10), nullable=False, server_default='Subtask')
+    
+    priority = db.Column(TASK_PRIORITY_ENUM, nullable=True)  # ✅ Allow NULL 
+    epic_priority = db.Column(EPIC_PRIORITY_ENUM, nullable=True)  # ✅ Allow Null
+    
+    # ✅ Ensure task_type determines allowed priority
+    @validates("priority", "epic_priority")
+    def validate_priority(self, key, value):
+        logger.debug(f"🔍 Validating priority: key={key}, value={value}, task_type={self.task_type}")
+        
+        if self.task_type == "Epic" and key == "priority":
+            raise ValueError("Epics cannot have priority.")
+        if self.task_type != "Epic" and key == "epic_priority":
+            logger.warning(f"🚨 Unexpected epic_priority for non-Epic task: {self.to_dict()}")
+            return None  # ✅ Instead of raising an error, just ignore it for now
+    
+    
     is_archived = db.Column(db.Boolean, default=False, index=True)
     completed = db.Column(db.Boolean, default=False, index=True)
     status = db.Column(
@@ -51,9 +74,19 @@ class Task(db.Model):
     def validate_status(self, key, value):
         """
         Validates that the status is one of the allowed values.
+        Automatically updates 'completed' and 'completed_date'.
         """
         if value not in self.ALLOWED_STATUSES:
             raise ValueError(f"Invalid status '{value}'. Allowed statuses are: {self.ALLOWED_STATUSES}")
+
+        # ✅ Update 'completed' and 'completed_date' automatically
+        if value == "Completed":
+            self.completed = True
+            self.completed_date = datetime.utcnow()
+        else:
+            self.completed = False
+            self.completed_date = None
+
         return value
     
     def __init__(self, *args, **kwargs):
@@ -72,11 +105,18 @@ class Task(db.Model):
 
     
     __table_args__ = (
+    # ✅ Ensure proper task hierarchy
         CheckConstraint(
             "(task_type = 'Epic' AND parent_id IS NULL) OR "
             "(task_type = 'User Story' AND parent_id IN (SELECT id FROM task WHERE task_type = 'Epic')) OR "
             "(task_type = 'Subtask' AND parent_id IN (SELECT id FROM task WHERE task_type = 'User Story'))",
             name="task_hierarchy_constraint"
+        ),
+        
+        # ✅ Ensure Epics cannot have priority
+        CheckConstraint(
+            "(task_type != 'Epic' OR priority IS NULL)",
+            name="check_epic_priority_null"
         ),
     )
 
@@ -210,6 +250,8 @@ class Task(db.Model):
             "name": self.name,
             "description": self.description,
             "task_type": self.task_type,
+            "priority": self.priority,  # ✅ Include priority in API response
+            "epic_priority": self.epic_priority if self.task_type == "Epic" else None,  # ✅ Include only for epics
             "is_archived": self.is_archived,
             "completed": self.completed,
             "parent_id": self.parent_id,

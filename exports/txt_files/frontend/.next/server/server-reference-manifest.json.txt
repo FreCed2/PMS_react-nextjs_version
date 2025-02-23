@@ -1,5 +1,0 @@
-{
-  "node": {},
-  "edge": {},
-  "encryptionKey": "COPXbFPtnGJXpYIYBiD25FxpBWplPMeVqRhkGfmZOcM="
-}

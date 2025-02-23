@@ -9,11 +9,16 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_cors import CORS  # ✅ Import CORS
+from flask_socketio import SocketIO  # ✅ Import WebSockets
 from app.extensions.db import db
 from app.forms.forms import csrf
 from app.utils.logging_config import setup_logging
 from app.config import get_config
 from dotenv import load_dotenv
+
+# ✅ Ensure `async_mode` is set to "threading" for better compatibility
+socketio = SocketIO(cors_allowed_origins="*", async_mode="threading")  # ✅ WebSocket Initialization
+
 
 # Load environment variables from .env
 load_dotenv()
@@ -57,7 +62,12 @@ def create_app():
         # Initialize Flask extensions
         db.init_app(app)
         csrf.init_app(app)
+        socketio.init_app(app)  # ✅ Initialize WebSockets
+        
+        
+        # ✅ Register Flask-Migrate
         Migrate(app, db)
+
         #toolbar.init_app(app)
 
         # Enable CORS globally ✅
@@ -65,7 +75,9 @@ def create_app():
 
         # Import models AFTER db is initialized
         with app.app_context():
-            from app.models import Project, Contributor
+            from app.models.models import Project, Contributor
+            from app.tasks.models import Task
+            _ = Project, Contributor, Task  # ✅ Dummy usage to prevent IDE warnings
 
         # Set up logging
         logger = setup_logging()

@@ -1,3 +1,0 @@
-{
-  "/alltasks/page": "app/alltasks/page.js"
-}

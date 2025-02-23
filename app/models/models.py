@@ -26,8 +26,9 @@ class Project(db.Model):
 
     id = db.Column(Integer, primary_key=True)
     name = db.Column(String(100), unique=True, nullable=False)
-    start_date = db.Column(Date, nullable=False)
-    end_date = db.Column(Date, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    start_date = db.Column(db.Date, nullable=False, default=lambda: datetime.now(timezone.utc).date())  # ✅ Set default
+    end_date = db.Column(db.Date, nullable=False, default=lambda: datetime.now(timezone.utc).date())  # ✅ Set default
     scope = db.Column(db.Integer, nullable=True)
     completed_story_points = db.Column(Integer, default=0)
     created_at = db.Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
@@ -36,6 +37,27 @@ class Project(db.Model):
     #@staticmethod
     #def secondary_table():
     #   return get_project_contributor()
+    
+    @staticmethod
+    def ensure_miscellaneous_project():
+        """Ensure that a default 'Miscellaneous' project exists."""
+        misc_project = Project.query.filter_by(name="Miscellaneous").first()
+        if not misc_project:
+            # ✅ Set valid default dates (current UTC time)
+            now = datetime.now(timezone.utc)
+            misc_project = Project(
+                name="Miscellaneous",
+                description="Default project for uncategorized tasks",
+                start_date=datetime.now(timezone.utc).date(),  # ✅ Explicitly set start_date
+                end_date=datetime.now(timezone.utc).date(),     # ✅ Explicitly set end_date
+                scope=0,          # Default value if required
+                completed_story_points=0
+            )
+            db.session.add(misc_project)
+            db.session.commit()
+            logging.info("✅ 'Miscellaneous' project created.")
+            
+        return misc_project.id
     
     # Relationships
     @declared_attr
