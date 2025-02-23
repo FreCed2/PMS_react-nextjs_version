@@ -243,6 +243,14 @@ ALTER TABLE ONLY public.task
 
 
 --
+-- Name: task unique_task_name_per_parent; Type: CONSTRAINT; Schema: public; Owner: pythonproject_user
+--
+
+ALTER TABLE ONLY public.task
+    ADD CONSTRAINT unique_task_name_per_parent UNIQUE (name, parent_id);
+
+
+--
 -- Name: ix_task_completed; Type: INDEX; Schema: public; Owner: pythonproject_user
 --
 

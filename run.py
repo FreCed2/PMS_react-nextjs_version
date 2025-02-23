@@ -1,4 +1,4 @@
-from app import create_app
+from app import create_app, socketio
 from dotenv import load_dotenv
 import logging
 import os
@@ -21,4 +21,4 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     logger.addHandler(console_handler)
 
-    app.run(debug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)  # 🔥 WebSockets ar

@@ -108,13 +108,202 @@
     color: #111827; /* Gray-900 */
   }
 
-  .task-status-dropdown {
+  select.task-status-dropdown,
+  select.priority-dropdown,
+  select.contributor-dropdown {
     width: 8rem;
     height: 1.7rem;
     line-height: 1.0rem;
     font-size: 0.7rem;
     padding: 0.2rem 0.8rem 0.2rem 0.8rem;
     background-color: transparent;
-    border: 1px solid rgba(150,150,150,0.5);
+    border: 0px solid rgba(150,150,150,0.5);
   }
 
+  .task-modal {
+    padding: 1.5rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(150,150,150,0.3); /* Gray-300 */
+    color: #dddddd;
+    font-size: 1.1rem;
+    background: rgb(22, 23, 27, 0.8);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  }
+
+
+  
+
+  .modal-background {
+    background-color: rgba(255, 255, 255, 0.3)
+  }
+
+  .label {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    color: #d1d5db; 
+    border-radius: 0.55rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  input, textarea, optgroup, option {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(200,200,200,0.9);
+    background-color: #16171b;
+    color: #ffffff !important; /* Override default color */
+    font-size: 1.0rem;
+  }
+
+
+  select {
+    padding: 0.5rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(150,150,150,0.5);
+    background-color: rgba(28, 32, 53, 0.7);
+    color: #ffffff !important; /* Override default color */
+    font-size: 0.8rem;
+  }
+
+  select .select-project {
+    width: 80%;
+    padding: 0.5rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(150,150,150,0.5);
+    background-color: rgba(28, 32, 53, 0.7);
+    color: #ffffff !important; /* Override default color */
+    font-size: 1.1rem;
+  }
+
+/*---------------Task Type Dropdown-----------------*/
+
+  select.select-task-type,
+  select.select-status, 
+  select.select-contributor, 
+  select.select-project, 
+  select.select-assignee, 
+  select.select-priority {
+    width: 80%;
+    padding: 0.3rem 0.9rem !important;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(150,150,150,0.5);
+    font-size: 1.0rem;
+  }
+
+  /* ✅ Task Type Colors */
+.task-epic {
+  background-color: #7CE3FFFE;
+  color: black !important;
+}
+
+.task-userstory {
+  background-color: #2BADFE8B;
+  color: black;
+}
+
+.task-subtask {
+  background-color: #1C9DFD5D;
+  color: black;
+}
+
+/* ✅ Ensure Text is Visible */
+.task-epic, .task-userstory, .task-subtask {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+  select .select-task-status {
+    width: 80%;
+    padding: 0.5rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(150,150,150,0.5);
+    background-color: rgba(28, 32, 53, 0.7);
+    color: #ffffff !important; /* Override default color */
+    font-size: 1.1rem;
+  }
+
+/*---------------Task Status Dropdown-----------------*/
+
+/* ✅ Task Status Colors */
+.status-not-started {
+  background-color: #d3d3d3; /* Gray */
+  color: black;
+}
+
+.status-in-progress {
+  background-color: #ffcc00; /* Yellow */
+  color: black;
+}
+
+.status-blocked {
+  background-color: #ff4d4d; /* Red */
+  color: white;
+}
+
+.status-completed {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+/* ✅ Ensure Smooth Transition */
+.status-not-started, .status-in-progress, .status-blocked, .status-completed {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+  /*---------------Task Contributor Dropdown-----------------*/
+
+
+  .contributor-dropdown option {
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  .contributor-dropdown option.add {
+    color: #4CAF50; /* Green color for "Add to Project" */
+    font-weight: bold;
+  }
+  
+  .contributor-dropdown option.in-project {
+    color: #4A90E2; /* Blue color for "In Project" */
+  }
+
+  select .select-contributor {
+    width: 80%;
+    padding: 0.5rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(150,150,150,0.5);
+    background-color: rgba(28, 32, 53, 0.7);
+    color: #ffffff !important; /* Override default color */
+    font-size: 1.1rem;
+  }
+
+  button side-view-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.55rem;
+    background: transparent !important; /* Blue-600 */
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 1.6rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  /* ------Icons------ */
+
+  .bi bi-arrows-angle-expand {
+    color: #2563eb; /* Blue-600 */
+    font-size: 1.2rem !important;
+    padding-right: 1.5rem;
+    margin-right: 1.5rem;
+    text-decoration: none;
+  }
