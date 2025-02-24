@@ -46,18 +46,27 @@ export default function AllTasks() {
   // ✅ Fetch Contributors based on whether a project is selected
   useEffect(() => {
     if (!selectedProjectId) {
-      console.log("🔄 Fetching global contributors...");
-      fetch("http://127.0.0.1:5000/api/contributors")
+      console.log("🔄 Fetching all contributors...");
+      fetch("http://127.0.0.1:5000/api/contributors") // ✅ Updated API now includes projects array
         .then((res) => res.json())
         .then((data) => {
           if (!Array.isArray(data)) {
             console.error("❌ Contributors API response is not an array!", data);
             return;
           }
-          console.log("✅ Global Contributors loaded:", data);
-          setContributors(data);
+
+          // 🔹 Ensure `projects` is always an array
+          const cleanedData = data.map((c) => ({
+            ...c,
+            projects: Array.isArray(c.projects) ? c.projects : [], // Normalize `projects`
+          }));
+
+          console.log("✅ Global Contributors loaded:", cleanedData);
+          setContributors(cleanedData);
         })
-        .catch((error) => console.error("❌ Error fetching global contributors:", error));
+        .catch((error) =>
+          console.error("❌ Error fetching global contributors:", error)
+        );
     } else {
       console.log(`🔄 Fetching contributors for project ID ${selectedProjectId}...`);
       fetch(`http://127.0.0.1:5000/api/projects/${selectedProjectId}/contributors/manage`)
@@ -67,12 +76,22 @@ export default function AllTasks() {
             console.error("❌ Project Contributors API response is not an array!", data);
             return;
           }
+
           console.log(`✅ Contributors for project ${selectedProjectId} loaded:`, data);
-          setContributors(data);
+
+          // ✅ Ensure contributors have `is_in_project` properly flagged
+          const updatedData = data.map((c) => ({
+            ...c,
+            is_in_project: c.is_in_project ?? true, // Assume true since they are fetched for this project
+          }));
+
+          setContributors(updatedData);
         })
-        .catch((error) => console.error(`❌ Error fetching contributors for project ${selectedProjectId}:`, error));
+        .catch((error) =>
+          console.error(`❌ Error fetching contributors for project ${selectedProjectId}:`, error)
+        );
     }
-  }, [selectedProjectId]);  // ✅ Re-run when selectedProjectId changes
+  }, [selectedProjectId]); // ✅ Re-run when selectedProjectId changes
 
   // ✅ WebSocket: Listen for contributor updates
   useEffect(() => {
@@ -136,8 +155,21 @@ export default function AllTasks() {
           }
 
           const projectId = task.project_id;
+
+          // ✅ Fetch the current contributors of the task's project
           const contributorsResponse = await fetch(`http://127.0.0.1:5000/api/projects/${projectId}/contributors/manage`);
-          const projectContributors = await contributorsResponse.json();
+          let projectContributors = await contributorsResponse.json();
+
+          // ✅ Ensure projectContributors is an array
+          if (!Array.isArray(projectContributors)) {
+              console.error("❌ Error: API response for contributors is not an array!", projectContributors);
+              return;
+          }
+
+          console.log(`📡 Contributors in project ${projectId}:`, projectContributors);
+
+          // 🔴 LOG ISSUE: Is the contributor already in the list?
+          console.log(`🔍 Checking if Contributor ID ${newContributorId} is already in the project...`);
 
           // If contributor is NOT in the project, add them first
           if (!projectContributors.some(c => c.id === parseInt(newContributorId))) {
@@ -149,11 +181,26 @@ export default function AllTasks() {
                   body: JSON.stringify({ contributor_id: newContributorId }),
               });
 
-              // Fetch the updated project contributors after adding
+              // Refetch the updated project contributors after adding
               const updatedContributorsRes = await fetch(`http://127.0.0.1:5000/api/projects/${projectId}/contributors/manage`);
-              const updatedContributors = await updatedContributorsRes.json();
-              setContributors(updatedContributors);
+              const updatedContributors = await updatedContributorsRes.json();  // ✅ Correct variable name
+              console.log(`✅ Updated Contributors in project ${projectId}:`, updatedContributors);
+
+              // ✅ Update UI with latest contributors list
+              setContributors((prevContributors) => {
+                const updatedSet = new Set(updatedContributors.map(c => c.id));
+                return [
+                    ...prevContributors.filter(c => !updatedSet.has(c.id)), // Keep old contributors not in the new list
+                    ...updatedContributors.map((c) => ({
+                        ...c,
+                        is_in_project: c.is_in_project ?? false, // Ensure proper flagging
+                    })),
+                ];
+            });
           }
+
+          // 🔴 LOG ISSUE: Does the contributor exist in the state after update?
+          console.log("🔍 Updated contributor state: ", contributors);
 
           // Now assign the contributor to the task
           const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
@@ -618,7 +665,7 @@ export default function AllTasks() {
           {(provided) => (
             <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="group">
               <div
-                className="task-row grid grid-cols-[minmax(40px,60px)_minmax(40px,60px)_minmax(40px,60px)_minmax(250px,1fr)_minmax(50px,80px)_minmax(150px,200px)_minmax(130px,180px)_minmax(60px,100px)_minmax(100px,140px)_minmax(100px,140px)_minmax(130px,180px)_minmax(50px,80px)]
+                className="task-row grid grid-cols-[minmax(40px,60px)_minmax(40px,60px)_minmax(300px,1fr)_minmax(50px,80px)_minmax(150px,200px)_minmax(130px,180px)_minmax(60px,100px)_minmax(100px,140px)_minmax(100px,140px)_minmax(130px,180px)_minmax(50px,80px)]
                 gap-4 p-3 border-b border-gray-700 items-center hover:bg-gray-700 transition duration-200"
                 style={{ paddingLeft: `${depth * 20}px` }} // ✅ Indent Child Tasks
               >     
@@ -640,7 +687,7 @@ export default function AllTasks() {
                 </span>
 
                 {/* ✅ Task Type Icon */}
-                <span className="task-type-icon flex justify-center">
+                {/*<span className="task-type-icon flex justify-center">
                   {task.task_type === "Epic" ? (
                     <BookmarkIcon className="w-5 h-5 text-blue-400" />
                   ) : task.task_type === "User Story" ? (
@@ -648,7 +695,7 @@ export default function AllTasks() {
                   ) : (
                     <UserCircleIcon className="w-5 h-5 text-green-400" />
                   )}
-                </span>
+                </span>*/}
 
                 {/* ✅ Task Title */}
                 <span className="flex items-center relative w-full">
@@ -667,39 +714,46 @@ export default function AllTasks() {
                   </span>
                 </span>
 
-                <span className="">LM-{task.id}</span>
-                <span className="text-gray-400">{task.project}</span>
+                <span className="task-id">LM-{task.id}</span>
+                <span className="task-project">{task.project}</span>
                 {/* ✅ Contributor Dropdown inside Task List */}
                 <span className="text-center">
                 <select
                   name="contributor_id"
                   className="contributor-dropdown mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    value={task.contributor_id || ""}
-                    onChange={(e) => {
-                        if (!task.id) {
-                            console.error("🚨 Cannot assign contributor: Task ID is undefined!", taskData);
-                            return;
-                        }
-                        handleContributorChange(task.id, e.target.value);
-                    }}
+                  value={task.contributor_id || ""}
+                  onChange={(e) => {
+                    if (!task.id) {
+                      console.error("🚨 Cannot assign contributor: Task ID is undefined!", task);
+                      return;
+                    }
+                    handleContributorChange(task.id, e.target.value);
+                  }}
                 >
-                    <option value="">Unassigned</option>
-                    {contributors.map((c) => (
-                        <option key={c.id} value={c.id}>
-                            {c.name} {c.is_in_project ? "" : "➕ (Add to Project)"}
-                        </option>
-                    ))}
+                  <option value="">Unassigned</option>
+                  {contributors.map((c) => {
+                    const contributorProjects = Array.isArray(c.projects) ? c.projects : [];
+                    const taskProjectId = task.project_id ?? null;
+                    const isContributorInProject = contributorProjects.includes(taskProjectId);
+                    const isAssignedContributor = task.contributor_id === c.id; // ✅ Check if this contributor is assigned to the task
+
+                    return (
+                      <option key={c.id} value={c.id}>
+                        {c.name} {!isAssignedContributor && (isContributorInProject ? "✅ (In Project)" : "➕ (Add to Project)")}
+                      </option>
+                    );
+                  })}
                 </select>
                 </span>
-                <span className="text-center">{task.story_points || "-"}</span>
+                <span className="task-story-points text-center">{task.story_points || "-"}</span>
 
                 {/* ✅ Task Type Badge */}
-                <span className={`task-type-badge px-3 py-1 rounded text-center ${
+                <span className={`task-type-badge px-3 text-center ${
                   task.task_type === "Epic"
-                    ? "bg-blue-500"
+                    ? "epic-style"
                     : task.task_type === "User Story"
-                    ? "bg-purple-500"
-                    : "bg-green-500"
+                    ? "user-story-style"
+                    : "subtask-style"
                 }`}>
                   {task.task_type}
                 </span>
@@ -842,15 +896,15 @@ export default function AllTasks() {
       >
 
         {/* ✅ Header Row (Fixed Column Alignment) */}
-        <div className="grid grid-cols-[minmax(40px,60px)_minmax(40px,60px)_minmax(40px,60px)_minmax(250px,1fr)_minmax(50px,80px)_minmax(150px,200px)_minmax(130px,180px)_minmax(60px,100px)_minmax(100px,140px)_minmax(80px,140px)_minmax(90px,180px)_minmax(30px,80px)]
+        <div className="grid grid-cols-[minmax(40px,60px)_minmax(40px,60px)_minmax(250px,1fr)_minmax(50px,80px)_minmax(150px,200px)_minmax(130px,180px)_minmax(60px,100px)_minmax(100px,140px)_minmax(80px,140px)_minmax(90px,180px)_minmax(30px,80px)]
           gap-4 p-2 font-bold bg-gray-700 rounded-md text-white">
           <span className="text-center"><input type="checkbox" id="selectAll" /></span>
           <span className="">Toggle</span>
-          <span className="">Icon</span>
+          {/*<span className="">Icon</span>*/}
           <span className="text-left">Task Title</span>
           <span className="">ID</span>
           <span className="">Project</span>
-          <span className="text-center">Assigned To</span>
+          <span className="">Assigned To</span>
           <span className="text-center">Estimate</span>
           <span className="">Type</span>
           <span className="">Priority</span>
@@ -930,6 +984,29 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
   const pathname = usePathname();
 
   const [contributors, setContributors] = useState([]);
+
+  useEffect(() => {
+      if (!selectedTask || !selectedTask.project_id) {
+          console.warn("⚠️ TaskModal Warning: No selectedTask or project_id is undefined!", selectedTask);
+          return;
+      }
+
+      console.log(`🔄 Fetching contributors for project_id: ${selectedTask.project_id}`);
+
+      fetch(`http://127.0.0.1:5000/api/projects/${selectedTask.project_id}/contributors/manage`)
+          .then((res) => res.json())
+          .then((data) => {
+              if (!Array.isArray(data)) {
+                  console.error("❌ Project Contributors API response is not an array!", data);
+                  return;
+              }
+              console.log(`✅ Contributors loaded for project ${selectedTask.project_id}:`, data);
+              setContributors(data);
+          })
+          .catch((error) => console.error("❌ Error fetching contributors:", error));
+
+  }, [selectedTask?.project_id]); // ✅ Runs when `selectedTask.project_id` changes
+
   const [viewMode, setViewMode] = useState("modal");
 
   // ✅ Define scrollRef here
@@ -1256,7 +1333,7 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
           {/* ✅ Task Form */}
           <form className="mt-4 grid grid-cols-12 gap-4">
             {/* ✅ Left Column */}
-              <div className="col-span-9">
+              <div className="col-span-8">
                 <div className="mb-4">
                   <label className="label block text-sm font-medium text-gray-700">Task Title</label>
                   <input
@@ -1286,7 +1363,7 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
               </div>
 
               {/* ✅ Right Column */}
-              <div className="col-span-3 space-y-4 pl-6"> 
+              <div className="col-span-4 space-y-4 pl-6"> 
                 <div className="mb-4">
                   <label className="label block text-sm font-medium text-gray-700">Project</label>
                   <select
@@ -1417,11 +1494,23 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
                   onChange={(e) => handleContributorChange(taskData.id, e.target.value)}
                 >
                   <option value="">Unassigned</option>
-                  {contributors.map((contributor) => (
-                    <option key={contributor.id} value={contributor.id}>
-                      {contributor.name} {contributor.is_in_project ? "✅ (In Project)" : "➕ (Add to Project)"}
-                    </option>
-                  ))}
+                  {contributors.map((contributor) => {
+                      // Ensure projects is always an array
+                      const contributorProjects = Array.isArray(contributor.projects) ? contributor.projects : [];
+                      const isContributorInProject = contributorProjects.includes(taskData.project_id);
+                      const isAssignedContributor = taskData.contributor_id === contributor.id;
+
+                      console.log(
+                        `🔍 Checking Contributor ${contributor.name} (ID: ${contributor.id}): Assigned - ${isAssignedContributor}, In Project - ${isContributorInProject}`
+                      );
+
+                      return (
+                        <option key={contributor.id} value={contributor.id}>
+                            {contributor.name} 
+                            {!isAssignedContributor && (isContributorInProject ? "✅ (In Project)" : "➕ (Add to Project)")}
+                        </option>
+                      );
+                  })}
                 </select>
               </div>
             </div>

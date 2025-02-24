@@ -185,9 +185,14 @@ def manage_project_contributors(project_id):
             # ✅ Get contributors assigned to this project
             project_contributor_ids = {c.id for c in project.contributors}
 
-            # ✅ Prepare response with `is_in_project` flag
+            # ✅ Prepare response with `is_in_project` flag and `projects` array
             contributors = [
-                {"id": c.id, "name": c.name, "is_in_project": c.id in project_contributor_ids}
+                {
+                    "id": c.id,
+                    "name": c.name,
+                    "is_in_project": c.id in project_contributor_ids,
+                    "projects": [p.id for p in c.projects]  # ✅ List all project IDs
+                }
                 for c in all_contributors
             ]
 
@@ -287,8 +292,18 @@ def get_all_contributors():
     """
     try:
         all_contributors = Contributor.query.all()
-        contributors = [{"id": c.id, "name": c.name} for c in all_contributors]
+
+        contributors = [
+            {
+                "id": c.id,
+                "name": c.name,
+                "projects": [p.id for p in c.projects]  # ✅ Get all project IDs the contributor is assigned to
+            }
+            for c in all_contributors
+        ]
+
         return jsonify(contributors), 200
+    
     except Exception as e:
         return jsonify({"error": f"Failed to fetch contributors: {str(e)}"}), 500
 
