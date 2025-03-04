@@ -22,7 +22,7 @@ class Task(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    sort_order = db.Column(db.Integer, default=0)
+    sort_order = db.Column(db.Integer, nullable=False, default=0, index=True)
     description = db.Column(db.Text)
     task_type = db.Column(db.String(10), nullable=False, server_default='Subtask')
     
@@ -261,6 +261,7 @@ class Task(db.Model):
             "assigned_to": self.contributor.name if self.contributor else "Unassigned",
             "story_points": self.story_points if self.story_points is not None else 0,
             "status": self.status,  # ✅ Make sure this is included!
+            "sort_order": self.sort_order,  # ✅ Ensure sort_order is included
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -275,6 +276,27 @@ class Task(db.Model):
         """
         logger.info(f"Delegating hierarchy validation to TaskService for Task {self.id}")
         TaskService.validate_hierarchy(self)
+        
+    @staticmethod
+    def find_or_create_no_epic(project_id):
+        """
+        Ensures the 'No Epic' placeholder exists for the given project.
+        If it doesn't exist, create it.
+        """
+        logger.info(f"🟢 Checking if 'No Epic' exists for project {project_id}...")  # Step 1
+        
+        no_epic = Task.query.filter_by(name="No Epic", project_id=project_id, task_type="Epic").first()
+        if not no_epic:
+            logger.info(f"Creating 'No Epic' default Epic for project {project_id}...") # Step 2
+            no_epic = Task(name="No Epic", project_id=project_id, task_type="Epic", sort_order=0)
+            db.session.add(no_epic)
+            db.session.commit()
+            
+            logger.info(f"✅ 'No Epic' created with ID {no_epic.id}")  # Step 3
+        else:
+            logger.info(f"✅ 'No Epic' already exists with ID {no_epic.id}") # Step 3.a
+        
+        return no_epic
 
     
     def save(self):
@@ -286,10 +308,25 @@ class Task(db.Model):
         """
         try:
             logger.info(f"Saving task: {self}")
+
+            # ✅ Enforce task hierarchy validation
             self.validate_hierarchy()
+
+            # ✅ Assign orphaned User Stories to "No Epic"
+            if self.task_type == "User Story" and self.parent_id is None:
+                logger.info(f"Assigning orphaned User Story '{self.name}' (ID: {self.id}) to 'No Epic'.")
+                no_epic = Task.find_or_create_no_epic(self.project_id)
+                self.parent_id = no_epic.id
+
+            # ✅ Ensure sort order is set correctly for new tasks
+            if self.sort_order is None:
+                max_sort_order = db.session.query(func.coalesce(func.max(Task.sort_order), 0)).scalar()
+                self.sort_order = max_sort_order + 1
+
             db.session.add(self)
             db.session.commit()
             logger.info(f"Task saved successfully: {self}")
+
         except Exception as e:
             db.session.rollback()
             logger.error(f"Error saving task: {str(e)}")
@@ -298,20 +335,23 @@ class Task(db.Model):
     # Recursive Deletion Helper
     def delete_with_children(self, confirm=False):
         """
-        Deletes the task and optionally its children if 'confirm' is True.
+        Deletes the task and optionally its children.
+        If deleting an Epic, reassign its User Stories to 'No Epic'.
         """
+        if self.task_type == "Epic":
+            no_epic = Task.find_or_create_no_epic(self.project_id)
+            for child in self.children:
+                if child.task_type == "User Story":
+                    logger.info(f"Reassigning User Story '{child.name}' (ID: {child.id}) to 'No Epic'.")
+                    child.parent_id = no_epic.id
+                    db.session.add(child)
+
         if confirm:
             for child in self.children:
                 db.session.delete(child)
-                logger.info(f"Deleted child task: {child.id}")
         db.session.delete(self)
-        try:
-            db.session.commit()
-            logger.info(f"Deleted task: {self.id}")
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error deleting task {self.id}: {str(e)}")
-            raise e
+        db.session.commit()
+        logger.info(f"Deleted task: {self.id}")
     
     def archive(self):
         """Archives the task and its subtasks."""

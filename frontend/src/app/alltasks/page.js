@@ -5,6 +5,8 @@ import io from "socket.io-client"; // ✅ Import WebSocket client
 
 
 
+
+
 // import { useQuery } from 'react-query';
 import { debounce } from 'lodash';
 import { useParams, useRouter, usePathname } from "next/navigation"; // ✅ Navigation imports
@@ -20,12 +22,24 @@ import {
 import Card from "@/components/Card";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import TiptapEditor from "@/components/TiptapEditor"; // ✅ Import the Tiptap Editor
+import ParentTaskSelector from "@/components/ParentTaskSelector";
 import '../styles/custom.css';
 //import { useSession } from "next-auth/react"; // what is this for?
 
-const socket = io("http://127.0.0.1:5000"); // ✅ Connect to WebSocket server
+const socket = io("http://127.0.0.1:5000");
+window.socket = socket; // ✅ Expose socket globally for debugging
 
 export default function AllTasks() {
+
+  // 🔍 Debugging: Detect Page Reloads
+  useEffect(() => {
+    const reloadListener = () => console.trace("⛔ Page is reloading! Stack trace:");
+    window.addEventListener("beforeunload", reloadListener);
+
+    return () => window.removeEventListener("beforeunload", reloadListener);
+  }, []);
+  
   const [selectedTask, setSelectedTask] = useState(null); // ✅ Tracks currently selected task
   const [tasks, setTasks] = useState([]);
   const [contributors, setContributors] = useState([]);
@@ -41,6 +55,39 @@ export default function AllTasks() {
   });
   const [selectedProjectId, setSelectedProjectId] = useState("");  // ✅ Track default project
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // // ✅ Restore modal state from localStorage on component mount
+  // useEffect(() => {
+  //   const savedModalState = localStorage.getItem("isModalOpen");
+  //   if (savedModalState === "true") {
+  //     setIsModalOpen(true);
+  //     console.log("🔄 Restoring modal state from storage");
+  //   }
+  // }, []);
+
+  // // ✅ Save modal state to localStorage whenever it changes
+  // useEffect(() => {
+  //   localStorage.setItem("isModalOpen", isModalOpen);
+  // }, [isModalOpen]);
+
+  const [editingTaskId, setEditingTaskId] = useState(null); // Tracks the task being edited
+
+  const handleTitleClick = (taskId) => {
+    setEditingTaskId(taskId); // Activate edit mode
+  };
+
+  const handleTitleBlur = () => {
+    setEditingTaskId(null); // Exit edit mode when clicking outside
+  };
+
+  const handleTitleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setEditingTaskId(null); // Exit edit mode on Enter key press
+    }
+  };
+
+  const [isEditingNewTask, setIsEditingNewTask] = useState(false);
+  
   
 
   // ✅ Fetch Contributors based on whether a project is selected
@@ -119,23 +166,73 @@ export default function AllTasks() {
     };
   }, []);
 
-  // ✅ WebSocket: Listen for task updates (Contributors assigned to tasks)
+  // ✅ WebSocket: Listen for task updates (Handles ALL task field updates)
   useEffect(() => {
     socket.on("update_task", (updatedTask) => {
-      console.log("📡 WebSocket Update: Task Contributor Changed!", updatedTask);
+        console.log("📡 WebSocket Update: Task Updated!", updatedTask);
 
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === updatedTask.taskId
-            ? { ...task, contributor_id: updatedTask.contributor_id, contributor_name: updatedTask.contributor_name }
-            : task
-        )
-      );
+        setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+                task.id === updatedTask.taskId
+                    ? { ...task, [updatedTask.field]: updatedTask.value }
+                    : task
+            )
+        );
+
+        // ✅ Update task inside the modal if it's open
+        if (selectedTask && selectedTask.id === updatedTask.taskId) {
+            setSelectedTask((prev) => ({
+                ...prev,
+                [updatedTask.field]: updatedTask.value,
+            }));
+        }
     });
 
     return () => {
-      socket.off("update_task"); // ✅ Cleanup listener
+        socket.off("update_task"); // ✅ Cleanup listener on unmount
     };
+  }, [selectedTask]);
+
+  useEffect(() => {
+      socket.on("task_created", (newTask) => {
+          console.log("📡 WebSocket: New Task Created! Full Data:", newTask);
+          
+          // Check if task exists in payload
+          if (!newTask || !newTask.task || !newTask.task.id) {
+              console.error("🚨 Invalid WebSocket Task Data Received!", newTask);
+              return;
+          }
+
+          console.log("🔎 Task ID:", newTask.task.id, " Parent ID:", newTask.task.parent_id);
+
+          setTasks((prevTasks) => {
+              const updatedTasks = [...prevTasks, newTask.task].sort((a, b) => a.sort_order - b.sort_order);
+              console.log("🔄 Updated Task List from WebSocket:", updatedTasks);
+              return updatedTasks;
+          });
+
+          setFilteredTasks((prevFilteredTasks) => {
+              const updatedFilteredTasks = [...prevFilteredTasks, newTask.task].sort((a, b) => a.sort_order - b.sort_order);
+              return updatedFilteredTasks;
+          });
+
+          setExpandedTasks((prev) => ({
+              ...prev,
+              [newTask.task.parent_id]: true, // ✅ Keep parent expanded
+          }));
+
+          setTimeout(() => {
+              const inputField = document.getElementById(`task-title-${newTask.task.id}`);
+              if (inputField) {
+                  inputField.focus();
+                  inputField.select();
+              }
+          }, 100);
+      });
+
+      return () => {
+          socket.off("task_created");
+      };
   }, []);
 
   // Automatically Refetch Contributors When Project Changes
@@ -222,6 +319,14 @@ export default function AllTasks() {
                       : task
               )
           );
+
+          // ✅ Update `selectedTask` in TaskModal immediately
+          setSelectedTask((prevTask) => ({
+              ...prevTask,
+              contributor_id: newContributorId,
+              contributor_name: updatedTask.task.contributor_name,
+          }));
+
 
           // ✅ WebSocket: Notify all clients about the change
           socket.emit("update_task", {
@@ -405,109 +510,494 @@ export default function AllTasks() {
     }
   }, [projects, selectedProjectId]);
 
-  const handleFieldChange = useCallback(async (taskId, field, value) => {
-    console.log(`📌 Row 210 - Step 21: handleFieldChange called with taskId: ${taskId}, field: '${field}', value: '${value}'`);
 
-    if (!taskId) {
-        console.error("🚨 Error: taskId is undefined or null!");
-        return;
-    }
+  // Handles the creation of a new task under a parent task
+  const handleCreateTask = async (parentId, taskType) => {
+      console.log(`🛠️ Creating new ${taskType} under parent ${parentId}`);
+
+      const newTaskTitle = "New Subtask"; // Default title
+      setIsEditingNewTask(false); // Reset edit flag
+
+      const taskPayload = {
+          title: taskType === "User Story" ? "New User Story" : "New Subtask",
+          task_type: taskType,
+          parent_id: parentId,
+          project_id: selectedProjectId,
+      };
+
+      console.log("📡 Sending Task Payload:", JSON.stringify(taskPayload, null, 2));
+
+      try {
+          const response = await fetch("http://127.0.0.1:5000/api/tasks", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(taskPayload),
+          });
+
+          console.log("📩 API Response Status:", response.status);
+
+          if (!response.ok) {
+              const errorText = await response.text();
+              console.error("🚨 Task creation failed! API Response:", errorText);
+              throw new Error(`Task creation failed - ${errorText}`);
+          }
+
+          const newTask = await response.json();
+          console.log("✅ Task created successfully:", newTask);
+
+          // 🔹 Keep Parent Task Expanded
+          setExpandedTasks((prev) => ({
+              ...prev,
+              [parentId]: true, // ✅ Keep parent expanded
+          }));
+
+          // 🔹 Add New Task to the UI at the End of Its Parent
+          setTasks((prevTasks) => {
+            return prevTasks.map((task) => {
+              if (task.id === newTask.task.parent_id) {
+                return {
+                  ...task,
+                  children: [...(task.children || []), { ...newTask.task, project_id: task.project_id }],
+                };
+              }
+              return task;
+            });
+          });
+
+          // ✅ Ensure new task is in edit mode
+          setEditingTaskId(newTask.task.id);
+          setIsEditingNewTask(true);
+            
+          setFilteredTasks((prevFilteredTasks) => {
+              const updatedFilteredTasks = [...prevFilteredTasks, newTask.task];
+              console.log("🔄 Updated Filtered Task List:", updatedFilteredTasks);
+              return updatedFilteredTasks;
+          });
+
+          // 🔹 Emit WebSocket Event to Inform Other Clients
+          socket.emit("task_created", newTask.task);
+
+          // 🔹 Automatically Focus and Select the Task Title for Editing
+          setTimeout(() => {
+
+          //  const newTaskElement = document.querySelector(`[data-task-id="${newTask.task.id}"]`);
+              const inputField = document.getElementById(`task-title-${newTask.task.id}`);
+              if (inputField) {
+                  inputField.focus();
+                  inputField.select();
+              }
+          }, 100);
+
+      } catch (error) {
+          console.error("❌ Error creating task:", error);
+      }
+  };
+
+  const handleTitleChange = async (taskId, newTitle) => {
+      console.log(`📌 Updating title for task ${taskId} -> ${newTitle}`);
+      
+      setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+              task.id === taskId ? { ...task, name: newTitle } : task
+          )
+      );
+
+      try {
+          const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: newTitle }),
+          });
+
+          if (!response.ok) throw new Error("Failed to update task title");
+          console.log(`✅ Task ${taskId} title updated successfully!`);
+      } catch (error) {
+          console.error(`❌ Error updating task ${taskId} title:`, error);
+      }
+  };
+
+
+// Old version of handleFieldChange
+  // const handleFieldChange = useCallback(async (taskId, field, value) => {
+  //   console.log(`📌 Row 210 - Step 21: handleFieldChange called with taskId: ${taskId}, field: '${field}', value: '${value}'`);
+
+  //   if (!taskId) {
+  //       console.error("🚨 Error: taskId is undefined or null!");
+  //       return;
+  //   }
     
-    const taskToUpdate = tasks.find(task => task.id === taskId);
-    console.log("🔍 row 218-Step 22: Checking if task exists in local state:", taskToUpdate);
+  //   const taskToUpdate = tasks.find(task => task.id === taskId);
+  //   console.log("🔍 row 218-Step 22: Checking if task exists in local state:", taskToUpdate);
 
-    if (!taskToUpdate || taskToUpdate[field] === value) {
-        console.warn(`⚠️ row 221-Step 23: No changes detected for ${field}, skipping API call.`);
-        return;
-    }
+  //   if (!taskToUpdate || taskToUpdate[field] === value) {
+  //       console.warn(`⚠️ row 221-Step 23: No changes detected for ${field}, skipping API call.`);
+  //       return;
+  //   }
     
-    // ✅ Update `taskData` immediately to reflect UI changes before API call
-    setTaskData((prevTaskData) => ({
-      ...prevTaskData,
-      [field]: value,
-    }));
+  //   // ✅ Update `taskData` immediately to reflect UI changes before API call
+  //   setTaskData((prevTaskData) => ({
+  //     ...prevTaskData,
+  //     [field]: value,
+  //   }));
 
-    try {
-        const payload = { [field]: value };
-        console.log("📡 Step 24: Sending update to API for", field);
-        const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
-            method: "PATCH",
+  //   try {
+  //       const payload = { [field]: value };
+  //       console.log("📡 Step 24: Sending update to API for", field);
+  //       const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+  //           method: "PATCH",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify(payload),
+  //       });
+
+        
+  //       if (!response.ok) {
+  //           console.error("🚨 Step 26: API Error - Response not OK", response.status);
+  //           const errorText = await response.text();
+  //           throw new Error(`Failed to update ${field}: HTTP ${errorText}`);
+  //       }
+
+  //       const responseData = await response.json();
+  //       console.log("📩 Step 25: API Response Received:", responseData);
+
+  //       console.log(`✅ Step 27: Successfully updated '${field}' for Task ${taskId} to '${value}'`);
+
+  //       // ✅ Emit WebSocket Event for Real-Time Updates (for description, title, status and sort order changes)
+  //       const fieldsToBroadcast = ["title", "description", "status", "sort_order"];
+  //       if (fieldsToBroadcast.includes(field)) {
+  //           console.log(`📡 Emitting WebSocket event for '${field}' update...`);
+  //           socket.emit("update_task", { taskId, field, value });
+  //       }
+
+  //       // ✅ Handle Project Update (Ensure Project Name is Reflected)
+  //       let updatedProjectName = taskToUpdate.project;
+  //       if (field === "project_id") {
+  //           console.log("📌 Step 28: Checking project name for project_id:", value);
+  //           console.log("📌 Current projects state:", projects);
+            
+  //           if (!Array.isArray(projects)) {
+  //               console.error("🚨 projects is not an array!", projects);
+  //           }
+        
+  //           const updatedProject = projects.find((p) => p.id === parseInt(value, 10));
+  //           updatedProjectName = updatedProject ? updatedProject.name : "Unknown Project";
+
+  //           console.log(`✅ Step 29: Updated project name: ${updatedProjectName}`);
+  //       }
+
+  //       // ✅ Handle Contributor Updates - Ensure Contributor Name is Reflected
+  //       let updatedContributorId = taskToUpdate.contributor_id;
+  //       let updatedContributorName = taskToUpdate.contributor_name;
+  //       if (field === "contributor_id") {
+  //           updatedContributorId = responseData?.task?.contributor_id || value;
+  //           updatedContributorName = responseData?.task?.contributor_name || "Unassigned";
+  //       }
+
+  //       // ✅ Update Local Task State in `tasks` array
+  //       console.log("🔄 Step 29: Updating local state with new values...");
+  //       setTasks((prevTasks) =>
+  //           prevTasks.map((task) =>
+  //               task.id === taskId 
+  //                   ? { 
+  //                       ...task,
+  //                       [field]: value,
+  //                       ...(field === "project_id" && { project: updatedProjectName }),
+  //                       ...(field === "contributor_id" && {
+  //                           contributor_id: updatedContributorId,
+  //                           contributor_name: updatedContributorName,
+  //                       }),
+  //                     } 
+  //                   : task
+  //           )
+  //       );
+
+  //       // ✅ If the modal is open for this task, update `selectedTask` as well
+  //       if (selectedTask && selectedTask.id === taskId) {
+  //           console.log("🔄 Step 31: Updating selectedTask state in modal...");
+  //           setSelectedTask((prev) => ({
+  //               ...prev, 
+  //               [field]: value,
+  //               ...(field === "project_id" && { project: updatedProjectName }),
+  //               ...(field === "contributor_id" && {
+  //                   contributor_id: updatedContributorId,
+  //                   contributor_name: updatedContributorName,
+  //               }),
+  //           }));
+  //       }
+
+  //   } catch (error) {
+  //       console.error(`🚨 Step 31: Error updating ${field}:`, error);
+  //   }
+  // }, [projects, selectedTask, tasks]);
+
+
+  // -----------------Backup of old version, changed to new version 4 march 15:30-----------------
+
+
+  // Backup of old version, changed to new version 4 march 15:30 
+  //  ✅ Debounce the handleFieldChange function (Replaces the old handleFieldChange function)
+  // const debouncedSaveRef = useRef(
+  //   debounce(
+  //     async (taskId, field, value, tasks, projects, selectedTask, setTasks, setSelectedTask, socket) => {
+  //       console.log(`📌 Debounced Save Triggered for Task ${taskId}: ${field} → ${value}`);
+  
+  //       if (!taskId) {
+  //         console.error("🚨 Error: taskId is undefined or null!");
+  //         return;
+  //       }
+  
+  //       const taskToUpdate = tasks.find(task => task.id === taskId);
+  //       if (!taskToUpdate) {
+  //         console.error("❌ Error: Task not found in state!", { taskId, field, value });
+  //         return;
+  //       }
+
+  //       if (!taskToUpdate || taskToUpdate[field] === value) {
+  //         console.warn(`⚠️ No actual change detected for '${field}', skipping save.`);
+  //         return;
+  //       }
+
+  //       // 🔥 **NEW: Ensure `parent_id` is included in the update to maintain hierarchy**
+  //       const updatedTaskData = {
+  //         [field]: value,
+  //         parent_id: taskToUpdate.parent_id ?? null,  // ✅ Preserve parent_id if it exists
+  //       };
+  
+  //       // ✅ Optimistic UI Update
+  //       setTaskData(prev => ({ ...prev, [field]: value }));
+  
+  //       try {
+  //         const payload = { [field]: value };
+  //         console.log("📡 Sending update to API for", field);
+  //         console.log("📡 Sending update to API with payload:", updatedTaskData);
+        
+  //         const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+  //           method: "PATCH",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify(payload),
+  //         });
+  
+  //         if (!response.ok) {
+  //           console.error("🚨 API Error:", response.status);
+  //           throw new Error(`Failed to update ${field}`);
+  //         }
+  
+  //         const responseData = await response.json();
+  //         console.log(`✅ Successfully updated '${field}' for Task ${taskId}`);
+  
+  //         // ✅ WebSocket Update - Only Broadcast if it's an important field
+  //         const fieldsToBroadcast = ["title", "description", "status", "sort_order"];
+  //         if (fieldsToBroadcast.includes(field)) {
+  //           console.log(`📡 Emitting WebSocket update for '${field}'`);
+  //           socket.emit("update_task", { taskId, field, value });
+  //         }
+  
+  //         // ✅ Handle Project Update (Ensure Project Name is Reflected)
+  //         let updatedProjectName = taskToUpdate.project;
+  //         if (field === "project_id") {
+  //           console.log("📌 Checking project name for project_id:", value);
+  //           const updatedProject = projects.find((p) => p.id === parseInt(value, 10));
+  //           updatedProjectName = updatedProject ? updatedProject.name : "Unknown Project";
+  //           console.log(`✅ Updated project name: ${updatedProjectName}`);
+  //         }
+  
+  //         // ✅ Handle Contributor Updates - Ensure Contributor Name is Reflected
+  //         let updatedContributorId = taskToUpdate.contributor_id;
+  //         let updatedContributorName = taskToUpdate.contributor_name;
+  //         if (field === "contributor_id") {
+  //           updatedContributorId = responseData?.task?.contributor_id || value;
+  //           updatedContributorName = responseData?.task?.contributor_name || "Unassigned";
+  //         }
+  
+  //         // ✅ Update Local Task State in `tasks` array
+  //         console.log("🔄 Updating local state with new values...");
+  //         setTasks(prevTasks =>
+  //           prevTasks.map(task =>
+  //             task.id === taskId
+  //               ? {
+  //                   ...task,
+  //                   [field]: value,
+  //                   ...(field === "project_id" && { project: updatedProjectName }),
+  //                   ...(field === "contributor_id" && {
+  //                     contributor_id: updatedContributorId,
+  //                     contributor_name: updatedContributorName,
+  //                   }),
+  //                 }
+  //               : task
+  //           )
+  //         );
+  
+  //         // ✅ If the modal is open for this task, update `selectedTask` as well
+  //         if (selectedTask && selectedTask.id === taskId) {
+  //           console.log("🔄 Updating selectedTask state in modal...");
+  //           setSelectedTask(prev => ({
+  //             ...prev,
+  //             [field]: value,
+  //             parent_id: taskToUpdate.parent_id, // ✅ Ensure parent_id remains intact in modal
+  //             ...(field === "project_id" && { project: updatedProjectName }),
+  //             ...(field === "contributor_id" && {
+  //               contributor_id: updatedContributorId,
+  //               contributor_name: updatedContributorName,
+  //             }),
+  //           }));
+  //         }
+  //       } catch (error) {
+  //         console.error(`🚨 Error updating ${field}:`, error);
+  //       }
+  //     },
+  //     1000 // ✅ Debounce delay of 1000ms
+  //   )
+  // );
+
+  //---------------------New version of debouncedSavRef since 4 march 15:30---------------------//
+
+  const debouncedSaveRef = useRef(
+    debounce(
+      async (taskId, field, value, tasks, projects, selectedTask, setTasks, setSelectedTask, socket) => {
+        console.log(`📌 Debounced Save Triggered for Task ${taskId}: ${field} → ${value}`);
+  
+        if (!taskId) {
+          console.error("🚨 Error: taskId is undefined or null!");
+          return;
+        }
+  
+        const taskToUpdate = tasks.find(task => task.id === taskId);
+        if (!taskToUpdate) {
+          console.error("❌ Error: Task not found in state!", { taskId, field, value });
+          return;
+        }
+  
+        if (!taskToUpdate || taskToUpdate[field] === value) {
+          console.warn(`⚠️ No actual change detected for '${field}', skipping save.`);
+          return;
+        }
+  
+        // ✅ Check if we're updating the parent task
+        const isParentUpdate = field === "parent_id";
+  
+        // ✅ Choose correct API URL
+        const apiUrl = isParentUpdate
+          ? `http://127.0.0.1:5000/api/tasks/${taskId}/parent`  // 🔥 Dedicated parent update route
+          : `http://127.0.0.1:5000/api/tasks/${taskId}`;        // 🔥 General update route
+  
+        // ✅ Format payload correctly
+        const payload = isParentUpdate
+          ? { new_parent_id: value || null }  // 🔥 Ensure correct structure for parent updates
+          : { [field]: value };
+  
+        try {
+          console.log(`📡 Sending update to API: ${apiUrl}`, payload);
+  
+          const response = await fetch(apiUrl, {
+            method: "PATCH",  // 🔥 Always use PATCH
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
-        });
-
-        
-        if (!response.ok) {
-            console.error("🚨 Step 26: API Error - Response not OK", response.status);
-            const errorText = await response.text();
-            throw new Error(`Failed to update ${field}: HTTP ${errorText}`);
-        }
-
-        const responseData = await response.json();
-        console.log("📩 Step 25: API Response Received:", responseData);
-
-        console.log(`✅ Step 27: Successfully updated '${field}' for Task ${taskId} to '${value}'`);
-
-        // ✅ Handle Project Update (Ensure Project Name is Reflected)
-        let updatedProjectName = taskToUpdate.project;
-        if (field === "project_id") {
-            console.log("📌 Step 28: Checking project name for project_id:", value);
-            console.log("📌 Current projects state:", projects);
-            
-            if (!Array.isArray(projects)) {
-                console.error("🚨 projects is not an array!", projects);
+          });
+  
+          if (!response.ok) {
+            console.error("🚨 API Error:", response.status);
+            throw new Error(`Failed to update ${field}`);
+          }
+  
+          const responseData = await response.json();
+          console.log(`✅ Successfully updated '${field}' for Task ${taskId}`);
+  
+          // ✅ WebSocket Update (Different event for parent updates)
+          if (isParentUpdate) {
+            console.log("📡 Emitting WebSocket event: task_parent_updated");
+            socket.emit("task_parent_updated", { taskId, new_parent_id: value || null });
+          } else {
+            const fieldsToBroadcast = ["title", "description", "status", "sort_order"];
+            if (fieldsToBroadcast.includes(field)) {
+              console.log(`📡 Emitting WebSocket update for '${field}'`);
+              socket.emit("update_task", { taskId, field, value });
             }
-        
-            const updatedProject = projects.find((p) => p.id === parseInt(value, 10));
-            updatedProjectName = updatedProject ? updatedProject.name : "Unknown Project";
-
-            console.log(`✅ Step 29: Updated project name: ${updatedProjectName}`);
-        }
-
-        // ✅ Handle Contributor Updates - Ensure Contributor Name is Reflected
-        let updatedContributorId = taskToUpdate.contributor_id;
-        let updatedContributorName = taskToUpdate.contributor_name;
-        if (field === "contributor_id") {
-            updatedContributorId = responseData?.task?.contributor_id || value;
-            updatedContributorName = responseData?.task?.contributor_name || "Unassigned";
-        }
-
-        // ✅ Update Local Task State in `tasks` array
-        console.log("🔄 Step 29: Updating local state with new values...");
-        setTasks((prevTasks) =>
-            prevTasks.map((task) =>
-                task.id === taskId 
-                    ? { 
-                        ...task,
-                        [field]: value,
-                        ...(field === "project_id" && { project: updatedProjectName }),
-                        ...(field === "contributor_id" && {
-                            contributor_id: updatedContributorId,
-                            contributor_name: updatedContributorName,
-                        }),
-                      } 
-                    : task
+          }
+  
+          // ✅ Handle Project Update (ONLY for project_id changes)
+          let updatedProjectName = taskToUpdate.project;
+          let updatedContributorId = taskToUpdate.contributor_id;
+          let updatedContributorName = taskToUpdate.contributor_name;
+  
+          if (!isParentUpdate) {  // 🔥 Ensure these updates are skipped for parent_id changes
+            if (field === "project_id") {
+              console.log("📌 Checking project name for project_id:", value);
+              const updatedProject = projects.find((p) => p.id === parseInt(value, 10));
+              updatedProjectName = updatedProject ? updatedProject.name : "Unknown Project";
+              console.log(`✅ Updated project name: ${updatedProjectName}`);
+            }
+  
+            // ✅ Handle Contributor Updates - Ensure Contributor Name is Reflected
+            if (field === "contributor_id") {
+              updatedContributorId = responseData?.task?.contributor_id || value;
+              updatedContributorName = responseData?.task?.contributor_name || "Unassigned";
+            }
+          }
+  
+          // ✅ Update Local State in `tasks`
+          setTasks(prevTasks =>
+            prevTasks.map(task =>
+              task.id === taskId
+                ? {
+                    ...task,
+                    [field]: value,
+                    ...(field === "project_id" && { project: updatedProjectName }),
+                    ...(field === "contributor_id" && {
+                      contributor_id: updatedContributorId,
+                      contributor_name: updatedContributorName,
+                    }),
+                  }
+                : task
             )
-        );
-
-        // ✅ If the modal is open for this task, update `selectedTask` as well
-        if (selectedTask && selectedTask.id === taskId) {
-            console.log("🔄 Step 31: Updating selectedTask state in modal...");
-            setSelectedTask((prev) => ({
-                ...prev, 
-                [field]: value,
-                ...(field === "project_id" && { project: updatedProjectName }),
-                ...(field === "contributor_id" && {
-                    contributor_id: updatedContributorId,
-                    contributor_name: updatedContributorName,
-                }),
+          );
+  
+          // ✅ Ensure modal state updates correctly
+          if (selectedTask?.id === taskId) {
+            setSelectedTask(prev => ({
+              ...prev,
+              [field]: value,
+              ...(field === "project_id" && { project: updatedProjectName }),
+              ...(field === "contributor_id" && {
+                contributor_id: updatedContributorId,
+                contributor_name: updatedContributorName,
+              }),
             }));
+          }
+  
+        } catch (error) {
+          console.error(`🚨 Error updating ${field}:`, error);
         }
+      },
+      1000 // ✅ Debounce delay of 1000ms
+    )
+  );
+  
+  // ✅ Ensure `handleFieldChange` correctly triggers debounced save with parent_id
+  const handleFieldChange = useCallback((taskId, field, value) => {
+    debouncedSaveRef.current(taskId, field, value, tasks, projects, selectedTask, setTasks, setSelectedTask, socket);
+  }, [tasks, projects, selectedTask]);
 
+  const saveParentAssignment = async () => {
+    const payload = {
+      task_type: taskData.task_type,  // ✅ Needed for validation
+      task_id: taskData.id,  // ✅ Task being updated
+      parent_id: taskData.parent_id,  // ✅ New parent task
+      project_id: taskData.project_id,  // ✅ Ensure project consistency
+    };
+  
+    try {
+      const response = await fetch(`/api/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "include",
+      });
+  
+      if (!response.ok) throw new Error("Failed to assign parent task");
+      console.log("✅ Parent task assigned successfully!");
     } catch (error) {
-        console.error(`🚨 Step 31: Error updating ${field}:`, error);
+      console.error("Error assigning parent task:", error);
     }
-  }, [projects, selectedTask, tasks]);
+  };
   
   const handleDeleteTask = async (taskId) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
@@ -635,25 +1125,328 @@ export default function AllTasks() {
     setSelectedTask(null);
   };
 
-  
+  // // ✅ Function to Get CSRF Token from Cookies
+  // const getCsrfToken = async () => {
+  //     let csrfToken = document.cookie
+  //         .split('; ')
+  //         .find(row => row.startsWith('csrftoken='))
+  //         ?.split('=')[1];
 
+  //     if (!csrfToken) {
+  //         console.warn("🚨 CSRF token is missing in cookies! Trying to fetch...");
+  //         try {
+  //             const res = await fetch("http://127.0.0.1:5000/api/csrf", {
+  //                 method: "GET",
+  //                 //credentials: "include",
+  //             });
+  //             const data = await res.json();
+  //             csrfToken = data.csrf_token;
+  //         } catch (error) {
+  //             console.error("❌ Failed to fetch CSRF token:", error);
+  //         }
+  //     }
+
+  //     console.log("✅ CSRF Token:", csrfToken);
+  //     return csrfToken;
+  // };
+
+  // Version 1
   // ✅ Drag & Drop Handler
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
+  // const handleDragEnd = async (result) => {
+  //   if (!result.destination) return;
 
-    const reorderedTasks = Array.from(filteredTasks);
-    const [movedTask] = reorderedTasks.splice(result.source.index, 1);
-    reorderedTasks.splice(result.destination.index, 0, movedTask);
+  //   const movedTask = filteredTasks[result.source.index];
+  //   const targetTask = filteredTasks[result.destination.index];
 
-    setFilteredTasks(reorderedTasks);
+  //   if (!movedTask || !movedTask.id) {
+  //       console.error("❌ ERROR: movedTask is undefined or missing an ID!", movedTask);
+  //       return;
+  //   }
+
+  //   console.log("🟢 Drag Event:", result);
+  //   console.log("📡 Moved Task ID:", movedTask.id);
+  //   console.log("📌 New Order Index (Destination):", result.destination.index);
+
+    
+  //   // reorderedTasks.splice(result.destination.index, 0, movedTask);
+  //   // setFilteredTasks(reorderedTasks);
+
+  //   // // Step 2: Fetch CSRF Token
+  //   // const csrfToken = await getCsrfToken();
+    
+  //   // if (!csrfToken) {
+  //   //     console.error("🚨 No CSRF token found! Aborting API call.");
+  //   //     return;
+  //   // }
+
+  //   // Step 3: Send API Request to Persist Sorting
+  //   try {
+  //     let response;
+
+  //     if (result.destination.droppableId !== result.source.droppableId) {
+  //       if (!targetTask) {
+  //           console.error("❌ ERROR: targetTask is missing for parent update!", result);
+  //           return;
+  //       }
+    
+  //       console.log(`🔄 Moving task ${movedTask.id} inside new parent ${targetTask.id}`);
+    
+  //       response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/parent`, {
+  //           method: "PUT",
+  //           headers: { "Content-Type": "application/json" },
+  //           credentials: "include",
+  //           body: JSON.stringify({ new_parent_id: targetTask.id }),
+  //       });
+
+  //       } else {
+  //           // ✅ Reordering task within the same hierarchy
+  //           response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/sort`, {
+  //               method: "PUT",
+  //               headers: { "Content-Type": "application/json" },
+  //               credentials: "include",
+  //               body: JSON.stringify({ new_order_index: result.destination.index }),
+  //           });
+  //       }
+
+  //       if (!response.ok) {
+  //           // const errorText = await response.text();
+  //           throw new Error(`HTTP error! Status: ${response.status}`);
+  //       }
+
+  //       const data = await response.json();
+  //       console.log("✅ Task sorting updated successfully:", data);
+
+  //       socket.emit("task_sorted", {
+  //           taskId: movedTask.id,
+  //           new_order_index: result.destination.index,
+  //           new_parent_id: movedTask.parent_id, // Ensures correct hierarchy updates
+  //       });
+
+  //       // ✅ Fetch updated tasks after sorting/moving
+  //       const updatedTasksResponse = await fetch("http://localhost:5000/api/tasks");
+  //       const updatedTasks = await updatedTasksResponse.json();
+  //       setFilteredTasks(updatedTasks.tasks);
+
+  //   } catch (error) {
+  //       console.error("❌ Error updating task sorting:", error);
+  //   }
+  // };
+
+  //Version 2
+  // // ✅ Drag & Drop Handler
+  // const handleDragEnd = async (result) => {
+  //   console.log("🟢 Step 1: Drag & Drop Event Triggered:", result);
+
+  //   if (!result.destination) 
+  //     console.log("⚠️ Step 2.a: No valid destination. Drag event ignored.");
+  //     return;
+
+
+
+  //   const movedTask = filteredTasks[result.source.index];
+  //   const targetTask = filteredTasks[result.destination.index];
+
+  //   if (!movedTask || !movedTask.id) {
+  //       console.error("❌ ERROR: movedTask is undefined or missing an ID!", movedTask);
+  //       return;
+  //   }
+
+  //   console.log("📢 Drag & Drop Event:", result);
+  //   console.log("📦 Moved Task:", movedTask);
+  //   console.log("🎯 Target Task:", targetTask);
+  //   console.log("📍 Destination Index:", result.destination.index);
+  //   console.log("🔄 Parent Change:", result.destination.droppableId !== result.source.droppableId);
+
+  //   // ✅ Optimistically update UI BEFORE API request
+  //   setFilteredTasks((prevTasks) => {
+  //       const updatedTasks = [...prevTasks];
+  //       updatedTasks.splice(result.source.index, 1); // Remove moved task
+  //       updatedTasks.splice(result.destination.index, 0, movedTask); // Insert in new position
+  //       return updatedTasks;
+  //   });
+
+  //   try {
+  //       let response;
+
+  //       // ✅ Check if the task is moved inside another (Parent Change)
+  //       if (result.destination.droppableId !== result.source.droppableId) {
+  //           if (!targetTask) {
+  //               console.error("❌ ERROR: targetTask is missing for parent update!", result);
+  //               return;
+  //           }
+
+  //           // Prevent invalid parent assignments
+  //           if (movedTask.task_type === "User Story" && targetTask.task_type !== "Epic") {
+  //             alert("A User Story can only be assigned to an Epic.");
+  //             return;
+  //           }
+  //           if (movedTask.task_type === "Subtask" && targetTask.task_type !== "User Story") {
+  //               alert("A Subtask can only be assigned to a User Story.");
+  //               return;
+  //           }
+
+  //           console.log(`🔄 Moving task ${movedTask.id} inside new parent ${targetTask.id}`);
+
+  //           response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/parent`, {
+  //               method: "PUT",
+  //               headers: { "Content-Type": "application/json" },
+  //               credentials: "include",
+  //               body: JSON.stringify({ new_parent_id: targetTask.id }),
+  //           });
+
+  //       } else {
+  //           // ✅ Reordering task within the same hierarchy
+  //           console.log(`🔄 Reordering task ${movedTask.id} to new index ${result.destination.index}`);
+
+  //           response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/sort`, {
+  //               method: "PUT",
+  //               headers: { "Content-Type": "application/json" },
+  //               credentials: "include",
+  //               body: JSON.stringify({ new_order_index: result.destination.index }),
+  //           });
+  //       }
+
+  //       if (!response.ok) {
+  //           throw new Error(`HTTP error! Status: ${response.status}`);
+  //       }
+
+  //       const data = await response.json();
+  //       console.log("✅ Task sorting updated successfully:", data);
+
+  //       // ✅ Emit WebSocket event for real-time update
+  //       socket.emit("task_sorted", {
+  //           taskId: movedTask.id,
+  //           new_order_index: result.destination.index,
+  //           new_parent_id: movedTask.parent_id, // Ensures correct hierarchy updates
+  //       });
+
+  //       // ✅ Fetch updated tasks after sorting/moving
+  //       const updatedTasksResponse = await fetch("http://localhost:5000/api/tasks");
+  //       const updatedTasks = await updatedTasksResponse.json();
+  //       setFilteredTasks(updatedTasks.tasks);
+
+  //   } catch (error) {
+  //       console.error("❌ Error updating task sorting:", error);
+  //   }
+  // };
+
+  // Version 3
+  // ✅ Drag & Drop Handler with Detailed Execution Steps
+  const handleDragEnd = async (result) => {
+    console.log("🟢 Step 1: Drag & Drop Event Triggered:", result);
+
+    // ✅ Step 2: Check if there’s a valid destination
+    if (!result.destination) {  
+        console.log("⚠️ Step 2.a: No valid destination. Drag event ignored.");
+        return;
+    }
+    console.log("✅ Step 2.b: Valid destination found, proceeding...");
+
+    // ✅ Step 3: Identify Moved & Target Task
+    const movedTask = filteredTasks[result.source.index];
+    const targetTask = filteredTasks[result.destination.index];
+
+    console.log("📦 Step 3.a: Moved Task:", movedTask);
+    console.log("🎯 Step 3.b: Target Task:", targetTask || "None (Reordering in same list)");
+
+    // ✅ Step 3.c: If movedTask is missing → exit
+    if (!movedTask || !movedTask.id) {
+        console.error("❌ Step 3.c: ERROR: movedTask is undefined or missing an ID!", movedTask);
+        return;
+    }
+
+    // ✅ Step 4: Detect Parent Change
+    const isParentChange = result.destination.droppableId !== result.source.droppableId;
+    console.log("🔄 Step 4.a: Parent Change Detected:", isParentChange);
+    console.log("📍 Step 4.b: Destination Index:", result.destination.index);
+
+    // ✅ Step 5: Optimistic UI Update Before API Request
+    console.log("🖼️ Step 5.a: Updating UI optimistically...");
+    setFilteredTasks((prevTasks) => {
+        const updatedTasks = [...prevTasks];
+        updatedTasks.splice(result.source.index, 1);
+        updatedTasks.splice(result.destination.index, 0, movedTask);
+        console.log("✅ Step 5.b: UI Updated Locally:", updatedTasks);
+        return updatedTasks;
+    });
+
+    try {
+        let response;
+
+        // ✅ Step 6: Handle Parent Change
+        if (isParentChange) {
+            if (!targetTask) {
+                console.error("❌ Step 6.a: ERROR: targetTask is missing for parent update!", result);
+                return;
+            }
+
+            // 🚨 Step 6.b: Prevent invalid parent assignments
+            if (movedTask.task_type === "User Story" && targetTask.task_type !== "Epic") {
+                alert("A User Story can only be assigned to an Epic.");
+                return;
+            }
+            if (movedTask.task_type === "Subtask" && targetTask.task_type !== "User Story") {
+                alert("A Subtask can only be assigned to a User Story.");
+                return;
+            }
+
+            console.log(`🔄 Step 6.c: Moving task ${movedTask.id} inside new parent ${targetTask.id}`);
+            response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/parent`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ new_parent_id: targetTask.id }),
+            });
+
+        } else {
+            // ✅ Step 7: Handle Reordering (Within Same List)
+            console.log(`🔄 Step 7.a: Reordering task ${movedTask.id} to new index ${result.destination.index}`);
+            response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/sort`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ new_order_index: result.destination.index }),
+            });
+        }
+
+        // ✅ Step 8: Handle API Response
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("✅ Step 9: Task sorting/moving updated successfully:", data);
+
+        // ✅ Step 10: Emit WebSocket Event for Real-Time Update
+        console.log("📡 Step 10: Emitting WebSocket event...");
+        socket.emit("task_sorted", {
+            taskId: movedTask.id,
+            new_order_index: result.destination.index,
+            new_parent_id: movedTask.parent_id,
+        });
+
+        // ✅ Step 11: Fetch Updated Tasks After Sorting/Moving
+        console.log("🔄 Step 11.a: Fetching updated tasks from API...");
+        const updatedTasksResponse = await fetch("http://localhost:5000/api/tasks");
+        const updatedTasks = await updatedTasksResponse.json();
+        console.log("✅ Step 11.b: Updated tasks received:", updatedTasks);
+        setFilteredTasks(updatedTasks.tasks);
+
+    } catch (error) {
+        console.error("❌ Step 12: Error updating task sorting:", error);
+    }
   };
 
   // ✅ Expand/Collapse Nested Tasks
   const toggleExpand = (taskId) => {
-    setExpandedTasks((prev) => ({
-      ...prev,
-      [taskId]: !prev[taskId],
-    }));
+    setExpandedTasks((prev) => {
+      const newExpandedTasks = { ...prev, [taskId]: !prev[taskId] };
+      console.log("🔄 Expanding Task:", taskId, "State:", newExpandedTasks);
+      return newExpandedTasks;
+    });
+  
+    // Force React to re-render to ensure button visibility
+    setFilteredTasks((prev) => [...prev]);
   };
 
   // ✅ Render Tasks Recursively (Ensuring Nested Task Visibility)
@@ -674,15 +1467,27 @@ export default function AllTasks() {
                 </span>
 
                 {/* ✅ Expand/Collapse Toggle */}
-                <span className="text-center cursor-pointer" onClick={() => toggleExpand(task.id)}>
+                {/* ✅ Expand/Collapse Toggle */}
+                <span
+                  className={`text-center cursor-pointer ${
+                    task.task_type !== "Subtask" ? "opacity-80 hover:opacity-100" : ""
+                  }`}
+                  onClick={() => toggleExpand(task.id)}
+                >
                   {tasks.some((t) => t.parent_id === task.id) ? (
                     expandedTasks[task.id] ? (
-                      <ChevronDownIcon className="w-5 h-5 text-white" />
+                      <ChevronDownIcon className="w-6 h-6 text-white" />
                     ) : (
-                      <ChevronRightIcon className="w-5 h-5 text-white" />
+                      <ChevronRightIcon className="w-6 h-6 text-white" />
                     )
                   ) : (
-                    <span>&nbsp;</span>
+                    task.task_type !== "Subtask" && (
+                      expandedTasks[task.id] ? (
+                        <ChevronDownIcon className="w-6 h-6 text-gray-200 opacity-70 hover:opacity-100" />
+                      ) : (
+                        <ChevronRightIcon className="w-6 h-6 text-gray-200 opacity-70 hover:opacity-100" />
+                      )
+                    )
                   )}
                 </span>
 
@@ -699,18 +1504,39 @@ export default function AllTasks() {
 
                 {/* ✅ Task Title */}
                 <span className="flex items-center relative w-full">
-                  <span className="font-semibold">{task.name}</span>
-                  <span className="text-gray-400 text-sm ml-2">(Parent-ID: {task.parent_id || "None"})</span>
+                  <div key={task.id} className="task-container">
+                    {editingTaskId === task.id ? (
+                      <input
+                        id={`task-title-${task.id}`}
+                        type="text"
+                        value={task.name}
+                        onChange={(e) => handleTitleChange(task.id, e.target.value)}
+                        onBlur={handleTitleBlur} // Exit edit mode when focus is lost
+                        onKeyDown={handleTitleKeyDown} // Allow pressing "Enter" to save and exit
+                        autoFocus // ✅ Auto-focus on edit
+                        className="task-title-input w-full focus:ring"
+                      />
+                    ) : (
+                      <button
+                        onClick={() => handleTitleClick(task.id)}
+                        className="task-title-text text-left w-full px-2 py-1 bg-transparent border border-transparent hover:border-gray-400 rounded-md transition-all"
+                      >
+                        {task.name}
+                      </button>
+                    )}
+                  </div>
 
-                  {/* Open Link (Only Visible on Hover) */}
+                  {/* 🔹 Parent ID Info */}
+                  {/*<span className="text-gray-400 text-sm ml-2">(Parent-ID: {task.parent_id || "None"})</span>*/}
+
+                  {/* 🔹 Open Link (Only Visible on Hover) */}
                   <span className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
-                  <span
-                    className="cursor-pointer text-white-400 hover:underline flex items-center"
-                    onClick={() => openTaskModal(task)}
-                  >
-                    {/*<i className="bi bi-arrows-angle-expand w-4 h-4 mr-2 text-white-400" /></i>*/}
-                    <span className="bi bi-arrows-angle-expand"> Open</span>
-                  </span>
+                    <button
+                      className="cursor-pointer text-white-400 hover:underline flex items-center"
+                      onClick={() => openTaskModal(task)}
+                    >
+                      <span className="bi bi-arrows-angle-expand"> Open</span>
+                    </button>
                   </span>
                 </span>
 
@@ -805,7 +1631,32 @@ export default function AllTasks() {
               </div>
 
               {/* ✅ Render Nested Tasks (Only If Expanded) */}
-              {expandedTasks[task.id] && renderTasks(tasks, task.id, depth + 1)}
+              {expandedTasks[task.id] && (
+                <div className="pl-5"> {/* ✅ Ensures proper indentation */}
+
+                  {/* ✅ Render existing subtasks first */}
+                  {renderTasks(tasks, task.id, depth + 1)}
+
+                  {/* ✅ NEW: Add Task Button Inside Task Row */}
+                  {(task.task_type === "Epic" || task.task_type === "User Story") && (
+                    <div
+                      className="task-row grid grid-cols-[minmax(40px,60px)_minmax(40px,60px)_minmax(300px,1fr)_minmax(50px,80px)_minmax(150px,200px)_minmax(130px,180px)_minmax(60px,100px)_minmax(100px,140px)_minmax(100px,140px)_minmax(130px,180px)_minmax(50px,80px)]
+                      gap-4 p-3 border-b border-gray-700 items-center hover:bg-gray-700 transition duration-200"
+                      style={{ paddingLeft: `${(depth + 1) * 20}px` }} // ✅ Align at correct indentation
+                    >
+                      <span className="text-center">➕</span>
+                      <span className="text-left col-span-2">
+                        <button
+                          className="text-blue-400 hover:text-blue-600 px-2 py-1 rounded transition hover:bg-gray-800"
+                          onClick={() => handleCreateTask(task.id, task.task_type === "Epic" ? "User Story" : "Subtask")}
+                        >
+                          Add {task.task_type === "Epic" ? "User Story" : "Subtask"}
+                        </button>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </Draggable>
@@ -925,42 +1776,63 @@ export default function AllTasks() {
 
       {/* ✅ Render TaskModal when a task is selected or a new task is being created */}
       {isModalOpen && (
-        <TaskModal
-          isOpen={isModalOpen}
-          selectedTask={selectedTask}
-          setSelectedTask={setSelectedTask}
-          projects={projects}
-          selectedProjectId={selectedProjectId} // ✅ Pass selectedProjectId to modal
-          onClose={() => {
-            console.log("❌ Modal Close Button Clicked! isModalOpen → false");
-            setIsModalOpen(false);
+        <div
+          className="modal-overlay"
+          onMouseDown={(e) => {
+            console.log("❌ Modal background clicked, attempting to close");
+            console.log("Event target:", e.target);
+            console.log("Event currentTarget:", e.currentTarget);
+            console.log("Event type:", e.type);
+            onClose();
           }}
-          handleFieldChange={handleFieldChange}
-        />
+        >
+          <div
+            className="modal-content"
+            onMouseDown={(e) => {
+              console.log("✅ Click inside modal detected - stopping propagation");
+              e.stopPropagation();
+            }}
+          >
+            <TaskModal
+              isOpen={isModalOpen}
+              selectedTask={selectedTask}
+              setSelectedTask={setSelectedTask}
+              projects={projects}
+              selectedProjectId={selectedProjectId} // ✅ Pass selectedProjectId to modal
+              onClose={() => {
+                console.log("❌ Modal Close Button Clicked! isModalOpen → false");
+                setIsModalOpen(false);
+              }}
+              handleFieldChange={handleFieldChange}
+              handleContributorChange={handleContributorChange} // ✅ Pass handleContributorChange to modal
+              ParentTaskSelector={ParentTaskSelector}
+            />
+          </div>
+        </div>
       )}
 
     </div>
   );
 }
 
+
+
+
+
+
+
+
 {/* ------------------------Task details modal----------------------- */}
 
 
 
-function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose, handleFieldChange }) {
-  // ✅ Fetch contributors using React Query
-  //const { data: contributors, error, isLoading } = useQuery(
-  //    ['contributors', selectedProjectId], 
-  //    () => fetchContributors(selectedProjectId)
-  //);
 
-  //if (isLoading) {
-  //    console.log("🔄 Loading contributors...");
-  //}
-  //if (error) {
-  //    console.error("❌ Error fetching contributors:", error);
-  //}
-  
+
+
+
+
+function TaskModal({ isOpen, selectedTask, setSelectedTask, projects, selectedProjectId, onClose, handleFieldChange, handleContributorChange, ParentTaskSelector }) {
+  console.log("🔄 Received isOpen prop:", isOpen); // Log the received prop)
   const defaultTask = {
     name: "",
     description: "",
@@ -1007,12 +1879,18 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
 
   }, [selectedTask?.project_id]); // ✅ Runs when `selectedTask.project_id` changes
 
-  const [viewMode, setViewMode] = useState("modal");
+  const [viewMode, setViewMode] = useState("side");
 
   // ✅ Define scrollRef here
   const scrollRef = useRef(null);
 
-  
+  useEffect(() => {
+    console.log("🛠️ TaskModal useEffect triggered! isOpen:", isOpen);
+    
+    if (!isOpen) {
+      console.log("❌ Modal is closed - Check what triggered this!");
+    }
+  }, [isOpen]);
 
   // ✅ Ensure taskData syncs properly when selectedTask changes
   useEffect(() => {
@@ -1104,14 +1982,40 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
   }, 500);
 
 
-  // ✅ Modified handleChange to create the task on first input
-  const handleChange = async (event) => {
-      event.persist();  // ✅ Ensure the event is available inside debounce
-      const { name, value } = event.target; // ✅ Extract name and value from event
-      
-      console.log(`🛠️ Step 11: handleChange triggered for '${event.target.name}' → '${event.target.value}'`);
+  const handleChange = async (eventOrValue, fieldName = null) => {
+      eventOrValue.persist?.(); // ✅ Ensure the event is available inside debounce (if event-based)
 
-      // ✅ Update state immediately for instant UI feedback
+      let name, value;
+
+      // ✅ Handle inline contentEditable changes for both title (name) and description
+      if (typeof eventOrValue === "string" && fieldName) {
+          name = fieldName; // 🔹 Field name explicitly provided (e.g., "name" or "description")
+          value = eventOrValue; // 🔹 Use the passed string value
+
+          // ✅ If the field being updated is "description", update taskData immediately
+          if (fieldName === "description") {
+              setTaskData((prev) => ({ ...prev, description: value }));
+
+              // ✅ If the task already exists, trigger a debounced save
+              if (taskData.id) {
+                  debouncedSaveRef.current(taskData.id, "description", value, handleFieldChange);
+              }
+              return; // ✅ Prevents further execution
+          }
+      }
+      // ✅ Handle normal form inputs (e.g., select, input fields)
+      else if (eventOrValue.target) {
+          ({ name, value } = eventOrValue.target);
+      }
+      // ❌ If neither case applies, log an error and return early
+      else {
+          console.error("🚨 Unexpected event format in handleChange:", eventOrValue);
+          return;
+      }
+
+      console.log(`🛠️ handleChange triggered for '${name}' → '${value}'`);
+
+      // ✅ Update `taskData` state immediately for instant UI feedback
       setTaskData((prev) => ({
           ...prev,
           [name]: value,
@@ -1120,41 +2024,41 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
       console.log("🔄 Step 11a: Updated taskData:", taskData);
 
       // ✅ If editing an existing task, update it using `handleFieldChange`
-      if (taskData.id || selectedTask?.id) { // ✅ Include selectedTask.id for reliability
-        console.log(`📌 Step 12: Updating existing task ${taskData.id || selectedTask?.id}`);
-        debouncedSaveRef.current(taskData.id || selectedTask?.id, name, value, handleFieldChange); // ✅ Use `handleFieldChange`
-        return;
+      if (taskData.id || selectedTask?.id) { 
+          console.log(`📌 Step 12: Updating existing task ${taskData.id || selectedTask?.id}`);
+          debouncedSaveRef.current(taskData.id || selectedTask?.id, name, value, handleFieldChange);
+          return;
       }
 
-      // ✅ If creating a new task (no ID yet), create it on first input
+      // ✅ If creating a new task (no ID yet), create it when the first field is edited
       try {
-          console.log("🛠️ Step 14: Creating new task...");
-          console.log("📡 Sending payload to API:");
+          console.log("📡 Step 14: Creating new task...");
+
           const response = await fetch("http://127.0.0.1:5000/api/tasks", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                  title: taskData.name || "Untitled Task",  // ✅ Use title instead of name
+                  title: taskData.name || "Untitled Task",  // ✅ Ensure title is always set
                   description: taskData.description || "",
                   task_type: taskData.task_type || "User Story",
                   priority: taskData.priority || "Unset",
                   status: taskData.status || "Not Started",
-                  project_id: taskData.project_id || selectedProjectId, // ✅ Ensure project_id defaults to "Miscellaneous"
+                  project_id: taskData.project_id || selectedProjectId,  // ✅ Ensure `project_id` is defined
               }),
           });
 
           const responseData = await response.json();
-          console.log("📩 Step 15: API Response Received:", responseData);
+          console.log("📩 Step 15: API Response:", responseData);
 
-          // ✅ Handle warnings (like duplicate task name)
+          // ✅ Handle warnings (e.g., duplicate task name)
           if (responseData.warning) {
               console.warn(`⚠️ Step 16: Task name warning: ${responseData.warning}`);
-              setTaskNameWarning(responseData.warning); // ✅ Display warning message
+              setTaskNameWarning(responseData.warning);
           } else {
-              setTaskNameWarning(""); // ✅ Remove warning when name becomes unique
+              setTaskNameWarning("");
           }
 
-          console.log(`✅ Step 17: New Task Created Successfully - Task ID: ${responseData.task.id}, Name: "${responseData.task.name}"`);
+          console.log(`✅ Task Created - ID: ${responseData.task.id}, Name: "${responseData.task.name}"`);
 
           // ✅ Update state with new task ID (so future updates use `handleFieldChange`)
           setTaskData((prev) => ({
@@ -1164,10 +2068,11 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
 
           console.log("🔄 Step 18: Updated taskData with new ID:", taskData);
 
+          // ✅ Ensure `setSelectedTask` is defined before calling it
           if (typeof setSelectedTask === "function") {
-              setSelectedTask(responseData.task);  // ✅ Ensure setSelectedTask is defined
+              setSelectedTask(responseData.task);
           } else {
-            console.error("🚨 Step 19b: setSelectedTask is not available.");
+              console.error("🚨 setSelectedTask is not available.");
           }
 
       } catch (error) {
@@ -1233,33 +2138,20 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
       }
   }, [selectedTask]);
 
+  // ✅ Animation State for Side View when switching from Modal
+  // const [animateSideView, setAnimateSideView] = useState(false);
 
-  const handleContributorChange = async (e) => {
-    const newContributorId = e.target.value;
-    setTaskData((prevTaskData) => ({
-      ...prevTaskData,
-      assigned_to: newContributorId,
-    }));
+  // useEffect(() => {
+  //     if (viewMode === "side") {
+  //         setTimeout(() => setAnimateSideView(true), 500); // ✅ Small delay to trigger animation
+  //     } else {
+  //         setAnimateSideView(false);
+  //     }
+  // }, [viewMode]);
 
-    try {
-      const checkRes = await fetch(`http://127.0.0.1:5000/api/projects/${taskData.project_id}/contributors/manage`);
-      const projectContributors = await checkRes.json();
-
-      if (!projectContributors.some((c) => c.id === parseInt(newContributorId))) {
-        await fetch(`http://127.0.0.1:5000/api/projects/${taskData.project_id}/contributors/manage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contributor_id: newContributorId }),
-        });
-      }
-
-      const updatedContributorsRes = await fetch(`http://127.0.0.1:5000/api/projects/${taskData.project_id}/contributors/manage`);
-      setContributors(await updatedContributorsRes.json());
-    } catch (error) {
-      console.error("Error adding contributor to project:", error);
-    }
-  };
-
+  useEffect(() => {
+      console.log("🔄 Modal View Updated:", viewMode);
+  }, [viewMode]);
 
   const closeModal = () => {
     setSelectedTask(null);  // ✅ Clears modal when closed
@@ -1269,146 +2161,134 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
 
   return (
     <div className="modal-background">
-      <div ref={scrollRef} className={`fixed inset-0 flex items-center justify-center overflow-hidden ${
-          viewMode === "modal" ? "flex items-center justify-center" : ""
-        } ${viewMode === "side" ? "absolute top-0 left-0 w-[800px] h-full" : ""}`}
-      >
+      <div ref={scrollRef} className="modal-container">
         <div
-          className={`task-modal p-6 rounded-lg shadow-lg relative z-50 transition-all duration-300 ease-in-out ${
-            viewMode === "modal" ? "w-[70vw] max-w-4xl h-aut" : ""
-          } ${
-            viewMode === "side"
-              ? "h-full w-[400px] shadow-lg"
-              : ""
-          } ${
-            viewMode === "full"
-              ? "fixed inset-0 w-full h-full p-8 max-w-none max-h-none"
-              : ""
-          }`}
+          className={`task-modal side-view-modal transition-slow p-6 rounded-lg shadow-lg relative z-50
+            ${viewMode === "side" ? "side-view-modal-active" : ""}
+          `}
         >
-          {/* ✅ Page View Buttons - Now in Top Left */}
-          <div className="absolute top-4 left-6 flex space-x-3">
-            <button 
-              data-tooltip-id="global-tooltip" 
-              data-tooltip-content="Open in Modal View"
-              onClick={() => setViewMode("modal")}
-              className="modal-view-btn p-1 rounded"
-            >
-              <i className="bi bi-aspect-ratio"></i>
-            </button>
-
-            <button 
-              data-tooltip-id="global-tooltip" 
-              data-tooltip-content="Open in Side View"
-              onClick={() => setViewMode("side")}
-              className="modal-view-btn p-1 rounded"
-            >
-              <i className="bi bi-layout-sidebar-inset-reverse"></i>
-            </button>
-
-            <button 
-              data-tooltip-id="global-tooltip" 
-              data-tooltip-content="Open in Page View"
-              onClick={() => setViewMode("full")}
-              className="modal-view-btn p-1 rounded"
-            >
-              <i className="bi bi-arrows-angle-expand"></i>
-            </button>
-          </div>
-          <div className="absolute top-4 right-6 flex space-x-3">
-            <button onClick={onClose} className="text-gray-200 hover:text-white">
-              <XMarkIcon className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* ✅ Header (Draggable, Only Includes Title & Close Button) */}
-          <div 
-            className="flex justify-between items-center border-b pb-4 mt-10 drag-handle cursor-move"
-            onMouseDown={handleMouseDown} // ✅ Correctly references function
+        {/* ✅ Close Button - Top Left */}
+        <button 
+          onClick={onClose} 
+          className="close-view-btn absolute top-4 left-4 p-2 bg-transparent text-white hover:text-gray-400"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill="currentColor" 
+            className="close-modal-arrow"
           >
-            <h2 className="text-xl font-bold">{taskData.name}</h2>
-            
-          </div>
+            <path d="M19.1642 12L12.9571 5.79291L11.5429 7.20712L16.3358 12L11.5429 16.7929L12.9571 18.2071L19.1642 12ZM13.5143 12L7.30722 5.79291L5.89301 7.20712L10.6859 12L5.89301 16.7929L7.30722 18.2071L13.5143 12Z"></path>
+          </svg>
+        </button>
 
-          {/* ✅ Task Form */}
-          <form className="mt-4 grid grid-cols-12 gap-4">
-            {/* ✅ Left Column */}
-              <div className="col-span-8">
-                <div className="mb-4">
-                  <label className="label block text-sm font-medium text-gray-700">Task Title</label>
-                  <input
-                    type="text"
-                    name="name"
-                    className="input-task-name text-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    value={taskData.name ?? ""}// ✅ "" Ensures that even if taskData.name is undefined, it stays an empty string.
-                    onChange={handleChange}
-                  />
-                  {/* ✅ Display Task Name Warning */}
-                  {taskNameWarning && (
-                      <p className="mt-2 text-yellow-500">
-                          ⚠️ {taskNameWarning}
-                      </p>
+        {/* ✅ Close "X" Button - Top Right */}
+        <div className="absolute top-4 right-6 flex space-x-3">
+          <button onClick={onClose} className="text-gray-200 hover:text-white">
+            <XMarkIcon className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* ✅ Header (Draggable, Only Includes Title & Close Button) */}
+        <div 
+          className="task-modal-header flex justify-between items-center border-b pb-4 mt-10 drag-handle cursor-move"
+          onMouseDown={handleMouseDown} // ✅ Correctly references function
+        >
+          <div className="flex flex-col w-full">
+          <h2
+            className="text-xl font-bold outline-none focus:ring focus:ring-blue-300 p-1 rounded-md"
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => handleChange(e.target.innerText.trim(), "name")}  // ✅ Correctly passing "name"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); // ✅ Prevents new line
+                e.target.blur(); // ✅ Saves and exits edit mode
+              }
+            }}
+          >
+            {taskData.name}
+          </h2>
+            {/* ✅ Display Task Name Warning */}
+            {taskNameWarning && (
+              <p className="mt-1 text-yellow-500 text-sm">
+                ⚠️ {taskNameWarning}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* ✅ Task Form */}
+        <form className="mt-4 grid grid-cols-12 gap-4">
+          {/* ✅ Left Column */}
+            <div className="task-modal-left col-span-10">
+              <div className="mb-4">
+                <label className="label block text-sm font-medium text-gray-700">Description</label>
+                <TiptapEditor 
+                  value={taskData.description} 
+                  onChange={(newContent) => handleChange(newContent, "description")} 
+                />
+              </div>
+            </div>
+
+            {/* ✅ Right Column */}
+            <div className="task-modal-right col-span-2 space-y-4 pl-1"> 
+              <div className="mb-4">
+                <label className="label block text-sm font-medium text-gray-700">Project</label>
+                <select
+                  name="project_id"
+                  className="select-project mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  value={taskData.project_id || ""}
+                  onChange={(e) => {
+                    const selectedProjectId = e.target.value;
+                    console.log(`🎯 Row 1125-Project change: Step 1: Project selected: ${selectedProjectId} for task ${taskData.id}`); // <-- ADD THIS LINE
+
+                    // ✅ Ensure taskData has a valid task ID before updating
+                    if (!taskData.id) {
+                      console.error("🚨 Cannot update project, task ID is missing!", taskData);
+                      return;
+                    }
+                    
+                    // ✅ Update the backend
+                    handleFieldChange(taskData.id, "project_id", selectedProjectId);
+
+                    // ✅ Log when "Miscellaneous" is selected
+                    const selectedProject = projects.find((p) => p.id === parseInt(selectedProjectId, 10));
+                    if (selectedProject?.name === "Miscellaneous") {
+                        console.log("⚠️ Task is assigned to 'Miscellaneous'. Consider selecting a project.");
+                    }
+                  }}
+                >
+                  <option value="">Select Project</option> {/* ✅ Add a placeholder option */}
+                  {projects.length > 0 ? (
+                    projects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>Loading...</option> // ✅ Display loading message if empty
                   )}
-                </div>
-                <div className="mb-4">
-                  <label className="label block text-sm font-medium text-gray-700">Description</label>
-                  <textarea
-                    name="description"
-                    className="textfield mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    rows="10"
-                    value={taskData.description}
-                    onChange={handleChange}
-                  />
-                </div>
+                </select>
+
+                {/*✅ UI Indicator for "Miscellaneous"
+                {projects.find((p) => p.id === parseInt(taskData.project_id, 10))?.name === "Miscellaneous" && (
+                    <p className="mt-2 text-sm text-yellow-400">
+                        ⚠️ This task is assigned to <strong>Miscellaneous</strong>. Choose a project if needed.
+                    </p>
+                )}*/}
               </div>
 
-              {/* ✅ Right Column */}
-              <div className="col-span-4 space-y-4 pl-6"> 
-                <div className="mb-4">
-                  <label className="label block text-sm font-medium text-gray-700">Project</label>
-                  <select
-                    name="project_id"
-                    className="select-project mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    value={taskData.project_id || ""}
-                    onChange={(e) => {
-                      const selectedProjectId = e.target.value;
-                      console.log(`🎯 Row 1125-Project change: Step 1: Project selected: ${selectedProjectId} for task ${taskData.id}`); // <-- ADD THIS LINE
-
-                      // ✅ Ensure taskData has a valid task ID before updating
-                      if (!taskData.id) {
-                        console.error("🚨 Cannot update project, task ID is missing!", taskData);
-                        return;
-                      }
-                      
-                      // ✅ Update the backend
-                      handleFieldChange(taskData.id, "project_id", selectedProjectId);
-
-                      // ✅ Log when "Miscellaneous" is selected
-                      const selectedProject = projects.find((p) => p.id === parseInt(selectedProjectId, 10));
-                      if (selectedProject?.name === "Miscellaneous") {
-                          console.log("⚠️ Task is assigned to 'Miscellaneous'. Consider selecting a project.");
-                      }
-                    }}
-                  >
-                    <option value="">Select Project</option> {/* ✅ Add a placeholder option */}
-                    {projects.length > 0 ? (
-                      projects.map((project) => (
-                        <option key={project.id} value={project.id}>
-                          {project.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>Loading...</option> // ✅ Display loading message if empty
-                    )}
-                  </select>
-
-                  {/* ✅ UI Indicator for "Miscellaneous" */}
-                  {projects.find((p) => p.id === parseInt(taskData.project_id, 10))?.name === "Miscellaneous" && (
-                      <p className="mt-2 text-sm text-yellow-400">
-                          ⚠️ This task is assigned to <strong>Miscellaneous</strong>. Choose a project if needed.
-                      </p>
-                  )}
-                </div>
+              <div className="mb-4">
+                <label className="label block text-sm font-medium">Parent Task</label>
+                {/* ✅ Parent Task Selector Inside Modal */}
+                <ParentTaskSelector 
+                  taskData={selectedTask} 
+                  setTaskData={setSelectedTask}
+                  handleFieldChange={handleFieldChange}
+                  socket={socket}
+                />
+              </div>
 
               <div className="mb-4">
                 <label className="label block text-sm font-medium">Task Type</label>
@@ -1486,31 +2366,40 @@ function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose,
               </div>
 
               <div className="mb-4">
-                <label className="label block text-sm font-medium text-gray-100">Assigned Contributor</label>
+                <label className="label block text-sm font-medium text-gray-100">Owner</label>
                 <select
                   name="contributor_id"
                   className="select-contributor mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   value={taskData.contributor_id || ""}
-                  onChange={(e) => handleContributorChange(taskData.id, e.target.value)}
+                  onChange={(e) => {
+                    const newContributorId = e.target.value || "unassigned";
+                    console.log(`🔄 Assigning Contributor ID: ${newContributorId} to Task ${taskData.id}`);
+                  
+                    setTaskData((prevTaskData) => ({
+                      ...prevTaskData,
+                      contributor_id: newContributorId, 
+                    }));
+                  
+                    if (taskData.id) {
+                      handleContributorChange(taskData.id, newContributorId).then(() => {
+                        console.log(`📡 Emitting WebSocket event: contributor_updated → Task ID: ${taskData.id}, Contributor ID: ${newContributorId}`);
+                  
+                        socket.emit("contributor_updated", {
+                          taskId: taskData.id,
+                          contributorId: newContributorId
+                        });
+                      });
+                    } else {
+                      console.warn("⚠️ Task ID is missing, contributor update skipped!");
+                    }
+                  }}
                 >
                   <option value="">Unassigned</option>
-                  {contributors.map((contributor) => {
-                      // Ensure projects is always an array
-                      const contributorProjects = Array.isArray(contributor.projects) ? contributor.projects : [];
-                      const isContributorInProject = contributorProjects.includes(taskData.project_id);
-                      const isAssignedContributor = taskData.contributor_id === contributor.id;
-
-                      console.log(
-                        `🔍 Checking Contributor ${contributor.name} (ID: ${contributor.id}): Assigned - ${isAssignedContributor}, In Project - ${isContributorInProject}`
-                      );
-
-                      return (
-                        <option key={contributor.id} value={contributor.id}>
-                            {contributor.name} 
-                            {!isAssignedContributor && (isContributorInProject ? "✅ (In Project)" : "➕ (Add to Project)")}
-                        </option>
-                      );
-                  })}
+                  {contributors.map((contributor) => (
+                    <option key={contributor.id} value={contributor.id}>
+                      {contributor.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

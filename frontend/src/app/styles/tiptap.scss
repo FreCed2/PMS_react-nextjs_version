@@ -1,0 +1,267 @@
+/* Basic editor styles */
+.tiptap {
+    :first-child {
+      margin-top: 0;
+    }
+  
+    /* List styles */
+
+    /* Target unordered list (bullets) */
+    ul {
+      list-style-type: disc; /* Options: circle, square, none */
+      margin-left: 20px;
+      padding-left: 20px;
+    }
+
+    /* Target list items */
+    ul li {
+      font-size: 16px;
+      line-height: 1.0;
+    }
+
+    /* Custom bullet */
+    ul li::marker {
+      color: #ccc; /* Change bullet color */
+      font-size: 20px; /* Change bullet size */
+    }
+    /* Change bullet style */
+    ul {
+      list-style-type: disc; /* Options: disc, circle, square, none */
+    }
+
+    ul, 
+    ol {
+      padding: 0 1rem;
+      margin: 0.1rem 1rem 0.1rem .4rem;
+      color: #ccc;
+      
+      li p {
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+        color: #ccc;
+      }
+    }
+  
+    /* Heading styles */
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.1;
+      margin-top: 1.5rem;
+    }
+  
+    h1, h2 {
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.6rem; }
+    h3 { font-size: 1.4rem; }
+    h4 { font-size: 1.3rem; }
+    h5 { font-size: 1.2rem; }
+    h6 { font-size: 1.1rem; }
+
+  
+    /* Code styles */
+    code {
+      background-color: #eee;
+      border-radius: 0.4rem;
+      padding: 0.25em 0.3em;
+    }
+  
+    pre {
+      background: #222;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 0.5rem;
+    }
+  
+    blockquote {
+      border-left: 3px solid gray;
+      margin: 1.5rem 0;
+      padding-left: 1rem;
+    }
+  
+    hr {
+      border-top: 1px solid rgba(128, 128, 128, 0.408);
+      margin: 1rem 1.5rem;
+    }
+  }
+
+  /* Remove inner focus highlight */
+  .tiptap-editor [contenteditable]:focus {
+    outline: none !important;
+  }
+
+  /* Ensure the outer container gets a focus effect */
+  .tiptap-container:focus-within {
+    outline: 0px solid #2563eb; /* Change to your preferred highlight color */
+    border-radius: 4px;
+  }
+
+  .tiptap-container {
+    border: 0px solid transparent;
+    border-radius: 4px;
+    padding: 8px; /* ✅ Add padding to prevent toolbar from being cut off */
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    height: auto; /* ✅ Ensure it adapts dynamically */
+    max-height: 100%; /* Ensure it does not get clipped */
+    position: relative; /* ✅ Make sure toolbar stays positioned properly */
+  }
+
+  
+  .tiptap-toolbar {
+    display: flex;
+    flex-wrap: wrap; /* ✅ Ensures buttons wrap instead of overflowing */
+    justify-content: flex-start; /* Aligns buttons to the left */
+    gap: 8px;
+    padding: 6px 8px;
+    border: none !important; /* ✅ Remove border */
+    max-width: 100%; /* ✅ Prevents overflow */
+    overflow-x: hidden; /* ✅ Hide any accidental overflow */
+    width: calc(100% - 0px); /* Prevents pushing into the next column */
+    box-sizing: border-box; /* Ensures width calculation includes padding */
+    border-radius: 4px 4px 0 0;
+    background-color: transparent;
+  }
+  
+  .tiptap-toolbar button {
+    background: rgba(71, 61, 139, 0.495);
+    border: none;
+    padding: 5px 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color:#ffffff;
+    border-radius: 3px;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .tiptap-toolbar button:hover {
+    background: rgba(71, 61, 139, 0.9);
+  }
+  
+  .tiptap-toolbar button.active {
+    background: #007bff;
+    color: white;
+  }
+
+  .tiptap-toolbar button.active {
+    background-color: #2563eb;
+    color: white;
+    border-radius: 4px;
+  }
+  
+  /* ✅ Remove bottom border & ensure side borders extend */
+  .tiptap-editor {
+    flex-grow: 1; // Makes it take full available height inside .tiptap-container
+    border-left: 1px solid #ccc; // Keep side borders
+    border-right: 1px solid #ccc; // Keep side borders
+    border-bottom: none !important; // ✅ Remove bottom border
+    padding: 15px;
+    min-height: 500px; /* Start at full page height */
+    outline: none;
+    overflow-y: auto; // Prevents unnecessary scrollbars
+    resize: vertical; /* ✅ Allows resizing by dragging */
+  }
+
+  /* ✅ Ensure it expands dynamically */
+  .tiptap-editor [contenteditable] {
+    min-height: auto; /* Start at full height */
+    height: auto; /* Grow dynamically as content is added */
+  }
+
+  
+
+  .tiptap-editor {
+    min-height: 100%;
+    width: 100%;
+    background-color: transparent;
+    padding: 8px;
+    border: none;
+    border-radius: 0 0 4px 4px;
+  }
+  
+  .tiptap-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  /*------------------------------Code block Styling
+
+  /* 🌟 Inline Code Styling */
+.tiptap code {
+  background-color: rgb(26, 27, 39); /* Dark background */
+  color: #f8f8f2; /* Light text */
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: "Fira Code", monospace;
+  font-size: 0.9rem;
+  border: 0px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 🌟 Code Block Styling */
+.tiptap pre {
+  background:rgba(26, 27, 39, 0.7); /* Dark Dracula Theme */
+  color: #f8f8f2;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: "Fira Code", monospace;
+  font-size: 0.95rem;
+  overflow-x: auto;
+  position: relative;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+  border-left: 4px solid #6272a4;
+}
+
+/* ✅ Add Line Numbers */
+.tiptap pre code {
+  display: block;
+  counter-reset: line-number;
+}
+
+/* 🔢 Line Numbers */
+.tiptap pre code::before {
+  content: counter(line-number);
+  counter-increment: line-number;
+  display: inline-block;
+  width: 2em;
+  text-align: right;
+  color: #43375b;
+  margin-right: 12px;
+  user-select: none;
+}
+
+/* 🛠 Add Copy Button (Optional) */
+.tiptap pre::after {
+  content: "📋 Copy";
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 0.8rem;
+  color: #dddddd;
+  background: #43375b;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tiptap pre:hover::after {
+  background: #666;
+}
+
+/* 🎨 Code Highlighting */
+.tiptap pre.language-js {
+  border-left-color: #f7df1e;
+}
+.tiptap pre.language-python {
+  border-left-color: #3572A5;
+}
+.tiptap pre.language-css {
+  border-left-color: #563d7c;
+}
+  

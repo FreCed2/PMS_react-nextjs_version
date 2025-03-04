@@ -1,8 +1,10 @@
 import logging
 import traceback
 from sqlalchemy.exc import IntegrityError
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from flask_cors import CORS
+from flask_wtf.csrf import generate_csrf
+from markupsafe import Markup  # ✅ Import from markupsafe
 from datetime import datetime
 from app.forms.forms import csrf
 from app.tasks.utils import TaskService
@@ -41,8 +43,22 @@ def handle_remove_contributor(data):
     """ Broadcasts a WebSocket event when a contributor is removed. """
     logger.info(f"📡 WebSocket Event: Contributor Removed - {data}")
     emit("update_contributors", {"removed": True, **data}, broadcast=True)
+    
+@api.route("/csrf", methods=["GET"])
+def get_csrf_token():
+    """Returns a new CSRF token for the frontend."""
+    csrf_token = generate_csrf()
+    return jsonify({"csrf_token": csrf_token})
 
-# Json API endpoint to fetch all tasks. Used by the Next.js frontend.
+# @api.after_request
+# def add_cors_headers(response):
+#     response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+#     response.headers["Access-Control-Allow-Credentials"] = "true"
+#     response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+#     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+#     return response
+
+@csrf.exempt
 @api.route("/tasks", methods=["GET"])
 def list_tasks_json():
     """API endpoint to fetch tasks in JSON format for the Next.js frontend."""
@@ -56,7 +72,7 @@ def list_tasks_json():
     completion_status = request.args.get("completion_status")
     hierarchical = request.args.get("hierarchical", "false").lower() == "true"
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 110, type=int)
+    per_page = request.args.get("per_page", 700, type=int)
 
     filters = {
         "is_archived": show_archived,
@@ -70,41 +86,63 @@ def list_tasks_json():
 
     try:
         if project_id:
-            # Fetch tasks for the given project
-            all_tasks = TaskService.fetch_all_tasks_as_dicts(filters)
-            logger.debug(f"API Tasks fetched: {len(all_tasks)} tasks found")
-
             if hierarchical:
-                # Build a hierarchy
+                # 🔥 Optimized Recursive SQL Query for Hierarchical Data
+                sql = """
+                WITH RECURSIVE task_hierarchy AS (
+                    SELECT 
+                        id, name, description, task_type, is_archived, completed, 
+                        parent_id, project_id, contributor_id, story_points, status, sort_order
+                    FROM task
+                    WHERE project_id = %s AND parent_id IS NULL
+                    UNION ALL
+                    SELECT 
+                        t.id, t.name, t.description, t.task_type, t.is_archived, t.completed, 
+                        t.parent_id, t.project_id, t.contributor_id, t.story_points, t.status, t.sort_order
+                    FROM task t
+                    INNER JOIN task_hierarchy th ON t.parent_id = th.id
+                )
+                SELECT * FROM task_hierarchy ORDER BY sort_order;
+                """
+                result = db.session.execute(sql, (project_id,))
+                all_tasks = [dict(row) for row in result]
+
+                # Convert flat result into a nested structure
                 task_map = {task["id"]: task for task in all_tasks}
-                top_level_tasks = [task for task in all_tasks if task["parent_id"] is None]
-
                 for task in all_tasks:
+                    task.setdefault("children", [])
                     if task["parent_id"]:
-                        parent = task_map.get(task["parent_id"])
-                        if parent:
-                            parent.setdefault("children", []).append(task)
+                        task_map[task["parent_id"]]["children"].append(task)
 
-                tasks = top_level_tasks
+                tasks = [task for task in all_tasks if task["parent_id"] is None]
+
             else:
-                # Paginate tasks normally
-                tasks_flat = [task for task in all_tasks]
-                start = (page - 1) * per_page
-                end = start + per_page
-                tasks = tasks_flat[start:end]
+                # 🔥 Optimized Flat Query with Pagination
+                sql = """
+                SELECT id, name, description, task_type, is_archived, completed, 
+                       parent_id, project_id, contributor_id, story_points, status, sort_order
+                FROM task
+                WHERE project_id = %s
+                ORDER BY sort_order
+                LIMIT %s OFFSET %s;
+                """
+                result = db.session.execute(sql, (project_id, per_page, (page - 1) * per_page))
+                tasks = [dict(row) for row in result]
 
+            # Pagination metadata
             pagination = {
                 "page": page,
                 "per_page": per_page,
-                "total": len(tasks_flat),
-                "pages": (len(tasks_flat) + per_page - 1) // per_page,
+                "total": len(tasks),
+                "pages": (len(tasks) + per_page - 1) // per_page,
                 "page_numbers": TaskService.generate_page_numbers(
                     current_page=page,
-                    total_pages=(len(tasks_flat) + per_page - 1) // per_page
+                    total_pages=(len(tasks) + per_page - 1) // per_page
                 ),
             }
+
         else:
-            # Default case: Get all tasks
+            # 🔥 Use TaskService to Filter & Paginate Tasks Without Project Filtering
             tasks_query = TaskService.filter_tasks(filters=filters)
             pagination_obj = tasks_query.paginate(page=page, per_page=per_page, error_out=False)
             tasks = [task.to_dict() for task in pagination_obj.items]
@@ -656,22 +694,6 @@ def update_task(data, task_id):
         else:
             logger.info(f"Task ID {task_id} - No changes detected, skipping database commit.")
 
-        if "completed" in data and data["completed"] != task.completed:
-            task.completed = data["completed"]
-            updated_fields.append("completed")
-
-        if "sort_order" in data and data["sort_order"] != task.sort_order:
-            task.sort_order = data["sort_order"]
-            updated_fields.append("sort_order")
-
-        # ✅ Only update `updated_at` if changes were made
-        if updated_fields:
-            task.updated_at = datetime.utcnow()
-            db.session.commit()
-            logger.info(f"Task ID {task_id} updated successfully. Updated fields: {updated_fields}")
-        else:
-            logger.info(f"Task ID {task_id} - No changes detected, skipping database commit.")
-
         # Include contributor name in the response
         contributor_name = task.contributor.name if task.contributor else None
 
@@ -704,6 +726,54 @@ def update_task(data, task_id):
         logger.error(f"Unexpected error during update: {e}", exc_info=True)
         db.session.rollback()
         return jsonify({"error": "Unexpected error occurred"}), 500
+
+# def update_task(data, task_id):
+#     """
+#     Handles updates to a task by delegating specific updates to helper functions.
+#     Only processes fields that actually changed.
+#     """
+#     task = Task.query.get(task_id)
+#     if not task:
+#         return jsonify({"error": f"Task with ID {task_id} not found."}), 404
+
+#     updated_fields = []
+
+#     # ✅ Delegate status updates
+#     if "status" in data:
+#         response = update_task_status(task_id, data["status"])
+#         if response[1] == 200:
+#             updated_fields.append("status")
+
+#     # ✅ Delegate parent task updates
+#     if "parent_id" in data:
+#         response = update_task_parent(task_id, data["parent_id"])
+#         if response[1] == 200:
+#             updated_fields.append("parent_id")
+
+#     # ✅ Delegate contributor updates
+#     if "contributor_id" in data:
+#         response = update_task_contributor(task_id, data["contributor_id"])
+#         if response[1] == 200:
+#             updated_fields.append("contributor_id")
+
+#     # ✅ Delegate generic field updates
+#     for field in ["name", "description", "priority", "epic_priority", "sort_order"]:
+#         if field in data:
+#             response = update_task_field(task_id, field, data[field])
+#             if response[1] == 200:
+#                 updated_fields.append(field)
+
+#     # ✅ Emit WebSocket update only if something changed
+#     if updated_fields:
+#         socketio.emit("update_task", {
+#             "taskId": task.id,
+#             "updated_fields": updated_fields,
+#             "task": task.to_dict()
+#         }, namespace="/")
+
+#         return jsonify({"message": f"Task {task_id} updated.", "updated_fields": updated_fields, "task": task.to_dict()}), 200
+
+#     return jsonify({"message": "No changes detected."}), 200
     
 
 def create_task(data):
@@ -730,9 +800,15 @@ def create_task(data):
             logger.error(f"Invalid status value: {status}")
             return jsonify({"error": f"Invalid status value. Allowed values: {ALLOWED_STATUSES}"}), 400
         
-        # Ensure `project_id` exists
+        # ✅ If the task has a parent, inherit its project_id
+        if data.get("parent_id"):
+            parent_task = Task.query.get(data["parent_id"])
+            if parent_task:
+                data["project_id"] = parent_task.project_id  # ✅ Inherit project from parent
+
+        # ✅ Ensure `project_id` exists (for tasks created outside a parent)
         if "project_id" not in data or not data["project_id"]:
-            data["project_id"] = ensure_miscellaneous_project()  # ✅ Ensure default project is assigned
+            data["project_id"] = ensure_miscellaneous_project()  # ✅ Assign default project
             
         # ✅ Explicitly Remove epic_priority if the task is NOT an Epic
         if data["task_type"] != "Epic":
@@ -754,6 +830,16 @@ def create_task(data):
                 logger.error(f"Invalid priority value: {priority}")
                 return jsonify({"error": f"Invalid priority value. Allowed values: {ALLOWED_PRIORITIES}"}), 400
             
+        # ✅ Determine `sort_order` for the new task
+        if data.get("parent_id"):
+            last_sort_order = db.session.query(db.func.max(Task.sort_order)).filter_by(parent_id=data["parent_id"]).scalar()
+        else:
+            last_sort_order = db.session.query(db.func.max(Task.sort_order)).filter_by(project_id=data["project_id"]).scalar()
+
+        # If there are no existing tasks, default to 0
+        new_sort_order = (last_sort_order or 0) + 1
+        data["sort_order"] = new_sort_order
+            
 
         new_task = Task(
             name=data['name'],
@@ -765,15 +851,26 @@ def create_task(data):
             contributor_id=data.get('contributor_id'),
             completed=data.get('completed', False),
             created_at=datetime.utcnow(),
-            sort_order=data.get('sort_order', 0),
+            sort_order=data["sort_order"],  # ✅ Now correctly assigned
             status=status,  # ✅ Include status
             priority=priority,  # ✅ Include priority
             epic_priority=data.get('epic_priority') if data.get("task_type") == "Epic" else None
         )
 
-        db.session.add(new_task)
-        db.session.commit()
-        logger.info(f"New task created successfully: {new_task.id} (Priority: {new_task.priority}, Status: {new_task.status})")
+        try:
+            db.session.add(new_task)
+            db.session.commit()
+
+            task_data = new_task.to_dict()
+
+            print(f"✅ WebSocket Emitting task_created: {task_data}")  # LOGGING
+            socketio.emit("task_created", {"task": task_data}, namespace="/")  # EMITTING
+
+            logger.info(f"New task created successfully: {new_task.id} (Priority: {new_task.priority}, Status: {new_task.status})")
+
+        except Exception as e:
+            logger.error(f"❌ Error emitting WebSocket event: {e}", exc_info=True)
+            print(f"❌ Error emitting WebSocket event: {e}")  # LOGGING
 
         # Include contributor_name in the response
         contributor_name = new_task.contributor.name if new_task.contributor else None
@@ -819,8 +916,7 @@ def create_task(data):
         db.session.rollback()
         return jsonify({"error": "Unexpected error occurred", "details": str(e)}), 500
 
-
-        
+@csrf.exempt 
 @api.route('/tasks/delete/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     """
@@ -860,4 +956,225 @@ def cleanup_empty_tasks():
     ).delete()
     db.session.commit()
     return jsonify({"deleted_tasks": deleted_count})
+
+# Version 1
+# 📌 1️⃣ Update task sort order (PUT /tasks/{task_id}/sort)
+# @csrf.exempt
+# @api.route('/tasks/<int:task_id>/sort', methods=['PUT', 'OPTIONS'])
+# def update_task_sort(task_id):
+#     """ Updates the sorting order of a task within a project. """
+    
+#     if request.method == "OPTIONS":
+#         # ✅ Properly handle the preflight request
+#         response = make_response(jsonify({"message": "CORS preflight successful"}), 200)
+#         response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+#         response.headers["Access-Control-Allow-Credentials"] = "true"
+#         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+#         response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+#         return response
+    
+#     data = request.json
+#     new_order_index = data.get("new_order_index")
+
+#     if new_order_index is None:
+#         return jsonify({"error": "new_order_index is required"}), 400
+
+#     task = Task.query.get(task_id)
+#     if not task:
+#         return jsonify({"error": "Task not found"}), 404
+
+#     project_id = task.project_id
+
+#     # Fetch all tasks sorted by `sort_order`
+#     tasks = Task.query.filter_by(project_id=project_id).order_by(Task.sort_order).all()
+    
+#     if not tasks:
+#         return jsonify({"error": "No tasks found for project"}), 400
+    
+    
+#     # Find the task that was moved
+#     moved_task = None
+#     for t in tasks:
+#         if t.id == task_id:
+#             moved_task = t
+#             tasks.remove(t)
+#             break
+
+#     if not moved_task:
+#         return jsonify({"error": "Task not found in sorting list"}), 400
+
+#     # Insert the moved task at the new index
+#     tasks.insert(new_order_index, moved_task)
+
+#     # Reassign `sort_order` values
+#     for index, t in enumerate(tasks):
+#         t.sort_order = index
+    
+#     db.session.commit()
+
+#     # Emit WebSocket event
+#     socketio.emit("task_sorted", {"task_id": task.id, "new_order": new_order_index}, to='/')
+
+#     # ✅ FIX: Ensure CORS Headers are Returned
+#     response = jsonify({"message": "Task order updated"})
+#     response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+#     response.headers["Access-Control-Allow-Credentials"] = "true"
+#     return response, 200
+
+
+# Version 2
+# # 📌 1️⃣ Update task sort order (PUT /tasks/{task_id}/sort)
+@csrf.exempt
+@api.route('/tasks/<int:task_id>/sort', methods=['PUT', 'OPTIONS'])
+def update_task_sort(task_id):
+    """ Updates the sorting order of a task within its hierarchy level. """
+    
+    if request.method == "OPTIONS":
+        # ✅ Properly handle the preflight request
+        response = make_response(jsonify({"message": "CORS preflight successful"}), 200)
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+        return response
+
+    data = request.json
+    new_order_index = data.get("new_order_index")
+
+    if new_order_index is None:
+        return jsonify({"error": "new_order_index is required"}), 400
+
+    # Fetch the task
+    task = Task.query.get(task_id)
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    # parent_id = task.parent_id  # ✅ Ensure sorting happens within the same parent
+
+    # Fetch all sibling tasks (same parent)
+    # sibling_tasks = Task.query.filter_by(parent_id=parent_id).order_by(Task.sort_order).all()
+    
+    logger.info(f"Sorting Task {task.id} - {task.name} (Type: {task.task_type}) to index {new_order_index}")
+    
+    # ✅ Determine Sorting Scope (Stay Within Parent)
+    parent_id = task.parent_id
+    
+    if task.task_type == "User Story" and parent_id is None:
+        logger.info(f"⚠️ User Story {task.id} has no parent! Sorting within 'No Epic'.")
+        
+        # ✅ Ensure sorting happens within User Stories without a parent
+        sibling_tasks = Task.query.filter(
+            Task.task_type == "User Story",
+            Task.parent_id.is_(None),
+            Task.project_id == task.project_id
+        ).order_by(Task.sort_order).all()
+        
+    else:
+        sibling_tasks = Task.query.filter_by(parent_id=parent_id).order_by(Task.sort_order).all()
+
+    if not sibling_tasks:
+        return jsonify({"error": "No tasks found in this hierarchy level"}), 400
+    
+    if task not in sibling_tasks:
+        return jsonify({"error": "Task not found in sorting list"}), 400
+
+    # ✅ Remove task from its current position
+    sibling_tasks.remove(task)
+
+    # ✅ Insert at new position
+    sibling_tasks.insert(new_order_index, task)
+
+    # ✅ Update `sort_order` for all tasks in this level
+    for index, t in enumerate(sibling_tasks):
+        t.sort_order = index
+
+    db.session.commit()
+
+    # ✅ Emit WebSocket event for real-time updates
+    socketio.emit("task_sorted", {
+        "task_id": task.id,
+        "new_order": new_order_index,
+        "new_parent_id": parent_id  # Ensure frontend updates hierarchy
+    }, to='/')
+
+    logger.info(f"✅ Task {task.id} sorted to index {new_order_index} successfully.")
+
+    response = jsonify({"message": "Task order updated"})
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response, 200
+
+
+@csrf.exempt
+@api.route('/tasks/<int:task_id>/parent', methods=['PUT', 'PATCH', 'OPTIONS'])
+def update_task_parent(task_id):
+    """ Moves a task to a new parent while enforcing hierarchy rules,
+    including handling the 'No Epic' category. """
+    
+    if request.method == "OPTIONS":
+        response = make_response(jsonify({"message": "CORS preflight successful"}), 200)
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+        return response
+    
+    data = request.json
+    new_parent_id = data.get("new_parent_id")
+
+    if new_parent_id is None:
+        return jsonify({"error": "new_parent_id is required"}), 400
+
+    task = Task.query.get(task_id)
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    # ✅ Handle "No Epic" Epic Creation
+    if task.task_type == "User Story" and new_parent_id == "no_epic":
+        logger.info(f"🔍 Moving User Story {task.id} to 'No Epic'.")
+
+        # Check if "No Epic" exists
+        no_epic = Task.query.filter_by(
+            name="No Epic", task_type="Epic", project_id=task.project_id
+        ).first()
+
+        if not no_epic:
+            no_epic = Task(
+                name="No Epic",
+                task_type="Epic",
+                project_id=task.project_id,
+                sort_order=0
+            )
+            db.session.add(no_epic)
+            db.session.commit()
+            logger.info(f"✅ Created 'No Epic' in Project {task.project_id}")
+
+        new_parent_id = no_epic.id  # Assign to "No Epic"
+
+    else:
+        new_parent = Task.query.get(new_parent_id)
+        if not new_parent:
+            return jsonify({"error": "New parent task not found"}), 404
+
+        # ✅ Prevent invalid hierarchy placements
+        if task.task_type == "User Story" and new_parent.task_type != "Epic":
+            return jsonify({"error": "A User Story can only have an Epic as a parent."}), 400
+        if task.task_type == "Subtask" and new_parent.task_type != "User Story":
+            return jsonify({"error": "A Subtask can only have a User Story as a parent."}), 400
+        if task.task_type == "Epic":
+            return jsonify({"error": "Epics cannot have a parent task."}), 400
+
+    # ✅ Update parent relationship
+    task.parent_id = new_parent_id
+    db.session.commit()
+
+    # ✅ Emit WebSocket event for real-time frontend updates
+    socketio.emit("task_parent_updated", {"task_id": task.id, "new_parent_id": new_parent_id}, namespace="/")
+
+    response = jsonify({"message": "Task parent updated successfully"})
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+    return response, 200
     

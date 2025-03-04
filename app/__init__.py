@@ -10,6 +10,8 @@ from flask_migrate import Migrate
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_cors import CORS  # ✅ Import CORS
 from flask_socketio import SocketIO  # ✅ Import WebSockets
+from flask import make_response, request, jsonify
+from flask_wtf.csrf import generate_csrf
 from app.extensions.db import db
 from app.forms.forms import csrf
 from app.utils.logging_config import setup_logging
@@ -17,7 +19,7 @@ from app.config import get_config
 from dotenv import load_dotenv
 
 # ✅ Ensure `async_mode` is set to "threading" for better compatibility
-socketio = SocketIO(cors_allowed_origins="*", async_mode="threading")  # ✅ WebSocket Initialization
+socketio = SocketIO(cors_allowed_origins=["http://localhost:3000"], async_mode="threading")  # ✅ WebSocket Initialization
 
 
 # Load environment variables from .env
@@ -70,8 +72,25 @@ def create_app():
 
         #toolbar.init_app(app)
 
-        # Enable CORS globally ✅
-        CORS(app, resources={r"/api/*": {"origins": "*"}})  # ✅ Apply CORS for API routes
+        # ✅ Correctly allow credentials and set specific frontend origin
+        CORS(app, supports_credentials=True, resources={
+            r"/api/*": {
+                "origins": ["http://localhost:3000"],  # Explicit origin instead of "*"
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+                "allow_headers": ["Content-Type", "X-CSRFToken"],
+            },
+            r"/tasks/*": {  # ✅ Extend CORS to task-related routes
+                "origins": ["http://localhost:3000"],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+                "allow_headers": ["Content-Type", "X-CSRFToken"],
+            }
+        })
+        
+        
+        # CORS(app, supports_credentials=True, resources={r"/api/*": {
+        #     "origins": "http://localhost:3000",
+        #     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+        # }})
 
         # Import models AFTER db is initialized
         with app.app_context():
@@ -93,6 +112,34 @@ def create_app():
         app.register_blueprint(tasks_bp, url_prefix="/tasks")
 
         logger.info("Blueprints registered successfully")
+        
+        # # ✅ Set CSRF token in response cookie after every request
+        # @app.after_request
+        # def add_cors_headers(response):
+        #     response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        #     response.headers["Access-Control-Allow-Credentials"] = "true"
+        #     response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+        #     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        #     print("CORS headers applied with PATCH")
+        #     return response
+
+        def set_csrf_cookie(response):
+            csrf_token = generate_csrf()
+            response.set_cookie(
+                "csrftoken", csrf_token, 
+                httponly=True, secure=False, samesite="Lax"
+            )
+
+            # ✅ If JSON response, attach CSRF token explicitly
+            if response.is_json:
+                data = response.get_json()
+                if isinstance(data, dict):  # Ensure it's a JSON response
+                    data["csrf_token"] = csrf_token
+                    response.set_data(jsonify(data).data)
+            
+            print(f"✅ CSRF Token Set: {csrf_token}")  # Debugging output
+            return response
+
 
     except Exception as e:
         logging.error(f"Error during application initialization: {e}")

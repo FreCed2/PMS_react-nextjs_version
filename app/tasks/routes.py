@@ -1,7 +1,8 @@
 import logging
 import traceback
 from builtins import any
-from flask import Blueprint, render_template, request, flash, url_for, redirect, jsonify
+from flask import Blueprint, render_template, request, flash, url_for, redirect, jsonify, make_response
+from flask_cors import CORS
 from app.forms.forms import csrf
 from app.extensions.db import db
 from app.tasks.models import Task
@@ -11,8 +12,12 @@ from app.models import Contributor
 
 
 
-bp = Blueprint("tasks", __name__, template_folder="../templates/tasks")
+
+bp = Blueprint('tasks_bp', __name__, template_folder="../templates/tasks")
 logger = logging.getLogger(__name__)
+
+# ✅ Then apply CORS to the `tasks` blueprint
+CORS(bp)
 
 
 @bp.route("/", methods=["GET"])
@@ -28,7 +33,7 @@ def list_tasks():
     completion_status = request.args.get("completion_status")
     hierarchical = request.args.get("hierarchical", "false").lower() == "true"
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 110, type=int)
+    per_page = request.args.get("per_page", 500, type=int)
     
     filters = {
         "is_archived": False,
@@ -312,12 +317,21 @@ def disconnect_subtask(task_id):
     return redirect(url_for("tasks.list_tasks"))
 
 
-@bp.route("/available_tasks", methods=["GET"])
+@bp.route("/available_tasks", methods=["GET", 'OPTIONS'])
 def available_tasks():
     """
     Fetch a list of available tasks, excluding the specified one,
     while enforcing valid parent-child hierarchy rules.
     """
+    
+    if request.method == "OPTIONS":
+        response = make_response(jsonify({"message": "CORS preflight successful"}), 200)
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+        return response
+    
     logger.info("Entering available_tasks route...")
 
     try:
@@ -416,11 +430,19 @@ def available_tasks():
                     })
 
         logger.debug(f"Tasks returned: {task_list}")
-        return jsonify({"tasks": task_list, "has_more": has_more}), 200
+    
+        response = jsonify({"tasks": task_list, "has_more": has_more})
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response, 200
 
     except Exception as e:
         logger.error(f"Error fetching available tasks: {str(e)}", exc_info=True)
-        return jsonify({"error": "Failed to fetch tasks"}), 500
+        response = jsonify({"error": "Failed to fetch tasks"})
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response, 500
+        
 
 
 @bp.route("/assign_parent/<int:task_id>", methods=["POST"])

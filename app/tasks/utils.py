@@ -92,25 +92,61 @@ class TaskService:
         """
         Validates all parent-child relationships in the database to ensure they conform to hierarchy rules.
 
+        Ensures:
+        - User Stories must have an Epic as a parent.
+        - Subtasks must have a User Story as a parent.
+        - Orphaned User Stories are automatically assigned to 'No Epic'.
+        
         Raises:
             ValueError: If invalid relationships are detected.
         """
         tasks = Task.query.options(db.joinedload(Task.parent)).all()
 
+        # 🔹 Step 1: Find all projects to check for orphaned User Stories
+        projects = db.session.query(Task.project_id).distinct()
+
+        for project in projects:
+            project_id = project[0]
+
+            # ✅ Check if "No Epic" exists for this project
+            no_epic = Task.query.filter_by(name="No Epic", project_id=project_id, task_type="Epic").first()
+            
+            if not no_epic:
+                logger.info(f"Creating 'No Epic' for Project {project_id}")
+                no_epic = Task(name="No Epic", project_id=project_id, task_type="Epic", sort_order=0)
+                db.session.add(no_epic)
+                db.session.commit()  # ✅ Save changes
+
+            # ✅ Assign orphaned User Stories to "No Epic"
+            orphaned_user_stories = Task.query.filter(
+                Task.task_type == "User Story",
+                Task.parent_id.is_(None),
+                Task.project_id == project_id
+            ).all()
+
+            for story in orphaned_user_stories:
+                logger.info(f"Assigning orphaned User Story '{story.name}' (ID: {story.id}) to 'No Epic'.")
+                story.parent_id = no_epic.id
+                db.session.add(story)
+
+        db.session.commit()  # ✅ Save all changes
+
+        # 🔹 Step 2: Validate Parent-Child Relationships
         for task in tasks:
             if task.parent_id:
                 parent_task = task.parent
                 if not parent_task:
                     raise ValueError(f"Task {task.id} has an invalid parent ID {task.parent_id}.")
 
-                # Validate hierarchy rules
+                # ✅ Enforce hierarchy rules
                 if task.task_type == "User Story" and parent_task.task_type != "Epic":
                     raise ValueError(f"User Story {task.id} must have an Epic as its parent.")
                 if task.task_type == "Subtask" and parent_task.task_type != "User Story":
                     raise ValueError(f"Subtask {task.id} must have a User Story as its parent.")
 
-        logger.info("All parent-child relationships are valid.")
-
+        logger.info("✅ All parent-child relationships are valid.")
+    
+    
     @staticmethod
     def get_all_task_ids_with_parents():
         """
@@ -325,36 +361,51 @@ class TaskService:
         query = Task.query.options(db.load_only(
             Task.id, Task.name, Task.description, Task.task_type, 
             Task.is_archived, Task.completed, Task.parent_id, Task.project_id,
-            Task.contributor_id, Task.story_points, Task.status  # ✅ Ensure status is included
-        )).order_by(Task.sort_order)
+            Task.contributor_id, Task.story_points, Task.status,
+            Task.sort_order  # ✅ Ensure sort_order is explicitly included ADDED 25 FEB 2025
+        )).filter(Task.sort_order.isnot(None))  # ✅ Exclude tasks with NULL sort_order ADJUSTED 25 FEB 2025
         
         if filters:
-            if "project_id" in filters and filters["project_id"] is not None:  
-                query = query.filter(Task.project_id == filters["project_id"])
-            elif "project_id" in filters and filters["project_id"] is None:
-                query = query.filter(Task.project_id.is_(None))  # Only apply if explicitly set to None
-            else:
-                # Fetch tasks regardless of project association
-                query = query.filter(Task.project_id.isnot(None))
+            
+            if "project_id" in filters and filters["project_id"] is not None:   
+                query = query.filter(Task.project_id == filters["project_id"])  
             if "is_archived" in filters:
-                query = query.filter(Task.is_archived == filters["is_archived"])
+                query = query.filter(Task.is_archived == filters["is_archived"]) 
             else:
-                query = query.filter(Task.is_archived == False)
-
-            if "project_id" in filters and filters["project_id"] is not None:
-                query = query.filter(Task.project_id == filters["project_id"])
-            elif "project_id" not in filters:  # ✅ Only filter out NULL project_id if explicitly required
-                query = query.filter(Task.project_id.isnot(None))  # Allow tasks with any project_id
+                query = query.filter(Task.is_archived == False)  # ✅ Exclude archived tasks by default
 
         # Execute the query and serialize the results
         tasks = query.all()
         
         logger.info(f"✅ Retrieved {len(tasks)} tasks from database.")
         
-        if not tasks:
-            logger.warning("⚠️ No tasks found! Filters might be too strict.")
-            
-        return [task.to_dict() for task in tasks]
+        # ✅ Step 1: Find or Create "No Epic"
+        project_id = filters.get("project_id") if filters else None
+        if project_id:
+            no_epic = Task.query.filter_by(name="No Epic", project_id=project_id, task_type="Epic").first()
+            if not no_epic:
+                logger.info("Creating 'No Epic' default Epic for project...")
+                no_epic = Task(name="No Epic", project_id=project_id, task_type="Epic", sort_order=0)
+                db.session.add(no_epic)
+                db.session.commit()
+
+        # ✅ Step 2: Assign orphaned User Stories to "No Epic"
+        orphaned_user_stories = Task.query.filter(
+            Task.task_type == "User Story",
+            Task.parent_id.is_(None),
+            Task.project_id == project_id
+        ).all()
+
+        for story in orphaned_user_stories:
+            logger.info(f"Assigning orphaned User Story '{story.name}' (ID: {story.id}) to 'No Epic'.")
+            story.parent_id = no_epic.id
+            db.session.add(story)
+
+        db.session.commit()  # ✅ Save changes
+
+        # ✅ Step 3: Convert tasks to dictionary format
+        task_dicts = [task.to_dict() for task in tasks]
+        return task_dicts
     
     
     

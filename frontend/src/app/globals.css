@@ -19,3 +19,17 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.side-view-modal {
+  transition: transform 3s ease-in-out !important;
+}
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: inherit; /* Use component-specific duration */
+}
+
+.transition-slow {
+  transition: transform 3s ease-in-out !important;
+}
