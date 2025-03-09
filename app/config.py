@@ -1,9 +1,15 @@
 import os
+from dotenv import load_dotenv
+
+# Explicitly load .env from the root directory
+dotenv_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+load_dotenv(dotenv_path)
+
 
 class Config:
     """Base configuration."""
-    SECRET_KEY = os.getenv("SECRET_KEY", "your_default_secret_key")
-    SQLALCHEMY_DATABASE_URI = "postgresql://pythonproject_user:securepassword@localhost:5432/pythonproject"
+    SECRET_KEY = os.getenv("SECRET_KEY", "fallback_secret_key")  # Uses the .env value or a fallback
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "postgresql://localhost:5432/defaultdb")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
 
@@ -15,7 +21,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://pythonproject_user:securepassword@localhost:5432/pythonproject_test"
+    SQLALCHEMY_DATABASE_URI = os.getenv("TEST_DATABASE_URL", "postgresql://localhost:5432/testdb")
     DEBUG = True
 
 class ProductionConfig(Config):

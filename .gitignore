@@ -5,8 +5,19 @@ Projects.session.sql
 venv/
 .venv/
 
+# Patches
+*.patch 
+
 # Logs
 *.log
+
+*.log.1
+*.log.2
+*.log.3
+*.log.4
+*.log.5
+
+
 
 # Environment Variables
 .env
@@ -30,5 +41,21 @@ Thumbs.db
 instance/
 node_modules
 
-# docs
+# Project documentation
 docs/session_notes/*.md
+project_documentation/
+scripts_for_documentation/
+scripts_for_testing/
+tests/
+
+
+# export
+export/
+
+# .gitignore
+.gitignore
+
+out/
+```
+
+
