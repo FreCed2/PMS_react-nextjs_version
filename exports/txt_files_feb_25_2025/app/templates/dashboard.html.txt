@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}
+<h1>Dashboard</h1>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Begin:: Row 1: Page title -->
+    <div class="row">
+        <div class="text-center"><h1 class="fw-bold">Projects overview</h1>
+        </div>
+        <div>
+        {% from 'includes/macros.html' import render_create_project_form %}
+        <!-- Button to trigger the modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+            Create New Project
+        </button>
+        <!-- Render the form using the macro -->
+        {{ render_create_project_form(form) }}
+        </div>
+        <!--End:: Row 1-->
+        <!--Begin:: Row 2: Projects Overview Section-->
+        <div class="row mt-4">
+            <!--Start:: Column 1-->
+            <div class="col">
+                <div class="card bg-custom border-custom">
+                    <!--begin::Card body-->
+                    <div class="card-body pt-5 text-white text-opacity-50 d-flex flex-column justify-content-center align-items-center">
+                        <!--begin::Heading-->
+                        <h1 class="card-title text-primary fontxl">{{all_count}}</h1>
+                        <h3 class="fw-semibold text-white mb-7">Current Projects</h3>
+                        <!--end::Heading-->
+                        <!--begin::Diagram and Labels Wrapper-->
+                        <div class="d-flex align-content-center align-items-center flex-wrap justify-content-between pt-2">
+                            <!--begin::Circle Diagram-->
+                            <div class="d-flex flex-left w-auto pe-5">
+                                <!--Insert code for circle diagram here-->
+                                <img src="{{ project_breakdown_chart_url }}" alt="Project Breakdown Chart" class="img-fluid" style="max-width:100%;">
+                            </div>
+                            <!--end::Circle Diagram-->
+                            <!--begin::Diagram Labels-->
+                            <div class="d-flex flex-column text-white justify-content-between flex-row-fluid my-4 ps-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item-dark d-flex justify-content-between align-items-center p-2">
+                                        Active
+                                        <span class="badge text-bg-primary rounded-pill mx-4">{{ongoing_count}}</span>
+                                    </li>
+                                    <li class="list-group-item-dark d-flex justify-content-between align-items-center p-2">
+                                        Completed
+                                        <span class="badge text-bg-primary rounded-pill mx-4">{{completed_count}}</span>
+                                    </li>
+                                    <li class="list-group-item-dark d-flex justify-content-between align-items-center p-2">
+                                        Yet to start
+                                        <span class="badge text-bg-primary rounded-pill align-middle mx-4">{{unstarted_count}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!--end::Diagram Labels-->
+                        </div>
+                        <!--end::Diagram and Labels Wrapper-->
+                    </div>
+                    <!--end::Card body-->
+                </div>
+                <!--end::Card-->
+            </div>
+            <!--End column-->
+            <!--Start column-->
+            <div class="col">
+                <div class="card bg-custom border-custom">
+                    <div class="card-body pt-5 text-white text-opacity-50 d-flex flex-column justify-content-center align-items-center">
+                        <h1 class="card-title text-primary fontxl"><!--Number of Contributors-->{{all_contributors_count}}</h1>
+                        <h3 class="fw-semibold text-white mb-7">Contributors</h3>
+                        <!--end::Heading-->
+                        <!--begin::Diagram and Labels Wrapper-->
+                        <div class="d-flex align-content-center align-items-center flex-wrap justify-content-center p-2">
+                            <!--begin::Circle Diagram-->
+                            <div class="d-flex flex-left w-auto pe-0">
+                                <!--Insert code for diagram here-->
+                                <img src="{{ contributor_breakdown_chart_url }}" alt="Contributor Breakdown Chart" class="img-fluid" style="max-width:100%;">
+                            </div>
+                            <!--end::Circle Diagram-->
+                        <!--begin::Diagram Labels-->
+                            <div class="d-flex flex-column text-white justify-content-center align-items-right flex-row-fluid my-4 ps-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item-dark d-flex justify-content-between align-items-center p-2">
+                                        Assigned to project
+                                        <span class="badge text-bg-primary rounded-pill mx-4">{{assigned_contributors_count}}</span>
+                                    </li>
+                                    <li class="list-group-item-dark d-flex justify-content-between align-items-center p-2">
+                                        Available for work
+                                        <span class="badge text-bg-primary rounded-pill mx-4">{{unassigned_contributors_count}}</span>
+                                    </li>
+                                    <li class="list-group-item-dark d-flex justify-content-between align-items-center p-2">
+                                        Unavailable
+                                        <span class="badge text-bg-primary rounded-pill align-middle mx-4">6</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!--end::Diagram Labels-->
+                        </div>
+                        <!--end::Diagram and Labels Wrapper-->
+                    </div>
+                    <!--end::Card body-->
+                </div>
+                <!--end::Card-->
+            </div>
+            <!--End column-->
+        </div>
+        <!--End::Row-->
+    </div>
+
+        <!-- Row 2: Project Details and Contributor Management -->
+        <div class="m-4">
+            <h1 class="text-start fw-bold">Projects</h1>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    {% for item in project_data %}
+    <!-- Project Details Section -->
+    <div class="col">
+        <div class="card bg-custom border-custom p-4">
+            <a class="link-underline link-underline-opacity-0" href="{{ url_for('page.project', project_name=item.project.name) }}">
+                <div class="card-body">
+                    <h3 class="text-start text-white fw-bold text-truncate">{{ item.project.name }}</h3>
+
+                    <!-- Start and Due Dates in the Same Row -->
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="me-3">
+                            <label class="form-label text-white">Start</label>
+                            <input type="text" class="form-control transparent-input" value="{{ item.formatted_start_date }}" readonly>
+                        </div>
+                        <div>
+                            <label class="form-label text-white">Due</label>
+                            <input type="text" class="form-control transparent-input" value="{{ item.formatted_end_date }}" readonly>
+                        </div>
+                    </div>
+
+                    <p class="text-white">Total Scope: {{ item.project.total_story_points }} Story Points</p>
+                    <div class="clearfix"></div>
+                    <span class="progress" role="progressbar" aria-label="Project Progress" aria-valuenow="{{ item.completion_percentage }}" aria-valuemin="0" aria-valuemax="100" style="height: 15px">
+                        <span class="progress-bar progress-bar-striped" style="width: {{ item.completion_percentage }}%;">
+                            {{ item.completion_percentage }}%
+                        </span>
+                    </span>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+    <script>
+        // Adding CSRF token to AJAX requests
+        const csrfToken = "{{ csrf_token() }}";
+    </script>
+
+{% endblock %}
+
+

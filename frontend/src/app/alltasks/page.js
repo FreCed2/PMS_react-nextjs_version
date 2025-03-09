@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, forwardRef, useCallback } from "react";
+import Image from 'next/image';
 import io from "socket.io-client"; // ✅ Import WebSocket client
 
 
@@ -72,19 +73,49 @@ export default function AllTasks() {
 
   const [editingTaskId, setEditingTaskId] = useState(null); // Tracks the task being edited
 
-  const handleTitleClick = (taskId) => {
-    setEditingTaskId(taskId); // Activate edit mode
-  };
+  const handleTitleClick = useCallback((taskId) => {
+      setEditingTaskId(taskId);
+  }, []);
 
-  const handleTitleBlur = () => {
-    setEditingTaskId(null); // Exit edit mode when clicking outside
-  };
+  const handleTitleBlur = useCallback(async (taskId) => {
+      const input = titleRefs.current[taskId];
+      if (!input) return;
 
-  const handleTitleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      setEditingTaskId(null); // Exit edit mode on Enter key press
-    }
-  };
+      const newTitle = input.value.trim();
+      if (!newTitle) return; // Prevent empty titles
+
+      console.log(`📌 Saving title for task ${taskId}: ${newTitle}`);
+
+      try {
+          const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: newTitle }),
+          });
+
+          if (!response.ok) throw new Error("Failed to update task title");
+          console.log(`✅ Task ${taskId} title saved successfully!`);
+
+          // ✅ Ensure the updated title is in state
+          setTasks((prevTasks) =>
+              prevTasks.map((task) =>
+                  task.id === taskId ? { ...task, name: newTitle } : task
+              )
+          );
+
+      } catch (error) {
+          console.error(`❌ Error saving task ${taskId} title:`, error);
+      }
+
+      // ✅ Exit edit mode
+      setEditingTaskId(null);
+  }, []);
+
+  const handleTitleKeyDown = useCallback((e) => {
+      if (e.key === "Enter") {
+          setEditingTaskId(null);
+      }
+  }, []);
 
   const [isEditingNewTask, setIsEditingNewTask] = useState(false);
   
@@ -398,7 +429,7 @@ export default function AllTasks() {
               project_id: selectedProjectId,
           }));
       }
-  }, [selectedProjectId]); 
+  }, [selectedProjectId, taskData.project_id]); 
 
   useEffect(() => {
     console.log("Task Data:", taskData);
@@ -508,7 +539,7 @@ export default function AllTasks() {
     } catch (error) {
         console.error("🚨 Step 13: Error creating new task:", error);
     }
-  }, [projects, selectedProjectId]);
+  }, [projects]);
 
 
   // Handles the creation of a new task under a parent task
@@ -593,14 +624,34 @@ export default function AllTasks() {
       }
   };
 
+  const titleRefs = useRef({}); // ✅ Ref for storing title input elements
+
   const handleTitleChange = async (taskId, newTitle) => {
       console.log(`📌 Updating title for task ${taskId} -> ${newTitle}`);
-      
+
+      // Get ref to the input field
+      const input = titleRefs.current[taskId];
+      const cursorPosition = input ? input.selectionStart : null;
+
+      // ✅ Update local state immediately (so UI doesn't revert back)
       setTasks((prevTasks) =>
           prevTasks.map((task) =>
               task.id === taskId ? { ...task, name: newTitle } : task
           )
       );
+
+      // ✅ Update the ref value directly (so the input doesn't lose state)
+      if (input) {
+          input.value = newTitle;
+      }
+
+      // ✅ Restore cursor position after state update
+      setTimeout(() => {
+          const updatedInput = titleRefs.current[taskId];
+          if (updatedInput && cursorPosition !== null) {
+              updatedInput.setSelectionRange(cursorPosition, cursorPosition);
+          }
+      }, 0);
 
       try {
           const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
@@ -617,236 +668,7 @@ export default function AllTasks() {
   };
 
 
-// Old version of handleFieldChange
-  // const handleFieldChange = useCallback(async (taskId, field, value) => {
-  //   console.log(`📌 Row 210 - Step 21: handleFieldChange called with taskId: ${taskId}, field: '${field}', value: '${value}'`);
 
-  //   if (!taskId) {
-  //       console.error("🚨 Error: taskId is undefined or null!");
-  //       return;
-  //   }
-    
-  //   const taskToUpdate = tasks.find(task => task.id === taskId);
-  //   console.log("🔍 row 218-Step 22: Checking if task exists in local state:", taskToUpdate);
-
-  //   if (!taskToUpdate || taskToUpdate[field] === value) {
-  //       console.warn(`⚠️ row 221-Step 23: No changes detected for ${field}, skipping API call.`);
-  //       return;
-  //   }
-    
-  //   // ✅ Update `taskData` immediately to reflect UI changes before API call
-  //   setTaskData((prevTaskData) => ({
-  //     ...prevTaskData,
-  //     [field]: value,
-  //   }));
-
-  //   try {
-  //       const payload = { [field]: value };
-  //       console.log("📡 Step 24: Sending update to API for", field);
-  //       const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
-  //           method: "PATCH",
-  //           headers: { "Content-Type": "application/json" },
-  //           body: JSON.stringify(payload),
-  //       });
-
-        
-  //       if (!response.ok) {
-  //           console.error("🚨 Step 26: API Error - Response not OK", response.status);
-  //           const errorText = await response.text();
-  //           throw new Error(`Failed to update ${field}: HTTP ${errorText}`);
-  //       }
-
-  //       const responseData = await response.json();
-  //       console.log("📩 Step 25: API Response Received:", responseData);
-
-  //       console.log(`✅ Step 27: Successfully updated '${field}' for Task ${taskId} to '${value}'`);
-
-  //       // ✅ Emit WebSocket Event for Real-Time Updates (for description, title, status and sort order changes)
-  //       const fieldsToBroadcast = ["title", "description", "status", "sort_order"];
-  //       if (fieldsToBroadcast.includes(field)) {
-  //           console.log(`📡 Emitting WebSocket event for '${field}' update...`);
-  //           socket.emit("update_task", { taskId, field, value });
-  //       }
-
-  //       // ✅ Handle Project Update (Ensure Project Name is Reflected)
-  //       let updatedProjectName = taskToUpdate.project;
-  //       if (field === "project_id") {
-  //           console.log("📌 Step 28: Checking project name for project_id:", value);
-  //           console.log("📌 Current projects state:", projects);
-            
-  //           if (!Array.isArray(projects)) {
-  //               console.error("🚨 projects is not an array!", projects);
-  //           }
-        
-  //           const updatedProject = projects.find((p) => p.id === parseInt(value, 10));
-  //           updatedProjectName = updatedProject ? updatedProject.name : "Unknown Project";
-
-  //           console.log(`✅ Step 29: Updated project name: ${updatedProjectName}`);
-  //       }
-
-  //       // ✅ Handle Contributor Updates - Ensure Contributor Name is Reflected
-  //       let updatedContributorId = taskToUpdate.contributor_id;
-  //       let updatedContributorName = taskToUpdate.contributor_name;
-  //       if (field === "contributor_id") {
-  //           updatedContributorId = responseData?.task?.contributor_id || value;
-  //           updatedContributorName = responseData?.task?.contributor_name || "Unassigned";
-  //       }
-
-  //       // ✅ Update Local Task State in `tasks` array
-  //       console.log("🔄 Step 29: Updating local state with new values...");
-  //       setTasks((prevTasks) =>
-  //           prevTasks.map((task) =>
-  //               task.id === taskId 
-  //                   ? { 
-  //                       ...task,
-  //                       [field]: value,
-  //                       ...(field === "project_id" && { project: updatedProjectName }),
-  //                       ...(field === "contributor_id" && {
-  //                           contributor_id: updatedContributorId,
-  //                           contributor_name: updatedContributorName,
-  //                       }),
-  //                     } 
-  //                   : task
-  //           )
-  //       );
-
-  //       // ✅ If the modal is open for this task, update `selectedTask` as well
-  //       if (selectedTask && selectedTask.id === taskId) {
-  //           console.log("🔄 Step 31: Updating selectedTask state in modal...");
-  //           setSelectedTask((prev) => ({
-  //               ...prev, 
-  //               [field]: value,
-  //               ...(field === "project_id" && { project: updatedProjectName }),
-  //               ...(field === "contributor_id" && {
-  //                   contributor_id: updatedContributorId,
-  //                   contributor_name: updatedContributorName,
-  //               }),
-  //           }));
-  //       }
-
-  //   } catch (error) {
-  //       console.error(`🚨 Step 31: Error updating ${field}:`, error);
-  //   }
-  // }, [projects, selectedTask, tasks]);
-
-
-  // -----------------Backup of old version, changed to new version 4 march 15:30-----------------
-
-
-  // Backup of old version, changed to new version 4 march 15:30 
-  //  ✅ Debounce the handleFieldChange function (Replaces the old handleFieldChange function)
-  // const debouncedSaveRef = useRef(
-  //   debounce(
-  //     async (taskId, field, value, tasks, projects, selectedTask, setTasks, setSelectedTask, socket) => {
-  //       console.log(`📌 Debounced Save Triggered for Task ${taskId}: ${field} → ${value}`);
-  
-  //       if (!taskId) {
-  //         console.error("🚨 Error: taskId is undefined or null!");
-  //         return;
-  //       }
-  
-  //       const taskToUpdate = tasks.find(task => task.id === taskId);
-  //       if (!taskToUpdate) {
-  //         console.error("❌ Error: Task not found in state!", { taskId, field, value });
-  //         return;
-  //       }
-
-  //       if (!taskToUpdate || taskToUpdate[field] === value) {
-  //         console.warn(`⚠️ No actual change detected for '${field}', skipping save.`);
-  //         return;
-  //       }
-
-  //       // 🔥 **NEW: Ensure `parent_id` is included in the update to maintain hierarchy**
-  //       const updatedTaskData = {
-  //         [field]: value,
-  //         parent_id: taskToUpdate.parent_id ?? null,  // ✅ Preserve parent_id if it exists
-  //       };
-  
-  //       // ✅ Optimistic UI Update
-  //       setTaskData(prev => ({ ...prev, [field]: value }));
-  
-  //       try {
-  //         const payload = { [field]: value };
-  //         console.log("📡 Sending update to API for", field);
-  //         console.log("📡 Sending update to API with payload:", updatedTaskData);
-        
-  //         const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
-  //           method: "PATCH",
-  //           headers: { "Content-Type": "application/json" },
-  //           body: JSON.stringify(payload),
-  //         });
-  
-  //         if (!response.ok) {
-  //           console.error("🚨 API Error:", response.status);
-  //           throw new Error(`Failed to update ${field}`);
-  //         }
-  
-  //         const responseData = await response.json();
-  //         console.log(`✅ Successfully updated '${field}' for Task ${taskId}`);
-  
-  //         // ✅ WebSocket Update - Only Broadcast if it's an important field
-  //         const fieldsToBroadcast = ["title", "description", "status", "sort_order"];
-  //         if (fieldsToBroadcast.includes(field)) {
-  //           console.log(`📡 Emitting WebSocket update for '${field}'`);
-  //           socket.emit("update_task", { taskId, field, value });
-  //         }
-  
-  //         // ✅ Handle Project Update (Ensure Project Name is Reflected)
-  //         let updatedProjectName = taskToUpdate.project;
-  //         if (field === "project_id") {
-  //           console.log("📌 Checking project name for project_id:", value);
-  //           const updatedProject = projects.find((p) => p.id === parseInt(value, 10));
-  //           updatedProjectName = updatedProject ? updatedProject.name : "Unknown Project";
-  //           console.log(`✅ Updated project name: ${updatedProjectName}`);
-  //         }
-  
-  //         // ✅ Handle Contributor Updates - Ensure Contributor Name is Reflected
-  //         let updatedContributorId = taskToUpdate.contributor_id;
-  //         let updatedContributorName = taskToUpdate.contributor_name;
-  //         if (field === "contributor_id") {
-  //           updatedContributorId = responseData?.task?.contributor_id || value;
-  //           updatedContributorName = responseData?.task?.contributor_name || "Unassigned";
-  //         }
-  
-  //         // ✅ Update Local Task State in `tasks` array
-  //         console.log("🔄 Updating local state with new values...");
-  //         setTasks(prevTasks =>
-  //           prevTasks.map(task =>
-  //             task.id === taskId
-  //               ? {
-  //                   ...task,
-  //                   [field]: value,
-  //                   ...(field === "project_id" && { project: updatedProjectName }),
-  //                   ...(field === "contributor_id" && {
-  //                     contributor_id: updatedContributorId,
-  //                     contributor_name: updatedContributorName,
-  //                   }),
-  //                 }
-  //               : task
-  //           )
-  //         );
-  
-  //         // ✅ If the modal is open for this task, update `selectedTask` as well
-  //         if (selectedTask && selectedTask.id === taskId) {
-  //           console.log("🔄 Updating selectedTask state in modal...");
-  //           setSelectedTask(prev => ({
-  //             ...prev,
-  //             [field]: value,
-  //             parent_id: taskToUpdate.parent_id, // ✅ Ensure parent_id remains intact in modal
-  //             ...(field === "project_id" && { project: updatedProjectName }),
-  //             ...(field === "contributor_id" && {
-  //               contributor_id: updatedContributorId,
-  //               contributor_name: updatedContributorName,
-  //             }),
-  //           }));
-  //         }
-  //       } catch (error) {
-  //         console.error(`🚨 Error updating ${field}:`, error);
-  //       }
-  //     },
-  //     1000 // ✅ Debounce delay of 1000ms
-  //   )
-  // );
 
   //---------------------New version of debouncedSavRef since 4 march 15:30---------------------//
 
@@ -1150,185 +972,7 @@ export default function AllTasks() {
   //     return csrfToken;
   // };
 
-  // Version 1
-  // ✅ Drag & Drop Handler
-  // const handleDragEnd = async (result) => {
-  //   if (!result.destination) return;
-
-  //   const movedTask = filteredTasks[result.source.index];
-  //   const targetTask = filteredTasks[result.destination.index];
-
-  //   if (!movedTask || !movedTask.id) {
-  //       console.error("❌ ERROR: movedTask is undefined or missing an ID!", movedTask);
-  //       return;
-  //   }
-
-  //   console.log("🟢 Drag Event:", result);
-  //   console.log("📡 Moved Task ID:", movedTask.id);
-  //   console.log("📌 New Order Index (Destination):", result.destination.index);
-
-    
-  //   // reorderedTasks.splice(result.destination.index, 0, movedTask);
-  //   // setFilteredTasks(reorderedTasks);
-
-  //   // // Step 2: Fetch CSRF Token
-  //   // const csrfToken = await getCsrfToken();
-    
-  //   // if (!csrfToken) {
-  //   //     console.error("🚨 No CSRF token found! Aborting API call.");
-  //   //     return;
-  //   // }
-
-  //   // Step 3: Send API Request to Persist Sorting
-  //   try {
-  //     let response;
-
-  //     if (result.destination.droppableId !== result.source.droppableId) {
-  //       if (!targetTask) {
-  //           console.error("❌ ERROR: targetTask is missing for parent update!", result);
-  //           return;
-  //       }
-    
-  //       console.log(`🔄 Moving task ${movedTask.id} inside new parent ${targetTask.id}`);
-    
-  //       response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/parent`, {
-  //           method: "PUT",
-  //           headers: { "Content-Type": "application/json" },
-  //           credentials: "include",
-  //           body: JSON.stringify({ new_parent_id: targetTask.id }),
-  //       });
-
-  //       } else {
-  //           // ✅ Reordering task within the same hierarchy
-  //           response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/sort`, {
-  //               method: "PUT",
-  //               headers: { "Content-Type": "application/json" },
-  //               credentials: "include",
-  //               body: JSON.stringify({ new_order_index: result.destination.index }),
-  //           });
-  //       }
-
-  //       if (!response.ok) {
-  //           // const errorText = await response.text();
-  //           throw new Error(`HTTP error! Status: ${response.status}`);
-  //       }
-
-  //       const data = await response.json();
-  //       console.log("✅ Task sorting updated successfully:", data);
-
-  //       socket.emit("task_sorted", {
-  //           taskId: movedTask.id,
-  //           new_order_index: result.destination.index,
-  //           new_parent_id: movedTask.parent_id, // Ensures correct hierarchy updates
-  //       });
-
-  //       // ✅ Fetch updated tasks after sorting/moving
-  //       const updatedTasksResponse = await fetch("http://localhost:5000/api/tasks");
-  //       const updatedTasks = await updatedTasksResponse.json();
-  //       setFilteredTasks(updatedTasks.tasks);
-
-  //   } catch (error) {
-  //       console.error("❌ Error updating task sorting:", error);
-  //   }
-  // };
-
-  //Version 2
-  // // ✅ Drag & Drop Handler
-  // const handleDragEnd = async (result) => {
-  //   console.log("🟢 Step 1: Drag & Drop Event Triggered:", result);
-
-  //   if (!result.destination) 
-  //     console.log("⚠️ Step 2.a: No valid destination. Drag event ignored.");
-  //     return;
-
-
-
-  //   const movedTask = filteredTasks[result.source.index];
-  //   const targetTask = filteredTasks[result.destination.index];
-
-  //   if (!movedTask || !movedTask.id) {
-  //       console.error("❌ ERROR: movedTask is undefined or missing an ID!", movedTask);
-  //       return;
-  //   }
-
-  //   console.log("📢 Drag & Drop Event:", result);
-  //   console.log("📦 Moved Task:", movedTask);
-  //   console.log("🎯 Target Task:", targetTask);
-  //   console.log("📍 Destination Index:", result.destination.index);
-  //   console.log("🔄 Parent Change:", result.destination.droppableId !== result.source.droppableId);
-
-  //   // ✅ Optimistically update UI BEFORE API request
-  //   setFilteredTasks((prevTasks) => {
-  //       const updatedTasks = [...prevTasks];
-  //       updatedTasks.splice(result.source.index, 1); // Remove moved task
-  //       updatedTasks.splice(result.destination.index, 0, movedTask); // Insert in new position
-  //       return updatedTasks;
-  //   });
-
-  //   try {
-  //       let response;
-
-  //       // ✅ Check if the task is moved inside another (Parent Change)
-  //       if (result.destination.droppableId !== result.source.droppableId) {
-  //           if (!targetTask) {
-  //               console.error("❌ ERROR: targetTask is missing for parent update!", result);
-  //               return;
-  //           }
-
-  //           // Prevent invalid parent assignments
-  //           if (movedTask.task_type === "User Story" && targetTask.task_type !== "Epic") {
-  //             alert("A User Story can only be assigned to an Epic.");
-  //             return;
-  //           }
-  //           if (movedTask.task_type === "Subtask" && targetTask.task_type !== "User Story") {
-  //               alert("A Subtask can only be assigned to a User Story.");
-  //               return;
-  //           }
-
-  //           console.log(`🔄 Moving task ${movedTask.id} inside new parent ${targetTask.id}`);
-
-  //           response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/parent`, {
-  //               method: "PUT",
-  //               headers: { "Content-Type": "application/json" },
-  //               credentials: "include",
-  //               body: JSON.stringify({ new_parent_id: targetTask.id }),
-  //           });
-
-  //       } else {
-  //           // ✅ Reordering task within the same hierarchy
-  //           console.log(`🔄 Reordering task ${movedTask.id} to new index ${result.destination.index}`);
-
-  //           response = await fetch(`http://localhost:5000/api/tasks/${movedTask.id}/sort`, {
-  //               method: "PUT",
-  //               headers: { "Content-Type": "application/json" },
-  //               credentials: "include",
-  //               body: JSON.stringify({ new_order_index: result.destination.index }),
-  //           });
-  //       }
-
-  //       if (!response.ok) {
-  //           throw new Error(`HTTP error! Status: ${response.status}`);
-  //       }
-
-  //       const data = await response.json();
-  //       console.log("✅ Task sorting updated successfully:", data);
-
-  //       // ✅ Emit WebSocket event for real-time update
-  //       socket.emit("task_sorted", {
-  //           taskId: movedTask.id,
-  //           new_order_index: result.destination.index,
-  //           new_parent_id: movedTask.parent_id, // Ensures correct hierarchy updates
-  //       });
-
-  //       // ✅ Fetch updated tasks after sorting/moving
-  //       const updatedTasksResponse = await fetch("http://localhost:5000/api/tasks");
-  //       const updatedTasks = await updatedTasksResponse.json();
-  //       setFilteredTasks(updatedTasks.tasks);
-
-  //   } catch (error) {
-  //       console.error("❌ Error updating task sorting:", error);
-  //   }
-  // };
+  
 
   // Version 3
   // ✅ Drag & Drop Handler with Detailed Execution Steps
@@ -1467,7 +1111,6 @@ export default function AllTasks() {
                 </span>
 
                 {/* ✅ Expand/Collapse Toggle */}
-                {/* ✅ Expand/Collapse Toggle */}
                 <span
                   className={`text-center cursor-pointer ${
                     task.task_type !== "Subtask" ? "opacity-80 hover:opacity-100" : ""
@@ -1504,15 +1147,16 @@ export default function AllTasks() {
 
                 {/* ✅ Task Title */}
                 <span className="flex items-center relative w-full">
-                  <div key={task.id} className="task-container">
+                  <div className="task-container">
                     {editingTaskId === task.id ? (
                       <input
                         id={`task-title-${task.id}`}
                         type="text"
-                        value={task.name}
-                        onChange={(e) => handleTitleChange(task.id, e.target.value)}
-                        onBlur={handleTitleBlur} // Exit edit mode when focus is lost
-                        onKeyDown={handleTitleKeyDown} // Allow pressing "Enter" to save and exit
+                        defaultValue={task.name} // ✅ Use defaultValue instead
+                        ref={(el) => (titleRefs.current[task.id] = el)} // Store input reference
+                        onChange={(e) => handleTitleChange(task.id, e.target.value)}  // ✅ Pass `e` correctly
+                        onBlur={(e) => handleTitleBlur(task.id)} // ✅ Save to state onBlur only
+                        onKeyDown={(e) => handleTitleKeyDown(e, task.id)}
                         autoFocus // ✅ Auto-focus on edit
                         className="task-title-input w-full focus:ring"
                       />
@@ -1670,7 +1314,7 @@ export default function AllTasks() {
       {/* ✅ Fixed Navigation Menu & Theme Toggle */}
       <nav className="fixed top-0 left-0 w-full bg-gray-800 p-4 flex items-center justify-between shadow-md z-50">
         <div className="flex items-center space-x-4">
-          <img src="/logo.png" alt="PMS Logo" className="h-8 w-auto hidden sm:block" onError={(e) => e.target.style.display = 'none'} />
+          <Image src="/logo.png" width={120} height={60} alt="PMS Logo" className="h-8 w-auto hidden sm:block" onError={(e) => e.target.style.display = 'none'} />
           <span className="text-white text-xl font-bold sm:hidden">PMS</span>
         </div>
         
@@ -1877,7 +1521,7 @@ function TaskModal({ isOpen, selectedTask, setSelectedTask, projects, selectedPr
           })
           .catch((error) => console.error("❌ Error fetching contributors:", error));
 
-  }, [selectedTask?.project_id]); // ✅ Runs when `selectedTask.project_id` changes
+  }, [selectedTask, selectedTask.project_id]); // ✅ Runs when `selectedTask.project_id` changes
 
   const [viewMode, setViewMode] = useState("side");
 
@@ -2082,9 +1726,10 @@ function TaskModal({ isOpen, selectedTask, setSelectedTask, projects, selectedPr
 
   // ✅ Cleanup Effect to prevent debounce issues
   useEffect(() => {
+      const debouncedSave = debouncedSaveRef.current;
       return () => {
           console.log("🛑 Cancelling debouncedSave, but NOT closing modal.");
-          debouncedSaveRef.current.cancel();
+          debouncedSave.cancel();
       };
   }, []);
 

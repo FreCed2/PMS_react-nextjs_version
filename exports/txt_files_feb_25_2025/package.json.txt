@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "acorn": "^8.14.0",
+    "acorn-walk": "^8.3.4",
+    "sortablejs": "^1.15.6"
+  },
+  "name": "pythonproject",
+  "version": "1.0.0",
+  "main": "extract_javascript_variables_from_files.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

@@ -1,0 +1,96 @@
+Global Variables:
+
+debounce
+deleteTask
+fetchTaskDetails
+getHierarchyLevel
+getModal
+handleTaskOpenClick
+initTableSorter
+initToggleDetails
+initializeRowLevels
+initializeToggleStates
+refreshTaskRow
+setupDeleteTaskLogic
+setupThemeToggle
+setupTooltips
+toggleChildRows
+updateTaskParentMap
+
+Function Variables:
+
+function:
+  boundHandleTaskSave
+  button
+  childRows
+  clearButton
+  confirmClose
+  contributorCell
+  contributorId
+  contributorSelect
+  csrfToken
+  currentListeners
+  currentTheme
+  currentlyOpenedTaskId
+  data
+  draggedRow
+  element
+  error
+  errorData
+  errorText
+  event
+  existingRow
+  fieldsToReset
+  filterElement
+  filters
+  formData
+  htmlElement
+  icon
+  index
+  isAnyChildVisible
+  isCurrentlyHidden
+  isFullPage
+  isModalOpening
+  isSaving
+  later
+  level
+  listenersAfterAdding
+  modalElement
+  modalFields
+  modalInstance
+  modalLabel
+  nestedChildId
+  newTaskButton
+  optionText
+  params
+  parentDropdown
+  parentId
+  parentRow
+  payload
+  reorderedTasks
+  response
+  result
+  row
+  rowToHighlight
+  saveTaskButton
+  saveTaskHandler
+  selector
+  tableBody
+  target
+  task
+  taskData
+  taskForm
+  taskId
+  taskIdField
+  taskRow
+  taskTable
+  taskTableBody
+  taskType
+  taskTypeStyles
+  themeButton
+  timeout
+  toggleButton
+  tooltipTriggerList
+  trigger
+  unsavedChanges
+  

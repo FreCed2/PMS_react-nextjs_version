@@ -1,0 +1,2549 @@
+(globalThis.TURBOPACK = globalThis.TURBOPACK || []).push(["static/chunks/src_10b5ed._.js", {
+
+"[project]/src/components/Card.js [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+__turbopack_esm__({
+    "default": (()=>__TURBOPACK__default__export__)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$prop$2d$types$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/prop-types/index.js [app-client] (ecmascript)");
+;
+;
+/**
+ * Renders a card with a title and description.
+ *
+ * @component
+ * @example
+ * return (
+ *   <Card title="React" description="A JavaScript library for building UI" />
+ * )
+ */ const Card = ({ title, description })=>{
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "card",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                children: title
+            }, void 0, false, {
+                fileName: "[project]/src/components/Card.js",
+                lineNumber: 15,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                children: description
+            }, void 0, false, {
+                fileName: "[project]/src/components/Card.js",
+                lineNumber: 16,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/Card.js",
+        lineNumber: 14,
+        columnNumber: 5
+    }, this);
+};
+_c = Card;
+Card.propTypes = {
+    title: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$prop$2d$types$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].string.isRequired,
+    description: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$prop$2d$types$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].string.isRequired
+};
+const __TURBOPACK__default__export__ = Card;
+var _c;
+__turbopack_refresh__.register(_c, "Card");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/src/app/alltasks/page.js [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+__turbopack_esm__({
+    "default": (()=>AllTasks)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_import__("[project]/node_modules/socket.io-client/build/esm/index.js [app-client] (ecmascript) <module evaluation>"); // ✅ Import WebSocket client
+// import { useQuery } from 'react-query';
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lodash$2f$debounce$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/lodash/debounce.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/navigation.js [app-client] (ecmascript)"); // ✅ Navigation imports
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$use$2d$draggable$2d$scroll$2f$dist$2f$react$2d$use$2d$draggable$2d$scroll$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react-use-draggable-scroll/dist/react-use-draggable-scroll.esm.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/src/components/Card.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_import__("[project]/node_modules/socket.io-client/build/esm/index.js [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$hello$2d$pangea$2f$dnd$2f$dist$2f$dnd$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/@hello-pangea/dnd/dist/dnd.esm.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$ChevronRightIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRightIcon$3e$__ = __turbopack_import__("[project]/node_modules/@heroicons/react/24/solid/esm/ChevronRightIcon.js [app-client] (ecmascript) <export default as ChevronRightIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__ = __turbopack_import__("[project]/node_modules/@heroicons/react/24/solid/esm/ChevronDownIcon.js [app-client] (ecmascript) <export default as ChevronDownIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$XMarkIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__XMarkIcon$3e$__ = __turbopack_import__("[project]/node_modules/@heroicons/react/24/solid/esm/XMarkIcon.js [app-client] (ecmascript) <export default as XMarkIcon>");
+;
+var _s = __turbopack_refresh__.signature(), _s1 = __turbopack_refresh__.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+//import { useSession } from "next-auth/react"; // what is this for?
+const socket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["default"])("http://127.0.0.1:5000"); // ✅ Connect to WebSocket server
+function AllTasks() {
+    _s();
+    const [selectedTask, setSelectedTask1] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null); // ✅ Tracks currently selected task
+    const [tasks1, setTasks] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [contributors, setContributors] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [filteredTasks, setFilteredTasks] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [taskStatus, setTaskStatus] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
+    const [expandedTasks, setExpandedTasks] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
+    const [darkMode, setDarkMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [projects, setProjects] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [filters, setFilters] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        project: "",
+        taskType: "",
+        status: ""
+    });
+    const [selectedProjectId, setSelectedProjectId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(""); // ✅ Track default project
+    const [isModalOpen, setIsModalOpen1] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // ✅ Fetch Contributors based on whether a project is selected
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            if (!selectedProjectId) {
+                console.log("🔄 Fetching all contributors...");
+                fetch("http://127.0.0.1:5000/api/contributors") // ✅ Updated API now includes projects array
+                .then({
+                    "AllTasks.useEffect": (res)=>res.json()
+                }["AllTasks.useEffect"]).then({
+                    "AllTasks.useEffect": (data)=>{
+                        if (!Array.isArray(data)) {
+                            console.error("❌ Contributors API response is not an array!", data);
+                            return;
+                        }
+                        // 🔹 Ensure `projects` is always an array
+                        const cleanedData = data.map({
+                            "AllTasks.useEffect.cleanedData": (c)=>({
+                                    ...c,
+                                    projects: Array.isArray(c.projects) ? c.projects : []
+                                })
+                        }["AllTasks.useEffect.cleanedData"]);
+                        console.log("✅ Global Contributors loaded:", cleanedData);
+                        setContributors(cleanedData);
+                    }
+                }["AllTasks.useEffect"]).catch({
+                    "AllTasks.useEffect": (error)=>console.error("❌ Error fetching global contributors:", error)
+                }["AllTasks.useEffect"]);
+            } else {
+                console.log(`🔄 Fetching contributors for project ID ${selectedProjectId}...`);
+                fetch(`http://127.0.0.1:5000/api/projects/${selectedProjectId}/contributors/manage`).then({
+                    "AllTasks.useEffect": (res)=>res.json()
+                }["AllTasks.useEffect"]).then({
+                    "AllTasks.useEffect": (data)=>{
+                        if (!Array.isArray(data)) {
+                            console.error("❌ Project Contributors API response is not an array!", data);
+                            return;
+                        }
+                        console.log(`✅ Contributors for project ${selectedProjectId} loaded:`, data);
+                        // ✅ Ensure contributors have `is_in_project` properly flagged
+                        const updatedData = data.map({
+                            "AllTasks.useEffect.updatedData": (c)=>({
+                                    ...c,
+                                    is_in_project: c.is_in_project ?? true
+                                })
+                        }["AllTasks.useEffect.updatedData"]);
+                        setContributors(updatedData);
+                    }
+                }["AllTasks.useEffect"]).catch({
+                    "AllTasks.useEffect": (error)=>console.error(`❌ Error fetching contributors for project ${selectedProjectId}:`, error)
+                }["AllTasks.useEffect"]);
+            }
+        }
+    }["AllTasks.useEffect"], [
+        selectedProjectId
+    ]); // ✅ Re-run when selectedProjectId changes
+    // ✅ WebSocket: Listen for contributor updates
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            socket.on("update_contributors", {
+                "AllTasks.useEffect": (updatedContributor)=>{
+                    console.log("📡 WebSocket Update: Contributor Changed!", updatedContributor);
+                    setContributors({
+                        "AllTasks.useEffect": (prevContributors)=>{
+                            // Remove contributor if marked as removed
+                            if (updatedContributor.removed) {
+                                return prevContributors.filter({
+                                    "AllTasks.useEffect": (c)=>c.id !== updatedContributor.id
+                                }["AllTasks.useEffect"]);
+                            }
+                            // Update existing contributor or add new one
+                            const existingIndex = prevContributors.findIndex({
+                                "AllTasks.useEffect.existingIndex": (c)=>c.id === updatedContributor.id
+                            }["AllTasks.useEffect.existingIndex"]);
+                            if (existingIndex !== -1) {
+                                prevContributors[existingIndex] = updatedContributor;
+                                return [
+                                    ...prevContributors
+                                ]; // Trigger state update
+                            }
+                            return [
+                                ...prevContributors,
+                                updatedContributor
+                            ];
+                        }
+                    }["AllTasks.useEffect"]);
+                }
+            }["AllTasks.useEffect"]);
+            return ({
+                "AllTasks.useEffect": ()=>{
+                    socket.off("update_contributors"); // ✅ Cleanup listener
+                }
+            })["AllTasks.useEffect"];
+        }
+    }["AllTasks.useEffect"], []);
+    // ✅ WebSocket: Listen for task updates (Contributors assigned to tasks)
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            socket.on("update_task", {
+                "AllTasks.useEffect": (updatedTask)=>{
+                    console.log("📡 WebSocket Update: Task Contributor Changed!", updatedTask);
+                    setTasks({
+                        "AllTasks.useEffect": (prevTasks)=>prevTasks.map({
+                                "AllTasks.useEffect": (task)=>task.id === updatedTask.taskId ? {
+                                        ...task,
+                                        contributor_id: updatedTask.contributor_id,
+                                        contributor_name: updatedTask.contributor_name
+                                    } : task
+                            }["AllTasks.useEffect"])
+                    }["AllTasks.useEffect"]);
+                }
+            }["AllTasks.useEffect"]);
+            return ({
+                "AllTasks.useEffect": ()=>{
+                    socket.off("update_task"); // ✅ Cleanup listener
+                }
+            })["AllTasks.useEffect"];
+        }
+    }["AllTasks.useEffect"], []);
+    // Automatically Refetch Contributors When Project Changes
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            console.log(`📡 Selected project changed to: ${selectedProjectId}, refetching contributors...`);
+        }
+    }["AllTasks.useEffect"], [
+        selectedProjectId
+    ]);
+    const handleContributorChange = async (taskId, newContributorId)=>{
+        console.log(`📌 handleContributorChange called with Task ID: ${taskId}, Contributor ID: ${newContributorId}`);
+        try {
+            // Fetch the current contributors of the task's project
+            const task = tasks1.find((t)=>t.id === taskId);
+            if (!task) {
+                console.error(`❌ Error: taskId is undefined!`, {
+                    taskId,
+                    newContributorId
+                });
+                return;
+            }
+            const projectId = task.project_id;
+            // ✅ Fetch the current contributors of the task's project
+            const contributorsResponse = await fetch(`http://127.0.0.1:5000/api/projects/${projectId}/contributors/manage`);
+            let projectContributors = await contributorsResponse.json();
+            // ✅ Ensure projectContributors is an array
+            if (!Array.isArray(projectContributors)) {
+                console.error("❌ Error: API response for contributors is not an array!", projectContributors);
+                return;
+            }
+            console.log(`📡 Contributors in project ${projectId}:`, projectContributors);
+            // 🔴 LOG ISSUE: Is the contributor already in the list?
+            console.log(`🔍 Checking if Contributor ID ${newContributorId} is already in the project...`);
+            // If contributor is NOT in the project, add them first
+            if (!projectContributors.some((c)=>c.id === parseInt(newContributorId))) {
+                console.log(`➕ Contributor ${newContributorId} is NOT in project ${projectId}, adding...`);
+                await fetch(`http://127.0.0.1:5000/api/projects/${projectId}/contributors/manage`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        contributor_id: newContributorId
+                    })
+                });
+                // Refetch the updated project contributors after adding
+                const updatedContributorsRes = await fetch(`http://127.0.0.1:5000/api/projects/${projectId}/contributors/manage`);
+                const updatedContributors = await updatedContributorsRes.json(); // ✅ Correct variable name
+                console.log(`✅ Updated Contributors in project ${projectId}:`, updatedContributors);
+                // ✅ Update UI with latest contributors list
+                setContributors((prevContributors)=>{
+                    const updatedSet = new Set(updatedContributors.map((c)=>c.id));
+                    return [
+                        ...prevContributors.filter((c)=>!updatedSet.has(c.id)),
+                        ...updatedContributors.map((c)=>({
+                                ...c,
+                                is_in_project: c.is_in_project ?? false
+                            }))
+                    ];
+                });
+            }
+            // 🔴 LOG ISSUE: Does the contributor exist in the state after update?
+            console.log("🔍 Updated contributor state: ", contributors);
+            // Now assign the contributor to the task
+            const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    contributor_id: newContributorId
+                })
+            });
+            if (!response.ok) throw new Error("Failed to assign contributor");
+            const updatedTask = await response.json();
+            console.log("✅ Contributor assigned successfully:", updatedTask);
+            // ✅ Update the local tasks state
+            setTasks((prevTasks)=>prevTasks.map((task)=>task.id === taskId ? {
+                        ...task,
+                        contributor_id: newContributorId,
+                        contributor_name: updatedTask.task.contributor_name
+                    } : task));
+            // ✅ WebSocket: Notify all clients about the change
+            socket.emit("update_task", {
+                taskId,
+                contributor_id: newContributorId,
+                contributor_name: updatedTask.task.contributor_name
+            });
+        } catch (error) {
+            console.error("❌ Error assigning contributor:", error);
+        }
+    };
+    // ✅ Debugging log for modal state changes
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            if (isModalOpen) {
+                console.log("🔄 isModalOpen changed:", isModalOpen);
+            }
+        }
+    }["AllTasks.useEffect"], [
+        isModalOpen
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            console.log("🛠️ Step 1: Fetching projects...");
+            fetch("http://127.0.0.1:5000/api/projects").then({
+                "AllTasks.useEffect": (response)=>response.json()
+            }["AllTasks.useEffect"]).then({
+                "AllTasks.useEffect": (projects)=>{
+                    console.log("✅ Step 2: Projects loaded:", projects);
+                    setProjects(projects);
+                    // Find "Miscellaneous" project and set it as default
+                    const miscProject = (Array.isArray(projects) ? projects : []).find({
+                        "AllTasks.useEffect.miscProject": (p)=>p.name === "Miscellaneous"
+                    }["AllTasks.useEffect.miscProject"]);
+                    if (miscProject) {
+                        console.log("✅ Step 3: Defaulting to 'Miscellaneous' project", miscProject.id);
+                        setSelectedProjectId(miscProject.id);
+                    } else {
+                        console.warn("⚠️ 'Miscellaneous' project not found. Creating it...");
+                        // Create "Miscellaneous" project if it doesn't exist
+                        fetch("http://127.0.0.1:5000/api/projects", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                name: "Miscellaneous"
+                            })
+                        }).then({
+                            "AllTasks.useEffect": (response)=>response.json()
+                        }["AllTasks.useEffect"]).then({
+                            "AllTasks.useEffect": (newProject)=>{
+                                console.log("✅ Step 4: 'Miscellaneous' project created:", newProject);
+                                setSelectedProjectId(newProject.id);
+                                setProjects({
+                                    "AllTasks.useEffect": (prev)=>[
+                                            ...prev,
+                                            newProject
+                                        ]
+                                }["AllTasks.useEffect"]); // Add to state
+                            }
+                        }["AllTasks.useEffect"]).catch({
+                            "AllTasks.useEffect": (error)=>console.error("🚨 Step 5: Error creating 'Miscellaneous' project:", error)
+                        }["AllTasks.useEffect"]);
+                    }
+                }
+            }["AllTasks.useEffect"]).catch({
+                "AllTasks.useEffect": (error)=>console.error("🚨 Step 6: Error fetching projects:", error)
+            }["AllTasks.useEffect"]);
+        }
+    }["AllTasks.useEffect"], []);
+    // ✅ Ensure taskData updates when selectedProjectId changes
+    const [taskData, setTaskData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(selectedTask || {
+        name: "",
+        description: "",
+        task_type: "User Story",
+        priority: "Unset",
+        status: "Not Started",
+        project_id: ""
+    });
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            if (selectedProjectId && !taskData.project_id) {
+                setTaskData({
+                    "AllTasks.useEffect": (prev)=>({
+                            ...prev,
+                            project_id: selectedProjectId
+                        })
+                }["AllTasks.useEffect"]);
+            }
+        }
+    }["AllTasks.useEffect"], [
+        selectedProjectId
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            console.log("Task Data:", taskData);
+        }
+    }["AllTasks.useEffect"], [
+        taskData
+    ]);
+    // ✅ Updated createNewTask - Immediately saves task before opening modal
+    const createNewTask = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "AllTasks.useCallback[createNewTask]": async ()=>{
+            console.log("🛠️ Step 5: createNewTask triggered - Saving task before opening modal...");
+            // ✅ Ensure projects are loaded
+            if (projects.length === 0) {
+                console.warn("⚠️ Step 6a: No projects available, fetching projects...");
+                try {
+                    const response = await fetch("http://127.0.0.1:5000/api/projects");
+                    const fetchedProjects = await response.json();
+                    setProjects(fetchedProjects);
+                } catch (error) {
+                    console.error("🚨 Step 6b: Error fetching projects:", error);
+                    return;
+                }
+            }
+            // ✅ Find or create the "Miscellaneous" project
+            let miscProject = projects.find({
+                "AllTasks.useCallback[createNewTask].miscProject": (p)=>p.name === "Miscellaneous"
+            }["AllTasks.useCallback[createNewTask].miscProject"]);
+            let defaultProjectId = miscProject ? miscProject.id : null;
+            if (!defaultProjectId) {
+                console.warn("⚠️ Step 7a: 'Miscellaneous' project not found. Creating it...");
+                try {
+                    const response = await fetch("http://127.0.0.1:5000/api/projects", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: "Miscellaneous"
+                        })
+                    });
+                    const newProject = await response.json();
+                    console.log("✅ Step 7b: 'Miscellaneous' project created:", newProject);
+                    defaultProjectId = newProject.id;
+                    setProjects({
+                        "AllTasks.useCallback[createNewTask]": (prev)=>[
+                                ...prev,
+                                newProject
+                            ]
+                    }["AllTasks.useCallback[createNewTask]"]); // Add to state
+                } catch (error) {
+                    console.error("🚨 Step 7c: Error creating 'Miscellaneous' project:", error);
+                    return;
+                }
+            }
+            // ✅ Step 8: Create the new task immediately
+            let taskPayload = {
+                title: "Untitled Task",
+                description: "",
+                task_type: "User Story",
+                priority: "Unset",
+                status: "Not Started",
+                project_id: defaultProjectId
+            };
+            // ✅ Only include `epic_priority` if the task is an Epic
+            if (taskPayload.task_type === "Epic") {
+                taskPayload.epic_priority = "Unset"; // Default for Epics
+            } else {
+                delete taskPayload.epic_priority; // ✅ Completely remove epic_priority for non-Epics
+            }
+            console.log("📡 Task Payload before sending:", JSON.stringify(taskPayload, null, 2));
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/tasks", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(taskPayload)
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("🚨 Step 10a: Task creation failed!", errorText);
+                    return;
+                }
+                const newTask = await response.json();
+                console.log("✅ Step 10b: New Task Created - checking 'newTask':", newTask);
+                // ✅ Ensure `project_id` is in state before opening modal
+                console.log("🛠️ Step 10c: Checking Task Object 'newTask.task':", newTask.task);
+                console.log("🔍 Step 10d: Checkign project_id presence 'newTask?.task?.project_id':", newTask?.task?.project_id);
+                if (!newTask.task) {
+                    console.error("🚨 Step 10c-error: Response does not contain a 'task' object!", newTask);
+                    return;
+                }
+                // ✅ Ensure `tasks` is updated so `handleFieldChange` can find task 319
+                setTasks({
+                    "AllTasks.useCallback[createNewTask]": (prevTasks)=>[
+                            ...prevTasks,
+                            newTask.task
+                        ]
+                }["AllTasks.useCallback[createNewTask]"]);
+                // Ensure `project_id` exists before proceeding
+                if (!newTask.task.project_id) {
+                    console.error("🚨 Step 10d: New Task missing project_id!", newTask.task);
+                    return;
+                }
+                setTaskData({
+                    "AllTasks.useCallback[createNewTask]": (prev)=>({
+                            ...newTask.task,
+                            project_id: newTask.task.project_id || defaultProjectId
+                        })
+                }["AllTasks.useCallback[createNewTask]"]);
+                setSelectedTask1(newTask.task);
+                setTaskData(newTask.task); // ✅ Ensure `taskData` is in sync
+                setIsModalOpen1(true);
+            } catch (error) {
+                console.error("🚨 Step 13: Error creating new task:", error);
+            }
+        }
+    }["AllTasks.useCallback[createNewTask]"], [
+        projects,
+        selectedProjectId
+    ]);
+    const handleFieldChange = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "AllTasks.useCallback[handleFieldChange]": async (taskId, field, value)=>{
+            console.log(`📌 Row 210 - Step 21: handleFieldChange called with taskId: ${taskId}, field: '${field}', value: '${value}'`);
+            if (!taskId) {
+                console.error("🚨 Error: taskId is undefined or null!");
+                return;
+            }
+            const taskToUpdate = tasks1.find({
+                "AllTasks.useCallback[handleFieldChange].taskToUpdate": (task)=>task.id === taskId
+            }["AllTasks.useCallback[handleFieldChange].taskToUpdate"]);
+            console.log("🔍 row 218-Step 22: Checking if task exists in local state:", taskToUpdate);
+            if (!taskToUpdate || taskToUpdate[field] === value) {
+                console.warn(`⚠️ row 221-Step 23: No changes detected for ${field}, skipping API call.`);
+                return;
+            }
+            // ✅ Update `taskData` immediately to reflect UI changes before API call
+            setTaskData({
+                "AllTasks.useCallback[handleFieldChange]": (prevTaskData)=>({
+                        ...prevTaskData,
+                        [field]: value
+                    })
+            }["AllTasks.useCallback[handleFieldChange]"]);
+            try {
+                const payload = {
+                    [field]: value
+                };
+                console.log("📡 Step 24: Sending update to API for", field);
+                const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    console.error("🚨 Step 26: API Error - Response not OK", response.status);
+                    const errorText = await response.text();
+                    throw new Error(`Failed to update ${field}: HTTP ${errorText}`);
+                }
+                const responseData = await response.json();
+                console.log("📩 Step 25: API Response Received:", responseData);
+                console.log(`✅ Step 27: Successfully updated '${field}' for Task ${taskId} to '${value}'`);
+                // ✅ Handle Project Update (Ensure Project Name is Reflected)
+                let updatedProjectName = taskToUpdate.project;
+                if (field === "project_id") {
+                    console.log("📌 Step 28: Checking project name for project_id:", value);
+                    console.log("📌 Current projects state:", projects);
+                    if (!Array.isArray(projects)) {
+                        console.error("🚨 projects is not an array!", projects);
+                    }
+                    const updatedProject = projects.find({
+                        "AllTasks.useCallback[handleFieldChange].updatedProject": (p)=>p.id === parseInt(value, 10)
+                    }["AllTasks.useCallback[handleFieldChange].updatedProject"]);
+                    updatedProjectName = updatedProject ? updatedProject.name : "Unknown Project";
+                    console.log(`✅ Step 29: Updated project name: ${updatedProjectName}`);
+                }
+                // ✅ Handle Contributor Updates - Ensure Contributor Name is Reflected
+                let updatedContributorId = taskToUpdate.contributor_id;
+                let updatedContributorName = taskToUpdate.contributor_name;
+                if (field === "contributor_id") {
+                    updatedContributorId = responseData?.task?.contributor_id || value;
+                    updatedContributorName = responseData?.task?.contributor_name || "Unassigned";
+                }
+                // ✅ Update Local Task State in `tasks` array
+                console.log("🔄 Step 29: Updating local state with new values...");
+                setTasks({
+                    "AllTasks.useCallback[handleFieldChange]": (prevTasks)=>prevTasks.map({
+                            "AllTasks.useCallback[handleFieldChange]": (task)=>task.id === taskId ? {
+                                    ...task,
+                                    [field]: value,
+                                    ...field === "project_id" && {
+                                        project: updatedProjectName
+                                    },
+                                    ...field === "contributor_id" && {
+                                        contributor_id: updatedContributorId,
+                                        contributor_name: updatedContributorName
+                                    }
+                                } : task
+                        }["AllTasks.useCallback[handleFieldChange]"])
+                }["AllTasks.useCallback[handleFieldChange]"]);
+                // ✅ If the modal is open for this task, update `selectedTask` as well
+                if (selectedTask && selectedTask.id === taskId) {
+                    console.log("🔄 Step 31: Updating selectedTask state in modal...");
+                    setSelectedTask1({
+                        "AllTasks.useCallback[handleFieldChange]": (prev)=>({
+                                ...prev,
+                                [field]: value,
+                                ...field === "project_id" && {
+                                    project: updatedProjectName
+                                },
+                                ...field === "contributor_id" && {
+                                    contributor_id: updatedContributorId,
+                                    contributor_name: updatedContributorName
+                                }
+                            })
+                    }["AllTasks.useCallback[handleFieldChange]"]);
+                }
+            } catch (error) {
+                console.error(`🚨 Step 31: Error updating ${field}:`, error);
+            }
+        }
+    }["AllTasks.useCallback[handleFieldChange]"], [
+        projects,
+        selectedTask,
+        tasks1
+    ]);
+    const handleDeleteTask = async (taskId)=>{
+        if (!window.confirm("Are you sure you want to delete this task?")) return;
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/api/tasks/delete/${taskId}`, {
+                method: "DELETE"
+            });
+            if (!response.ok) throw new Error("Failed to delete task");
+            // ✅ Remove task from local state
+            setTasks((prevTasks)=>prevTasks.filter((task)=>task.id !== taskId));
+            // ✅ Close modal if the deleted task was open
+            if (selectedTask?.id === taskId) {
+                setSelectedTask1(null);
+            }
+            console.log(`Deleted Task ID: ${taskId}`);
+        } catch (error) {
+            console.error("Error deleting task:", error);
+        }
+    };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            fetch("http://127.0.0.1:5000/api/tasks").then({
+                "AllTasks.useEffect": (response)=>response.json()
+            }["AllTasks.useEffect"]).then({
+                "AllTasks.useEffect": (data)=>{
+                    const tasksArray = Array.isArray(data) ? data : data.tasks || [];
+                    setTasks(tasksArray);
+                    setFilteredTasks(tasksArray);
+                    const initialStatus = {};
+                    tasksArray.forEach({
+                        "AllTasks.useEffect": (task)=>{
+                            initialStatus[task.id] = task.status;
+                        }
+                    }["AllTasks.useEffect"]);
+                    setTaskStatus(initialStatus);
+                }
+            }["AllTasks.useEffect"]).catch({
+                "AllTasks.useEffect": (error)=>console.error("Error fetching tasks:", error)
+            }["AllTasks.useEffect"]);
+        }
+    }["AllTasks.useEffect"], []);
+    const [loadingProjects, setLoadingProjects] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // ✅ Fetch Projects on Page Load
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            async function fetchData() {
+                setLoadingProjects(true);
+                try {
+                    const projectsRes = await fetch("http://127.0.0.1:5000/api/projects");
+                    if (!projectsRes.ok) throw new Error(`HTTP error! Status: ${projectsRes.status}`);
+                    setProjects(await projectsRes.json());
+                } catch (error) {
+                    console.error("Error fetching projects:", error);
+                } finally{
+                    setLoadingProjects(false);
+                }
+            }
+            fetchData();
+        }
+    }["AllTasks.useEffect"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AllTasks.useEffect": ()=>{
+            let filtered = tasks1.filter({
+                "AllTasks.useEffect.filtered": (task)=>{
+                    return (filters.project ? task.project === filters.project : true) && (filters.taskType ? task.task_type === filters.taskType : true) && (filters.status ? task.status === filters.status : true);
+                }
+            }["AllTasks.useEffect.filtered"]);
+            setFilteredTasks(filtered);
+        }
+    }["AllTasks.useEffect"], [
+        filters,
+        tasks1
+    ]);
+    const handlePriorityChange = async (taskId, newPriority)=>{
+        const taskToUpdate = tasks1.find((task)=>task.id === taskId);
+        if (!taskToUpdate || taskToUpdate.priority === newPriority) {
+            console.log(`No changes detected for priority, skipping API call.`);
+            return;
+        }
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    priority: newPriority
+                })
+            });
+            if (!response.ok) throw new Error("Failed to update priority");
+            console.log(`Updated priority for Task ${taskId} to ${newPriority}`);
+            // ✅ Update local state after API success
+            setTasks((prevTasks)=>prevTasks.map((task)=>task.id === taskId ? {
+                        ...task,
+                        priority: newPriority
+                    } : task));
+            console.log(`Updated priority for Task ${taskId} to ${newPriority}`);
+        } catch (error) {
+            console.error("Error updating priority:", error);
+        }
+    };
+    const openTaskModal = async (task)=>{
+        try {
+            console.log("Opening modal for:", task);
+            const response = await fetch(`http://127.0.0.1:5000/api/tasks/${task.id}`);
+            if (!response.ok) throw new Error("Failed to fetch task details");
+            const taskData = await response.json();
+            setSelectedTask1(taskData); // ✅ Ensure modal gets up-to-date data
+            // ✅ Set modal open after task data is set
+            setTimeout(()=>{
+                console.log("🚀 Opening modal after fetching task data");
+                setIsModalOpen1(true);
+            }, 100);
+        } catch (error) {
+            console.error("Error fetching task details:", error);
+        }
+    };
+    const closeModal = ()=>{
+        setSelectedTask1(null);
+    };
+    // // ✅ Function to Get CSRF Token from Cookies
+    // const getCsrfToken = async () => {
+    //     let csrfToken = document.cookie
+    //         .split('; ')
+    //         .find(row => row.startsWith('csrftoken='))
+    //         ?.split('=')[1];
+    //     if (!csrfToken) {
+    //         console.warn("🚨 CSRF token is missing in cookies! Trying to fetch...");
+    //         try {
+    //             const res = await fetch("http://127.0.0.1:5000/api/csrf", {
+    //                 method: "GET",
+    //                 //credentials: "include",
+    //             });
+    //             const data = await res.json();
+    //             csrfToken = data.csrf_token;
+    //         } catch (error) {
+    //             console.error("❌ Failed to fetch CSRF token:", error);
+    //         }
+    //     }
+    //     console.log("✅ CSRF Token:", csrfToken);
+    //     return csrfToken;
+    // };
+    // ✅ Drag & Drop Handler
+    const handleDragEnd = async (result)=>{
+        if (!result.destination) return;
+        // Step 1: Reorder Tasks in UI
+        const reorderedTasks = Array.from(filteredTasks);
+        const [movedTask] = reorderedTasks.splice(result.source.index, 1);
+        reorderedTasks.splice(result.destination.index, 0, movedTask);
+        setFilteredTasks(reorderedTasks);
+        // // Step 2: Fetch CSRF Token
+        // const csrfToken = await getCsrfToken();
+        // if (!csrfToken) {
+        //     console.error("🚨 No CSRF token found! Aborting API call.");
+        //     return;
+        // }
+        // Step 3: Send API Request to Persist Sorting
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/api/tasks/${movedTask.id}/sort`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                //credentials: "include",  // ✅ Ensures cookies are sent
+                body: JSON.stringify({
+                    new_order_index: result.destination.index
+                })
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("✅ Task sorting updated successfully:", data);
+            // Step 4: Emit WebSocket Event for Real-Time Updates
+            socket.emit("update_task", {
+                taskId: movedTask.id,
+                new_order_index: result.destination.index
+            });
+        } catch (error) {
+            console.error("❌ Error updating task sorting:", error);
+        }
+    };
+    // ✅ Expand/Collapse Nested Tasks
+    const toggleExpand = (taskId)=>{
+        setExpandedTasks((prev)=>({
+                ...prev,
+                [taskId]: !prev[taskId]
+            }));
+    };
+    // ✅ Render Tasks Recursively (Ensuring Nested Task Visibility)
+    const renderTasks = (tasks1, parentId = null, depth = 0)=>{
+        return tasks1.filter((task)=>task.parent_id === parentId).map((task, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$hello$2d$pangea$2f$dnd$2f$dist$2f$dnd$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Draggable"], {
+                draggableId: task.id.toString(),
+                index: index,
+                children: (provided)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        ref: provided.innerRef,
+                        ...provided.draggableProps,
+                        ...provided.dragHandleProps,
+                        className: "group",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "task-row grid grid-cols-[minmax(40px,60px)_minmax(40px,60px)_minmax(300px,1fr)_minmax(50px,80px)_minmax(150px,200px)_minmax(130px,180px)_minmax(60px,100px)_minmax(100px,140px)_minmax(100px,140px)_minmax(130px,180px)_minmax(50px,80px)] gap-4 p-3 border-b border-gray-700 items-center hover:bg-gray-700 transition duration-200",
+                                style: {
+                                    paddingLeft: `${depth * 20}px`
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-center",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "checkbox"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/alltasks/page.js",
+                                            lineNumber: 736,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 735,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-center cursor-pointer",
+                                        onClick: ()=>toggleExpand(task.id),
+                                        children: tasks1.some((t)=>t.parent_id === task.id) ? expandedTasks[task.id] ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
+                                            className: "w-5 h-5 text-white"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/alltasks/page.js",
+                                            lineNumber: 743,
+                                            columnNumber: 23
+                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$ChevronRightIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRightIcon$3e$__["ChevronRightIcon"], {
+                                            className: "w-5 h-5 text-white"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/alltasks/page.js",
+                                            lineNumber: 745,
+                                            columnNumber: 23
+                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            children: " "
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/alltasks/page.js",
+                                            lineNumber: 748,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 740,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "flex items-center relative w-full",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-semibold",
+                                                children: task.name
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 765,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-gray-400 text-sm ml-2",
+                                                children: [
+                                                    "(Parent-ID: ",
+                                                    task.parent_id || "None",
+                                                    ")"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 766,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "cursor-pointer text-white-400 hover:underline flex items-center",
+                                                    onClick: ()=>openTaskModal(task),
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "bi bi-arrows-angle-expand",
+                                                        children: " Open"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 775,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/alltasks/page.js",
+                                                    lineNumber: 770,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 769,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 764,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "task-id",
+                                        children: [
+                                            "LM-",
+                                            task.id
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 780,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "task-project",
+                                        children: task.project
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 781,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-center",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                            name: "contributor_id",
+                                            className: "contributor-dropdown mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                            value: task.contributor_id || "",
+                                            onChange: (e)=>{
+                                                if (!task.id) {
+                                                    console.error("🚨 Cannot assign contributor: Task ID is undefined!", task);
+                                                    return;
+                                                }
+                                                handleContributorChange(task.id, e.target.value);
+                                            },
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                    value: "",
+                                                    children: "Unassigned"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/alltasks/page.js",
+                                                    lineNumber: 796,
+                                                    columnNumber: 19
+                                                }, this),
+                                                contributors.map((c)=>{
+                                                    const contributorProjects = Array.isArray(c.projects) ? c.projects : [];
+                                                    const taskProjectId = task.project_id ?? null;
+                                                    const isContributorInProject = contributorProjects.includes(taskProjectId);
+                                                    const isAssignedContributor = task.contributor_id === c.id; // ✅ Check if this contributor is assigned to the task
+                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: c.id,
+                                                        children: [
+                                                            c.name,
+                                                            " ",
+                                                            !isAssignedContributor && (isContributorInProject ? "✅ (In Project)" : "➕ (Add to Project)")
+                                                        ]
+                                                    }, c.id, true, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 804,
+                                                        columnNumber: 23
+                                                    }, this);
+                                                })
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/app/alltasks/page.js",
+                                            lineNumber: 784,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 783,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "task-story-points text-center",
+                                        children: task.story_points || "-"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 811,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: `task-type-badge px-3 text-center ${task.task_type === "Epic" ? "epic-style" : task.task_type === "User Story" ? "user-story-style" : "subtask-style"}`,
+                                        children: task.task_type
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 814,
+                                        columnNumber: 17
+                                    }, this),
+                                    task.task_type === "Epic" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        className: "priority-dropdown p-2 bg-gray-700 text-white rounded text-center",
+                                        value: task.epic_priority || "",
+                                        onChange: (e)=>handleFieldChange(task.id, "epic_priority", e.target.value),
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "P0",
+                                                children: "P0 - Highest"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 831,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "P1",
+                                                children: "P1 - High"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 832,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "P2",
+                                                children: "P2 - Medium"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 833,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "P3",
+                                                children: "P3 - Low"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 834,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "P4",
+                                                children: "P4 - Lowest"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 835,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 826,
+                                        columnNumber: 19
+                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        className: "priority-dropdown p-2 bg-gray-700 text-white rounded text-center",
+                                        value: task.priority || "",
+                                        onChange: (e)=>handleFieldChange(task.id, "priority", e.target.value),
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "Low",
+                                                children: "Low"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 843,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "Medium",
+                                                children: "Medium"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 844,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "High",
+                                                children: "High"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 845,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "Critical",
+                                                children: "Critical"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 846,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 838,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        className: "task-status-dropdown p-2 bg-gray-700 text-white rounded text-center",
+                                        value: task.status,
+                                        onChange: (e)=>handleFieldChange(task.id, "status", e.target.value),
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "Not Started",
+                                                children: "Not Started"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 856,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "In Progress",
+                                                children: "In Progress"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 857,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "Completed",
+                                                children: "Completed"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 858,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 851,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        className: "text-red-400 hover:text-red-600 text-center",
+                                        onClick: ()=>handleDeleteTask(task.id),
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
+                                            className: "bi bi-trash"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/alltasks/page.js",
+                                            lineNumber: 866,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 862,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 730,
+                                columnNumber: 15
+                            }, this),
+                            expandedTasks[task.id] && renderTasks(tasks1, task.id, depth + 1)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 729,
+                        columnNumber: 13
+                    }, this)
+            }, task.id, false, {
+                fileName: "[project]/src/app/alltasks/page.js",
+                lineNumber: 727,
+                columnNumber: 9
+            }, this));
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: `min-h-screen ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-black"} px-10 py-8 mt-16`,
+        style: {
+            backgroundImage: "url('/background.svg')",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+            position: "relative",
+            backgroundPosition: "center center"
+        },
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
+                className: "fixed top-0 left-0 w-full bg-gray-800 p-4 flex items-center justify-between shadow-md z-50",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center space-x-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                src: "/logo.png",
+                                alt: "PMS Logo",
+                                className: "h-8 w-auto hidden sm:block",
+                                onError: (e)=>e.target.style.display = 'none'
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 885,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-white text-xl font-bold sm:hidden",
+                                children: "PMS"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 886,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 884,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center space-x-6",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                href: "http://127.0.0.1:5000/dashboard",
+                                className: "text-gray-300 hover:text-white",
+                                children: "Overview"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 890,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                href: "http://127.0.0.1:5000/tasks/",
+                                className: "text-gray-300 hover:text-white",
+                                children: "All Tasks (Old)"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 891,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                href: "http://localhost:3000/alltasks",
+                                className: "text-white font-bold",
+                                children: "All Tasks (React)"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 892,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                className: "p-2 bg-gray-700 text-white hover:bg-gray-600 rounded",
+                                onClick: ()=>setDarkMode(!darkMode),
+                                children: darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 893,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 889,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/alltasks/page.js",
+                lineNumber: 883,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "grid grid-cols-4 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                        className: "p-2 bg-gray-800 text-white border border-gray-600 rounded",
+                        onChange: (e)=>setFilters({
+                                ...filters,
+                                project: e.target.value
+                            }),
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "",
+                                children: "All Projects"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 906,
+                                columnNumber: 11
+                            }, this),
+                            Array.isArray(projects) ? projects.map((project)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                    value: project.name,
+                                    children: project.name
+                                }, project.id, false, {
+                                    fileName: "[project]/src/app/alltasks/page.js",
+                                    lineNumber: 909,
+                                    columnNumber: 15
+                                }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                disabled: true,
+                                children: "Loading..."
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 914,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 902,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                        className: "p-2 bg-gray-800 text-white border border-gray-600 rounded",
+                        onChange: (e)=>setFilters({
+                                ...filters,
+                                taskType: e.target.value
+                            }),
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "",
+                                children: "All Task Types"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 923,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "Epic",
+                                children: "Epic"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 924,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "User Story",
+                                children: "User Story"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 925,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "Subtask",
+                                children: "Subtask"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 926,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 919,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                        className: "p-2 bg-gray-800 text-white border border-gray-600 rounded",
+                        onChange: (e)=>setFilters({
+                                ...filters,
+                                status: e.target.value
+                            }),
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "",
+                                children: "All Statuses"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 934,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "Not Started",
+                                children: "Not Started"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 935,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "In Progress",
+                                children: "In Progress"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 936,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                value: "Completed",
+                                children: "Completed"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 937,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 930,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        className: "p-2 bg-red-500 hover:bg-red-700 rounded",
+                        onClick: ()=>setFilters({
+                                project: "",
+                                taskType: "",
+                                status: ""
+                            }),
+                        children: "Clear Filters"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 941,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/alltasks/page.js",
+                lineNumber: 900,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                className: "new-task-button top-20 left-8 z-50 p-3 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition duration-200",
+                onClick: createNewTask,
+                children: "➕ New Task"
+            }, void 0, false, {
+                fileName: "[project]/src/app/alltasks/page.js",
+                lineNumber: 950,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: ` p-6 rounded-md shadow-md ${darkMode ? "bg-gray-800" : "bg-gray-300"}`,
+                style: {
+                    backgroundColor: "rgba(21, 22, 34, 0.8)"
+                },
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-[minmax(40px,60px)_minmax(40px,60px)_minmax(250px,1fr)_minmax(50px,80px)_minmax(150px,200px)_minmax(130px,180px)_minmax(60px,100px)_minmax(100px,140px)_minmax(80px,140px)_minmax(90px,180px)_minmax(30px,80px)] gap-4 p-2 font-bold bg-gray-700 rounded-md text-white",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-center",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                    type: "checkbox",
+                                    id: "selectAll"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/alltasks/page.js",
+                                    lineNumber: 964,
+                                    columnNumber: 41
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 964,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "",
+                                children: "Toggle"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 965,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-left",
+                                children: "Task Title"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 967,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "",
+                                children: "ID"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 968,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "",
+                                children: "Project"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 969,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "",
+                                children: "Assigned To"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 970,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-center",
+                                children: "Estimate"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 971,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "",
+                                children: "Type"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 972,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "",
+                                children: "Priority"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 973,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "",
+                                children: "Status"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 974,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-center",
+                                children: "Delete"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 975,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 962,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$hello$2d$pangea$2f$dnd$2f$dist$2f$dnd$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DragDropContext"], {
+                        onDragEnd: handleDragEnd,
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$hello$2d$pangea$2f$dnd$2f$dist$2f$dnd$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Droppable"], {
+                            droppableId: "tasklist",
+                            children: (provided)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    ...provided.droppableProps,
+                                    ref: provided.innerRef,
+                                    children: [
+                                        renderTasks(filteredTasks),
+                                        provided.placeholder
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/alltasks/page.js",
+                                    lineNumber: 980,
+                                    columnNumber: 15
+                                }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/alltasks/page.js",
+                            lineNumber: 978,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 977,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/alltasks/page.js",
+                lineNumber: 957,
+                columnNumber: 7
+            }, this),
+            isModalOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TaskModal, {
+                isOpen: isModalOpen,
+                selectedTask: selectedTask,
+                setSelectedTask: setSelectedTask1,
+                projects: projects,
+                selectedProjectId: selectedProjectId,
+                onClose: ()=>{
+                    console.log("❌ Modal Close Button Clicked! isModalOpen → false");
+                    setIsModalOpen1(false);
+                },
+                handleFieldChange: handleFieldChange
+            }, void 0, false, {
+                fileName: "[project]/src/app/alltasks/page.js",
+                lineNumber: 991,
+                columnNumber: 9
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/app/alltasks/page.js",
+        lineNumber: 879,
+        columnNumber: 5
+    }, this);
+}
+_s(AllTasks, "3dxRAD4NGaZ8x6/77Y8d0J81RDo=");
+_c = AllTasks;
+{}function TaskModal({ isOpen, selectedTask, projects, selectedProjectId, onClose, handleFieldChange }) {
+    _s1();
+    // ✅ Fetch contributors using React Query
+    //const { data: contributors, error, isLoading } = useQuery(
+    //    ['contributors', selectedProjectId], 
+    //    () => fetchContributors(selectedProjectId)
+    //);
+    //if (isLoading) {
+    //    console.log("🔄 Loading contributors...");
+    //}
+    //if (error) {
+    //    console.error("❌ Error fetching contributors:", error);
+    //}
+    const defaultTask = {
+        name: "",
+        description: "",
+        priority: "Unset",
+        status: "Not Started",
+        project_id: selectedProjectId,
+        contributor_id: null,
+        story_points: 0
+    };
+    // ✅ Ensure we always have a valid task object
+    const [taskData, setTaskData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(selectedTask || {
+        name: "",
+        description: "",
+        task_type: "User Story",
+        priority: "Unset",
+        status: "Not Started",
+        project_id: selectedProjectId || ""
+    });
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
+    const [contributors, setContributors] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TaskModal.useEffect": ()=>{
+            if (!selectedTask || !selectedTask.project_id) {
+                console.warn("⚠️ TaskModal Warning: No selectedTask or project_id is undefined!", selectedTask);
+                return;
+            }
+            console.log(`🔄 Fetching contributors for project_id: ${selectedTask.project_id}`);
+            fetch(`http://127.0.0.1:5000/api/projects/${selectedTask.project_id}/contributors/manage`).then({
+                "TaskModal.useEffect": (res)=>res.json()
+            }["TaskModal.useEffect"]).then({
+                "TaskModal.useEffect": (data)=>{
+                    if (!Array.isArray(data)) {
+                        console.error("❌ Project Contributors API response is not an array!", data);
+                        return;
+                    }
+                    console.log(`✅ Contributors loaded for project ${selectedTask.project_id}:`, data);
+                    setContributors(data);
+                }
+            }["TaskModal.useEffect"]).catch({
+                "TaskModal.useEffect": (error)=>console.error("❌ Error fetching contributors:", error)
+            }["TaskModal.useEffect"]);
+        }
+    }["TaskModal.useEffect"], [
+        selectedTask?.project_id
+    ]); // ✅ Runs when `selectedTask.project_id` changes
+    const [viewMode, setViewMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("modal");
+    // ✅ Define scrollRef here
+    const scrollRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    // ✅ Ensure taskData syncs properly when selectedTask changes
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TaskModal.useEffect": ()=>{
+            setTaskData(selectedTask || {});
+        }
+    }["TaskModal.useEffect"], [
+        selectedTask
+    ]);
+    // ✅ Track if project_id is set
+    const [readyToFetchContributors, setReadyToFetchContributors] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const effectRun = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(false); // ✅ Prevents double execution in strict mode
+    // ✅ NEW: Set "Miscellaneous" as default if no project is selected
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TaskModal.useEffect": ()=>{
+            console.log("📌 Checking available projects before assigning default:", projects);
+            if (!selectedTask) {
+                const miscProject = projects.find({
+                    "TaskModal.useEffect.miscProject": (p)=>p.name === "Miscellaneous"
+                }["TaskModal.useEffect.miscProject"]);
+                if (miscProject) {
+                    console.log("✅ 'Miscellaneous' project found, using ID:", miscProject.id);
+                    setTaskData({
+                        "TaskModal.useEffect": (prev)=>({
+                                ...prev,
+                                name: "",
+                                description: "",
+                                task_type: "User Story",
+                                priority: "Unset",
+                                status: "Not Started",
+                                project_id: miscProject.id
+                            })
+                    }["TaskModal.useEffect"]);
+                    setReadyToFetchContributors(true); // ✅ Now project_id is available
+                } else {
+                    console.warn("⚠️ 'Miscellaneous' project is missing!");
+                    setReadyToFetchContributors(false);
+                }
+            }
+        }
+    }["TaskModal.useEffect"], [
+        selectedTask,
+        projects
+    ]);
+    // ✅ Define debouncedSave inside TaskModal with correct reference
+    const debouncedSaveRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lodash$2f$debounce$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"])({
+        "TaskModal.useRef[debouncedSaveRef]": (taskId, field, value, handleFieldChange)=>{
+            console.log(`🔥 Debounced Save Triggered at ${new Date().toISOString()} for ${field}:`, value);
+            if (typeof handleFieldChange === "function") {
+                handleFieldChange(taskId, field, value);
+            } else {
+                console.error("🚨 handleFieldChange is not defined inside debounce!");
+            }
+        }
+    }["TaskModal.useRef[debouncedSaveRef]"], 1000));
+    const handleMouseDown = (event)=>{
+        if (scrollRef.current) {
+            onMouseDown(event); // ✅ This now works correctly
+        }
+    };
+    const handleCreateNewTask = ()=>{
+        setSelectedTask({
+            name: "",
+            description: "",
+            priority: "Medium",
+            status: "Not Started",
+            project_id: selectedProject?.id || null,
+            contributor_id: null,
+            story_points: 0
+        });
+        setIsModalOpen(true);
+    };
+    const [taskNameWarning, setTaskNameWarning] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(""); // ✅ Store warning message
+    const validateTaskName = (taskName)=>{
+        console.log("🔍 Validating Task Name:", taskName);
+        // Check for existing tasks with the same name
+        if (tasks.some((task)=>task.name === taskName)) {
+            setTaskNameWarning("⚠️ A task with this name already exists.");
+        } else {
+            setTaskNameWarning(""); // Clear warning when name is unique
+        }
+    };
+    const debouncedHandleChange = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lodash$2f$debounce$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"])((event)=>{
+        const { name, value } = event.currentTarget;
+        console.log(`🛠️ Debounced handleChange triggered for '${name}' → '${value}'`);
+        setTaskData((prev)=>({
+                ...prev,
+                [name]: value
+            }));
+        // ✅ Only validate the name field for new tasks
+        if (!selectedTask?.id && name === "name") {
+            validateTaskName(value);
+        }
+    }, 500);
+    // ✅ Modified handleChange to create the task on first input
+    const handleChange = async (event)=>{
+        event.persist(); // ✅ Ensure the event is available inside debounce
+        const { name, value } = event.target; // ✅ Extract name and value from event
+        console.log(`🛠️ Step 11: handleChange triggered for '${event.target.name}' → '${event.target.value}'`);
+        // ✅ Update state immediately for instant UI feedback
+        setTaskData((prev)=>({
+                ...prev,
+                [name]: value
+            }));
+        console.log("🔄 Step 11a: Updated taskData:", taskData);
+        // ✅ If editing an existing task, update it using `handleFieldChange`
+        if (taskData.id || selectedTask?.id) {
+            console.log(`📌 Step 12: Updating existing task ${taskData.id || selectedTask?.id}`);
+            debouncedSaveRef.current(taskData.id || selectedTask?.id, name, value, handleFieldChange); // ✅ Use `handleFieldChange`
+            return;
+        }
+        // ✅ If creating a new task (no ID yet), create it on first input
+        try {
+            console.log("🛠️ Step 14: Creating new task...");
+            console.log("📡 Sending payload to API:");
+            const response = await fetch("http://127.0.0.1:5000/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: taskData.name || "Untitled Task",
+                    description: taskData.description || "",
+                    task_type: taskData.task_type || "User Story",
+                    priority: taskData.priority || "Unset",
+                    status: taskData.status || "Not Started",
+                    project_id: taskData.project_id || selectedProjectId
+                })
+            });
+            const responseData = await response.json();
+            console.log("📩 Step 15: API Response Received:", responseData);
+            // ✅ Handle warnings (like duplicate task name)
+            if (responseData.warning) {
+                console.warn(`⚠️ Step 16: Task name warning: ${responseData.warning}`);
+                setTaskNameWarning(responseData.warning); // ✅ Display warning message
+            } else {
+                setTaskNameWarning(""); // ✅ Remove warning when name becomes unique
+            }
+            console.log(`✅ Step 17: New Task Created Successfully - Task ID: ${responseData.task.id}, Name: "${responseData.task.name}"`);
+            // ✅ Update state with new task ID (so future updates use `handleFieldChange`)
+            setTaskData((prev)=>({
+                    ...prev,
+                    id: responseData.task.id
+                }));
+            console.log("🔄 Step 18: Updated taskData with new ID:", taskData);
+            if (typeof setSelectedTask === "function") {
+                setSelectedTask(responseData.task); // ✅ Ensure setSelectedTask is defined
+            } else {
+                console.error("🚨 Step 19b: setSelectedTask is not available.");
+            }
+        } catch (error) {
+            console.error("🚨 Step 20: Error creating new task:", error);
+        }
+    };
+    // ✅ Cleanup Effect to prevent debounce issues
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TaskModal.useEffect": ()=>{
+            return ({
+                "TaskModal.useEffect": ()=>{
+                    console.log("🛑 Cancelling debouncedSave, but NOT closing modal.");
+                    debouncedSaveRef.current.cancel();
+                }
+            })["TaskModal.useEffect"];
+        }
+    }["TaskModal.useEffect"], []);
+    /*
+  // ✅ Fetch Contributors AFTER taskData.project_id is updated (Prevents double execution)
+  // useEffect(() => {
+  //  if (!readyToFetchContributors || !taskData.project_id) {
+  //      console.warn(`⚠️ project_id is still undefined. Skipping contributor fetch.`);
+  //      return;
+  //  }
+
+    if (effectRun.current) {
+        console.log("🛑 Skipping duplicate contributor fetch due to React Strict Mode.");
+        return;
+    }
+
+    console.log(`🔄 Fetching contributors for project_id: ${taskData.project_id}`);
+    
+    let isCancelled = false; // ✅ Prevents duplicate API calls if effect runs twice
+
+    const fetchContributors = async () => {
+        try {
+            console.log(`🔄 Fetching contributors for project_id: ${taskData.project_id}`);
+            const res = await fetch(`http://127.0.0.1:5000/api/projects/${taskData.project_id}/contributors/manage`);
+            if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+            const contributorsData = await res.json();
+            if (!isCancelled) { // ✅ Ensures state updates only if effect is still valid
+                console.log("✅ Contributors loaded:", contributorsData);
+                setContributors(contributorsData);
+            }
+        } catch (error) {
+            console.error("❌ Error fetching contributors:", error);
+        }
+    };
+
+    fetchContributors();
+    effectRun.current = true; // ✅ Ensures this effect only runs once
+
+    return () => {
+        console.log("🛑 Cleaning up contributor fetch effect.");
+        isCancelled = true; // ✅ Prevents duplicate API calls
+    };
+  }, [readyToFetchContributors, taskData.project_id]); // ✅ Waits for `readyToFetchContributors` to be true
+*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TaskModal.useEffect": ()=>{
+            if (!selectedTask || !selectedTask.project_id) {
+                console.warn("⚠️ TaskModal Warning: selectedTask or project_id is undefined!");
+                return;
+            }
+        }
+    }["TaskModal.useEffect"], [
+        selectedTask
+    ]);
+    const handleContributorChange = async (e)=>{
+        const newContributorId = e.target.value;
+        setTaskData((prevTaskData)=>({
+                ...prevTaskData,
+                assigned_to: newContributorId
+            }));
+        try {
+            const checkRes = await fetch(`http://127.0.0.1:5000/api/projects/${taskData.project_id}/contributors/manage`);
+            const projectContributors = await checkRes.json();
+            if (!projectContributors.some((c)=>c.id === parseInt(newContributorId))) {
+                await fetch(`http://127.0.0.1:5000/api/projects/${taskData.project_id}/contributors/manage`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        contributor_id: newContributorId
+                    })
+                });
+            }
+            const updatedContributorsRes = await fetch(`http://127.0.0.1:5000/api/projects/${taskData.project_id}/contributors/manage`);
+            setContributors(await updatedContributorsRes.json());
+        } catch (error) {
+            console.error("Error adding contributor to project:", error);
+        }
+    };
+    const closeModal = ()=>{
+        setSelectedTask(null); // ✅ Clears modal when closed
+    };
+    if (!selectedTask && !isOpen) return null;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "modal-background",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            ref: scrollRef,
+            className: `fixed inset-0 flex items-center justify-center overflow-hidden ${viewMode === "modal" ? "flex items-center justify-center" : ""} ${viewMode === "side" ? "absolute top-0 left-0 w-[800px] h-full" : ""}`,
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: `task-modal p-6 rounded-lg shadow-lg relative z-50 transition-all duration-300 ease-in-out ${viewMode === "modal" ? "w-[70vw] max-w-4xl h-aut" : ""} ${viewMode === "side" ? "h-full w-[400px] shadow-lg" : ""} ${viewMode === "full" ? "fixed inset-0 w-full h-full p-8 max-w-none max-h-none" : ""}`,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute top-4 left-6 flex space-x-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                "data-tooltip-id": "global-tooltip",
+                                "data-tooltip-content": "Open in Modal View",
+                                onClick: ()=>setViewMode("modal"),
+                                className: "modal-view-btn p-1 rounded",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
+                                    className: "bi bi-aspect-ratio"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/alltasks/page.js",
+                                    lineNumber: 1360,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 1354,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                "data-tooltip-id": "global-tooltip",
+                                "data-tooltip-content": "Open in Side View",
+                                onClick: ()=>setViewMode("side"),
+                                className: "modal-view-btn p-1 rounded",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
+                                    className: "bi bi-layout-sidebar-inset-reverse"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/alltasks/page.js",
+                                    lineNumber: 1369,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 1363,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                "data-tooltip-id": "global-tooltip",
+                                "data-tooltip-content": "Open in Page View",
+                                onClick: ()=>setViewMode("full"),
+                                className: "modal-view-btn p-1 rounded",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
+                                    className: "bi bi-arrows-angle-expand"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/alltasks/page.js",
+                                    lineNumber: 1378,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 1372,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 1353,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute top-4 right-6 flex space-x-3",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: onClose,
+                            className: "text-gray-200 hover:text-white",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$XMarkIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__XMarkIcon$3e$__["XMarkIcon"], {
+                                className: "w-6 h-6"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 1383,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/alltasks/page.js",
+                            lineNumber: 1382,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 1381,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex justify-between items-center border-b pb-4 mt-10 drag-handle cursor-move",
+                        onMouseDown: handleMouseDown,
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                            className: "text-xl font-bold",
+                            children: taskData.name
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/alltasks/page.js",
+                            lineNumber: 1392,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 1388,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                        className: "mt-4 grid grid-cols-12 gap-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "col-span-8",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "label block text-sm font-medium text-gray-700",
+                                                children: "Task Title"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1401,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "text",
+                                                name: "name",
+                                                className: "input-task-name text-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                                value: taskData.name ?? "",
+                                                onChange: handleChange
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1402,
+                                                columnNumber: 19
+                                            }, this),
+                                            taskNameWarning && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "mt-2 text-yellow-500",
+                                                children: [
+                                                    "⚠️ ",
+                                                    taskNameWarning
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1411,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1400,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "label block text-sm font-medium text-gray-700",
+                                                children: "Description"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1417,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                                name: "description",
+                                                className: "textfield mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                                rows: "10",
+                                                value: taskData.description,
+                                                onChange: handleChange
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1418,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1416,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 1399,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "col-span-4 space-y-4 pl-6",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "label block text-sm font-medium text-gray-700",
+                                                children: "Project"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1431,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                name: "project_id",
+                                                className: "select-project mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                                value: taskData.project_id || "",
+                                                onChange: (e)=>{
+                                                    const selectedProjectId = e.target.value;
+                                                    console.log(`🎯 Row 1125-Project change: Step 1: Project selected: ${selectedProjectId} for task ${taskData.id}`); // <-- ADD THIS LINE
+                                                    // ✅ Ensure taskData has a valid task ID before updating
+                                                    if (!taskData.id) {
+                                                        console.error("🚨 Cannot update project, task ID is missing!", taskData);
+                                                        return;
+                                                    }
+                                                    // ✅ Update the backend
+                                                    handleFieldChange(taskData.id, "project_id", selectedProjectId);
+                                                    // ✅ Log when "Miscellaneous" is selected
+                                                    const selectedProject1 = projects.find((p)=>p.id === parseInt(selectedProjectId, 10));
+                                                    if (selectedProject1?.name === "Miscellaneous") {
+                                                        console.log("⚠️ Task is assigned to 'Miscellaneous'. Consider selecting a project.");
+                                                    }
+                                                },
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "",
+                                                        children: "Select Project"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1456,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    " ",
+                                                    projects.length > 0 ? projects.map((project)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                            value: project.id,
+                                                            children: project.name
+                                                        }, project.id, false, {
+                                                            fileName: "[project]/src/app/alltasks/page.js",
+                                                            lineNumber: 1459,
+                                                            columnNumber: 25
+                                                        }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        disabled: true,
+                                                        children: "Loading..."
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1464,
+                                                        columnNumber: 23
+                                                    }, this) // ✅ Display loading message if empty
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1432,
+                                                columnNumber: 19
+                                            }, this),
+                                            projects.find((p)=>p.id === parseInt(taskData.project_id, 10))?.name === "Miscellaneous" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "mt-2 text-sm text-yellow-400",
+                                                children: [
+                                                    "⚠️ This task is assigned to ",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                        children: "Miscellaneous"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1471,
+                                                        columnNumber: 55
+                                                    }, this),
+                                                    ". Choose a project if needed."
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1470,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1430,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "label block text-sm font-medium",
+                                                children: "Task Type"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1477,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                name: "task_type",
+                                                className: "select-task-type mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 transition-all duration-300",
+                                                value: taskData.task_type ?? "User Story",
+                                                onChange: (e)=>handleFieldChange(taskData.id, "task_type", e.target.value),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Epic",
+                                                        children: "Epic"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1484,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "User Story",
+                                                        children: "User Story"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1485,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Subtask",
+                                                        children: "Subtask"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1486,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1478,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1476,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "select-priority label block text-sm font-medium",
+                                                children: "Priority"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1491,
+                                                columnNumber: 17
+                                            }, this),
+                                            taskData.task_type === "Epic" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                name: "epic_priority",
+                                                className: "select-priority mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 transition-all duration-300",
+                                                value: taskData.epic_priority ?? "Unset",
+                                                onChange: (e)=>handleFieldChange(taskData.id, "epic_priority", e.target.value),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "P0",
+                                                        children: "P0 - Highest"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1499,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "P1",
+                                                        children: "P1 - High"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1500,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "P2",
+                                                        children: "P2 - Medium"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1501,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "P3",
+                                                        children: "P3 - Low"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1502,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "P4",
+                                                        children: "P4 - Lowest"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1503,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1493,
+                                                columnNumber: 19
+                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                name: "priority",
+                                                className: "select-priority mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 transition-all duration-300",
+                                                value: taskData.priority ?? "Unset",
+                                                onChange: (e)=>handleFieldChange(taskData.id, "priority", e.target.value),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Low",
+                                                        children: "Low"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1512,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Medium",
+                                                        children: "Medium"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1513,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "High",
+                                                        children: "High"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1514,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Critical",
+                                                        children: "Critical"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1515,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1506,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1490,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "label block text-sm font-medium",
+                                                children: "Task Status"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1521,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                name: "status",
+                                                className: `select-status mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 transition-all duration-300 ${taskData.status === "Not Started" ? "status-not-started" : taskData.status === "In Progress" ? "status-in-progress" : taskData.status === "Blocked" ? "status-blocked" : taskData.status === "Completed" ? "status-completed" : ""}`,
+                                                value: taskData.status ?? "Not Started",
+                                                onChange: (e)=>handleFieldChange(taskData.id, "status", e.target.value),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Not Started",
+                                                        children: "Not Started"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1533,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "In Progress",
+                                                        children: "In Progress"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1534,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Blocked",
+                                                        children: "Blocked"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1535,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "Completed",
+                                                        children: "Completed"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1536,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1522,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1520,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "label block text-sm font-medium",
+                                                children: "Estimate (Story Points)"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1541,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "number",
+                                                name: "story_points",
+                                                className: "input-story-points mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                                value: taskData.story_points || "",
+                                                onChange: (e)=>handleFieldChange(taskData.id, "story_points", e.target.value)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1542,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1540,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "label block text-sm font-medium text-gray-100",
+                                                children: "Assigned Contributor"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1552,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                name: "contributor_id",
+                                                className: "select-contributor mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                                value: taskData.contributor_id || "",
+                                                onChange: (e)=>handleContributorChange(taskData.id, e.target.value),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "",
+                                                        children: "Unassigned"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/alltasks/page.js",
+                                                        lineNumber: 1559,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    contributors.map((contributor)=>{
+                                                        // Ensure projects is always an array
+                                                        const contributorProjects = Array.isArray(contributor.projects) ? contributor.projects : [];
+                                                        const isContributorInProject = contributorProjects.includes(taskData.project_id);
+                                                        const isAssignedContributor = taskData.contributor_id === contributor.id;
+                                                        console.log(`🔍 Checking Contributor ${contributor.name} (ID: ${contributor.id}): Assigned - ${isAssignedContributor}, In Project - ${isContributorInProject}`);
+                                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                            value: contributor.id,
+                                                            children: [
+                                                                contributor.name,
+                                                                !isAssignedContributor && (isContributorInProject ? "✅ (In Project)" : "➕ (Add to Project)")
+                                                            ]
+                                                        }, contributor.id, true, {
+                                                            fileName: "[project]/src/app/alltasks/page.js",
+                                                            lineNumber: 1571,
+                                                            columnNumber: 25
+                                                        }, this);
+                                                    })
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/alltasks/page.js",
+                                                lineNumber: 1553,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/alltasks/page.js",
+                                        lineNumber: 1551,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/alltasks/page.js",
+                                lineNumber: 1429,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 1397,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "mt-6 flex justify-end space-x-4",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: onClose,
+                            className: "px-4 py-2 bg-gray-400 text-white rounded-md",
+                            children: "Close"
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/alltasks/page.js",
+                            lineNumber: 1584,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/alltasks/page.js",
+                        lineNumber: 1583,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/alltasks/page.js",
+                lineNumber: 1339,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/app/alltasks/page.js",
+            lineNumber: 1335,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/src/app/alltasks/page.js",
+        lineNumber: 1334,
+        columnNumber: 5
+    }, this);
+}
+_s1(TaskModal, "iO08eHPekcGUbelnwftU0rGv6KQ=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
+    ];
+});
+_c1 = TaskModal;
+var _c, _c1;
+__turbopack_refresh__.register(_c, "AllTasks");
+__turbopack_refresh__.register(_c1, "TaskModal");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/src/app/alltasks/page.js [app-rsc] (ecmascript, Next.js server component, client modules)": ((__turbopack_context__) => {
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+}}),
+}]);
+
+//# sourceMappingURL=src_10b5ed._.js.map

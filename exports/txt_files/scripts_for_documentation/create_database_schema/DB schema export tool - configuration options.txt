@@ -1,0 +1,161 @@
+# Database Schema Export Tool - Configuration Options
+
+This document outlines the configuration options available for the scripts used to export database schemas in your project. These scripts allow you to customize the output format, destination, and the data included in the schema exports.
+
+---
+
+## **1. Configurations in `run_export_schema.py`**
+
+This script serves as the entry point for exporting your database schema.
+
+### **A. Output File Path**
+- **Description**: Specifies where the exported schema will be saved.
+- **Default**: `"project_documentation/database_schemas/schema_output.txt"`
+- **Custom Usage**:
+  ```bash
+  python run_export_schema.py --output "custom_path/schema.txt"
+  ```
+
+### **B. Output Format**
+- **Description**: Determines the format of the exported schema.
+- **Available Options**:
+  - `"txt"`: Human-readable plain text format.
+  - `"json"`: Machine-readable JSON format.
+  - `"markdown"`: Markdown format, suitable for documentation purposes.
+- **Default**: `"txt"`
+- **Custom Usage**:
+  ```bash
+  python run_export_schema.py --format "json"
+  ```
+
+### **C. Exception Handling**
+- **Description**: Handles unexpected errors during the export process.
+- **Behavior**: Prints error details to the console.
+- **Example Error Message**:
+  ```
+  An unexpected error occurred: [Error Details]
+  ```
+
+---
+
+## **2. Configurations in `export_database_schema`**
+
+This script contains the core logic for exporting the schema. The following options can be configured:
+
+### **A. Application Context**
+- **Description**: Ensures that the database operations run within the app context.
+- **Note**: Custom application initializations should be performed before passing the `app` object.
+
+### **B. Output File**
+- **Description**: Specifies the path to save the schema output. If set to `None`, the schema is returned as a Python dictionary.
+
+### **C. Output Formats**
+- **Description**: Supports exporting the schema in the following formats:
+  - `Text`: Detailed, human-readable schema.
+  - `JSON`: Suitable for programmatic use.
+  - `Markdown`: Great for documentation.
+
+### **D. Table Details**
+- **Description**: Includes details such as:
+  - Columns (with type, nullability, and default values)
+  - Primary keys
+  - Foreign keys
+  - Unique constraints
+  - Indexes
+- **Customization**: You can exclude or modify the details as needed by editing the script logic.
+
+### **E. Directory Management**
+- **Description**: Ensures the output directory exists before writing the file.
+- **Default Behavior**: Automatically creates missing directories.
+- **Customization Example**:
+  ```python
+  output_dir = os.path.dirname(output_file)
+  if not os.path.exists(output_dir):
+      os.makedirs(output_dir)
+  ```
+
+### **F. Error Handling**
+- **Description**: Handles SQLAlchemy and OS-related errors. You can extend it for additional error types, such as permission issues or database timeouts.
+
+### **G. Schema Structure**
+- **Description**: Outputs table details in a structured format. You can extend the schema to include additional metadata like table comments, relationships, or triggers.
+  ```python
+  for comment in inspector.get_table_comment(table_name):
+      schema[table_name]["comment"] = comment
+  ```
+
+---
+
+## **3. Extending the Scripts**
+
+The following are ways to enhance or customize the scripts for specific use cases:
+
+### **A. Adding More Output Formats**
+- Add support for formats like XML, YAML, or HTML.
+- **Example for XML**:
+  ```python
+  elif format == "xml":
+      import dicttoxml
+      xml_data = dicttoxml.dicttoxml(schema)
+      f.write(xml_data.decode())
+  ```
+
+### **B. Select Specific Tables**
+- Add an argument to export only specific tables:
+  ```python
+  parser.add_argument("--tables", nargs="*", help="List of tables to export")
+  ```
+- Update the logic to filter tables:
+  ```python
+  tables = args.tables or inspector.get_table_names()
+  for table_name in tables:
+      ...
+  ```
+
+### **C. Including Views**
+- Extend the script to include database views:
+  ```python
+  for view_name in inspector.get_view_names():
+      schema[view_name] = {"type": "view", "columns": []}
+  ```
+
+### **D. Custom Logging Levels**
+- Configure logging levels via environment variables or command-line arguments:
+  ```python
+  import os
+  logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+  ```
+
+---
+
+## **4. Example Usage**
+
+### **Export as JSON**
+```bash
+python run_export_schema.py --output "exports/schema.json" --format "json"
+```
+
+### **Export as Markdown to Custom Directory**
+```bash
+python run_export_schema.py --output "docs/database_schema.md" --format "markdown"
+```
+
+### **Export Only Specific Tables**
+```bash
+python run_export_schema.py --output "exports/schema_subset.txt" --tables "users" "orders"
+```
+
+---
+
+## **5. Summary of Configurable Elements**
+
+| Feature              | Script                | Default Value                               | Notes                                                                 |
+|----------------------|-----------------------|---------------------------------------------|-----------------------------------------------------------------------|
+| Output File Path     | `run_export_schema.py` | `"project_documentation/database_schemas/schema_output.txt"` | Configurable via `--output` argument.                               |
+| Output Format        | `run_export_schema.py` | `"txt"`                                   | Configurable via `--format` argument.                               |
+| Export Specific Tables | `run_export_schema.py` | All tables                                  | Add the `--tables` argument to limit the scope.                     |
+| Schema Details       | `export_database_schema` | Columns, PKs, FKs, Unique Constraints, Indexes | Modify the logic to exclude or add details.                         |
+| Directory Handling   | `export_database_schema` | Creates directories if missing              | Customize for stricter error handling or logging.                   |
+| Logging              | Both                  | Logs errors to `stderr`                     | Extendable for more detailed logging or different logging levels.   |
+| Error Handling       | Both                  | SQLAlchemy and OS errors                    | Extendable for additional error types.                              |
+

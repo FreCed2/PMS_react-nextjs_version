@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Global Tasks{% endblock %}
+
+{% block content %}
+    <h1>Global Tasks</h1>
+    <p>Here are the tasks that need to be done to improve the website. Each task has a Reach, Impact, Confidence, and Effort score. The Priority Score is calculated by multiplying the Reach, Impact, and Confidence scores and dividing by the Effort score.</p>
+    <p>Click on the column headers to sort the table by that column.</p>
+    <p>Click on a task to edit it.</p>
+    <p>Click the "Add Task" button to add a new task.</p>
+    <button onclick="addTask()">Add Task</button>
+<table id="task-table">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th onclick="sortBy('reach')">Reach 🔼</th>
+            <th onclick="sortBy('impact')">Impact</th>
+            <th onclick="sortBy('confidence')">Confidence</th>
+            <th onclick="sortBy('effort')">Effort</th>
+            <th onclick="sortBy('priority')">Priority Score</th>
+        </tr>
+    </thead>
+    <tbody id="task-list">
+        <!-- Tasks dynamically inserted here -->
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function updatePriority(taskId, field, value) {
+    await fetch(`/tasks/${taskId}/update_priority`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: parseFloat(value) })
+    });
+}
+
+function sortBy(field) {
+    const rows = [...document.querySelectorAll("#task-list tr")];
+    rows.sort((a, b) => parseFloat(a.dataset[field]) - parseFloat(b.dataset[field]));
+    document.getElementById("task-list").innerHTML = "";
+    rows.forEach(row => document.getElementById("task-list").appendChild(row));
+}
+
+// Auto-update when priority values are edited
+document.querySelectorAll(".priority-editable").forEach(input => {
+    input.addEventListener("change", (e) => {
+        updatePriority(e.target.dataset.taskId, e.target.name, e.target.value);
+    });
+});
+</script>
+{% endblock %}
