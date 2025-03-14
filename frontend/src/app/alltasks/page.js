@@ -1,5 +1,7 @@
 "use client";
 
+import { updateTask } from "@/utils/api";
+import { createTask } from "@/utils/api";
 import { useEffect, useState, useRef, forwardRef, useCallback } from "react";
 import Image from 'next/image';
 import io from "socket.io-client"; // ✅ Import WebSocket client
@@ -28,10 +30,19 @@ import ParentTaskSelector from "@/components/ParentTaskSelector";
 import '../styles/custom.css';
 //import { useSession } from "next-auth/react"; // what is this for?
 
-const socket = io("http://127.0.0.1:5000");
-window.socket = socket; // ✅ Expose socket globally for debugging
+let socket; // Define socket globally
+
+if (typeof window !== "undefined") {
+  socket = io("http://127.0.0.1:5000");
+  window.socket = socket; // ✅ Assign socket to `window` only in the browser
+}
 
 export default function AllTasks() {
+  useEffect(() => {
+    if (socket) {
+      console.log("✅ WebSocket connection established in the client.");
+    }
+  }, []);
 
   // 🔍 Debugging: Detect Page Reloads
   useEffect(() => {
@@ -87,13 +98,17 @@ export default function AllTasks() {
       console.log(`📌 Saving title for task ${taskId}: ${newTitle}`);
 
       try {
-          const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name: newTitle }),
-          });
+          // const response = await fetch(`http://127.0.0.1:5000/api/tasks/${taskId}`, {
+          //     method: "PATCH",
+          //     headers: { "Content-Type": "application/json" },
+          //     body: JSON.stringify({ name: newTitle }),
+          // });
 
-          if (!response.ok) throw new Error("Failed to update task title");
+          // ✅ Use centralized API function
+          const updatedTask = await updateTask(taskId, { name: newTitle });
+          if (!updatedTask) throw new Error("Failed to update task title");
+
+          // if (!response.ok) throw new Error("Failed to update task title");
           console.log(`✅ Task ${taskId} title saved successfully!`);
 
           // ✅ Ensure the updated title is in state
@@ -225,46 +240,64 @@ export default function AllTasks() {
   }, [selectedTask]);
 
   useEffect(() => {
-      socket.on("task_created", (newTask) => {
+      console.log("🔄 Updated Tasks State:", tasks);
+  }, [tasks]); // Runs every time tasks state updates
+
+  useEffect(() => {
+      const handleNewTask = (newTask) => {
           console.log("📡 WebSocket: New Task Created! Full Data:", newTask);
           
-          // Check if task exists in payload
           if (!newTask || !newTask.task || !newTask.task.id) {
               console.error("🚨 Invalid WebSocket Task Data Received!", newTask);
               return;
           }
 
-          console.log("🔎 Task ID:", newTask.task.id, " Parent ID:", newTask.task.parent_id);
+          const newTaskId = newTask.task.id;
+          console.log(`🔎 Step 2: Received Task - ID: ${newTaskId}, Parent ID: ${newTask.task.parent_id}`);
 
           setTasks((prevTasks) => {
-              const updatedTasks = [...prevTasks, newTask.task].sort((a, b) => a.sort_order - b.sort_order);
-              console.log("🔄 Updated Task List from WebSocket:", updatedTasks);
-              return updatedTasks;
+              if (!Array.isArray(prevTasks)) {
+                  console.error("❌ prevTasks is not an array!", prevTasks);
+                  return prevTasks;
+              }
+
+              if (prevTasks.some(task => task.id === newTaskId)) {
+                  console.warn(`⚠️ Duplicate Task Detected! Skipping: ${newTaskId}`);
+                  return prevTasks;
+              }
+
+              console.log(`➕ Adding new WebSocket Task: ${newTask.task.name}`);
+              return [...prevTasks, newTask.task].sort((a, b) => a.sort_order - b.sort_order);
           });
 
           setFilteredTasks((prevFilteredTasks) => {
-              const updatedFilteredTasks = [...prevFilteredTasks, newTask.task].sort((a, b) => a.sort_order - b.sort_order);
-              return updatedFilteredTasks;
+              if (prevFilteredTasks.some(task => task.id === newTaskId)) {
+                  console.warn(`⚠️ Duplicate Task in filteredTasks! Skipping: ${newTaskId}`);
+                  return prevFilteredTasks;
+              }
+
+              console.log(`➕ Adding new task to filteredTasks: ${newTask.task.name}`);
+              return [...prevFilteredTasks, newTask.task].sort((a, b) => a.sort_order - b.sort_order);
           });
 
           setExpandedTasks((prev) => ({
               ...prev,
-              [newTask.task.parent_id]: true, // ✅ Keep parent expanded
+              [newTask.task.parent_id]: true,
           }));
 
           setTimeout(() => {
-              const inputField = document.getElementById(`task-title-${newTask.task.id}`);
-              if (inputField) {
-                  inputField.focus();
-                  inputField.select();
-              }
-          }, 100);
-      });
+              console.log("📊 FINAL STATE CHECK AFTER 500ms:");
+              console.log("🔄 Tasks:", tasks);
+              console.log("🔄 Filtered Tasks:", filteredTasks);
+          }, 500);
+      };
+
+      socket.on("task_created", handleNewTask);
 
       return () => {
-          socket.off("task_created");
+          socket.off("task_created", handleNewTask);
       };
-  }, []);
+  }, [filteredTasks, tasks]); 
 
   // Automatically Refetch Contributors When Project Changes
   useEffect(() => {
@@ -379,36 +412,16 @@ export default function AllTasks() {
   }, [isModalOpen]);
 
   useEffect(() => {
-    console.log("🛠️ Step 1: Fetching projects...");
-    fetch("http://127.0.0.1:5000/api/projects")
+    console.log("🛠️ Fetching 'Miscellaneous' project...");
+    fetch("http://127.0.0.1:5000/api/projects/miscellaneous")
       .then((response) => response.json())
-      .then((projects) => {
-        console.log("✅ Step 2: Projects loaded:", projects);
-        setProjects(projects);
-  
-        // Find "Miscellaneous" project and set it as default
-        const miscProject = (Array.isArray(projects) ? projects : []).find(p => p.name === "Miscellaneous");
-        if (miscProject) {
-          console.log("✅ Step 3: Defaulting to 'Miscellaneous' project", miscProject.id);
-          setSelectedProjectId(miscProject.id);
-        } else {
-          console.warn("⚠️ 'Miscellaneous' project not found. Creating it...");
-          // Create "Miscellaneous" project if it doesn't exist
-          fetch("http://127.0.0.1:5000/api/projects", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: "Miscellaneous" }),
-          })
-            .then((response) => response.json())
-            .then((newProject) => {
-              console.log("✅ Step 4: 'Miscellaneous' project created:", newProject);
-              setSelectedProjectId(newProject.id);
-              setProjects((prev) => [...prev, newProject]); // Add to state
-            })
-            .catch((error) => console.error("🚨 Step 5: Error creating 'Miscellaneous' project:", error));
-        }
+      .then((miscProject) => {
+        console.log("✅ 'Miscellaneous' project loaded:", miscProject);
+        
+        // ✅ Set as default project
+        setSelectedProjectId(miscProject.id); 
       })
-      .catch((error) => console.error("🚨 Step 6: Error fetching projects:", error));
+      .catch((error) => console.error("🚨 Error fetching 'Miscellaneous' project:", error))
   }, []);
 
   // ✅ Ensure taskData updates when selectedProjectId changes
@@ -517,9 +530,11 @@ export default function AllTasks() {
             return;
         }
 
-        // ✅ Ensure `tasks` is updated so `handleFieldChange` can find task 319
-        setTasks((prevTasks) => [...prevTasks, newTask.task]); 
+        // ❌ REMOVED THIS to prevent duplicate state update:
+        // setTasks((prevTasks) => [...prevTasks, newTask.task]); 
 
+        // ✅ Instead, emit WebSocket event so all clients sync properly
+        socket.emit("task_created", newTask.task);
         
         
         // Ensure `project_id` exists before proceeding
@@ -556,24 +571,26 @@ export default function AllTasks() {
           project_id: selectedProjectId,
       };
 
-      console.log("📡 Sending Task Payload:", JSON.stringify(taskPayload, null, 2));
+      console.log("📡 Sending Task Payload before API Call:", JSON.stringify(taskPayload, null, 2));
 
       try {
-          const response = await fetch("http://127.0.0.1:5000/api/tasks", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(taskPayload),
-          });
+          // const response = await fetch("http://127.0.0.1:5000/api/tasks", {
+          //     method: "POST",
+          //     headers: { "Content-Type": "application/json" },
+          //     body: JSON.stringify(taskPayload),
+          // });
 
-          console.log("📩 API Response Status:", response.status);
+          // console.log("📩 API Response Status:", response.status);
 
-          if (!response.ok) {
-              const errorText = await response.text();
-              console.error("🚨 Task creation failed! API Response:", errorText);
-              throw new Error(`Task creation failed - ${errorText}`);
-          }
+          // if (!response.ok) {
+          //     const errorText = await response.text();
+          //     console.error("🚨 Task creation failed! API Response:", errorText);
+          //     throw new Error(`Task creation failed - ${errorText}`);
+          // }
 
-          const newTask = await response.json();
+          // const newTask = await response.json();
+          const newTask = await createTask(taskPayload); // ✅ Now using centralized API function
+          if (!newTask) throw new Error("Failed to create task");
           console.log("✅ Task created successfully:", newTask);
 
           // 🔹 Keep Parent Task Expanded
@@ -582,35 +599,36 @@ export default function AllTasks() {
               [parentId]: true, // ✅ Keep parent expanded
           }));
 
+          // REMOVED THIS to prevent duplicate state update:
           // 🔹 Add New Task to the UI at the End of Its Parent
-          setTasks((prevTasks) => {
-            return prevTasks.map((task) => {
-              if (task.id === newTask.task.parent_id) {
-                return {
-                  ...task,
-                  children: [...(task.children || []), { ...newTask.task, project_id: task.project_id }],
-                };
-              }
-              return task;
-            });
-          });
+          // setTasks((prevTasks) => {
+          //   return prevTasks.map((task) => {
+          //     if (task.id === newTask.task.parent_id) {
+          //       return {
+          //         ...task,
+          //         children: [...(task.children || []), { ...newTask.task, project_id: task.project_id }],
+          //       };
+          //     }
+          //     return task;
+          //   });
+          // });
 
           // ✅ Ensure new task is in edit mode
           setEditingTaskId(newTask.task.id);
           setIsEditingNewTask(true);
             
-          setFilteredTasks((prevFilteredTasks) => {
-              const updatedFilteredTasks = [...prevFilteredTasks, newTask.task];
-              console.log("🔄 Updated Filtered Task List:", updatedFilteredTasks);
-              return updatedFilteredTasks;
-          });
+          // REMOVED THIS to prevent duplicate state update:
+          // setFilteredTasks((prevFilteredTasks) => {
+          //     const updatedFilteredTasks = [...prevFilteredTasks, newTask.task];
+          //     console.log("🔄 Updated Filtered Task List:", updatedFilteredTasks);
+          //     return updatedFilteredTasks;
+          // });
 
-          // 🔹 Emit WebSocket Event to Inform Other Clients
+          // 🔹 Relying on WebSocket event for real-time updates
           socket.emit("task_created", newTask.task);
 
           // 🔹 Automatically Focus and Select the Task Title for Editing
           setTimeout(() => {
-
           //  const newTaskElement = document.querySelector(`[data-task-id="${newTask.task.id}"]`);
               const inputField = document.getElementById(`task-title-${newTask.task.id}`);
               if (inputField) {
@@ -795,6 +813,7 @@ export default function AllTasks() {
   
   // ✅ Ensure `handleFieldChange` correctly triggers debounced save with parent_id
   const handleFieldChange = useCallback((taskId, field, value) => {
+    console.log(`📡 API Update Triggered for Task ${taskId}: ${field} → ${value}`);
     debouncedSaveRef.current(taskId, field, value, tasks, projects, selectedTask, setTasks, setSelectedTask, socket);
   }, [tasks, projects, selectedTask]);
 
@@ -850,6 +869,7 @@ export default function AllTasks() {
       .then((response) => response.json())
       .then((data) => {
         const tasksArray = Array.isArray(data) ? data : data.tasks || [];
+        console.log("🛠️ Setting tasks state with:", tasksArray); // ✅ Debug before updating state
         setTasks(tasksArray);
         setFilteredTasks(tasksArray);
 
@@ -926,11 +946,20 @@ export default function AllTasks() {
   const openTaskModal = async (task) => {
     try {
       console.log("Opening modal for:", task);
+
+      // ✅ Uncomment if you need to ensure we do NOT load from localStorage (force fresh DB fetch)
+      // localStorage.removeItem(`editorDraft-${task.id}`);
+
       const response = await fetch(`http://127.0.0.1:5000/api/tasks/${task.id}`);
       if (!response.ok) throw new Error("Failed to fetch task details");
       
       const taskData = await response.json();
-      setSelectedTask(taskData); // ✅ Ensure modal gets up-to-date data
+      console.log("🔍 Task details from API:", taskData);
+      // ✅ Fix: Deep copy the object to prevent modifying global state
+      const clonedTaskData = JSON.parse(JSON.stringify(taskData));
+      // setSelectedTask(taskData); // ✅ Ensure modal gets up-to-date data
+      setSelectedTask(clonedTaskData);
+      console.log("✅ Updated selectedTask state:", clonedTaskData);
 
       // ✅ Set modal open after task data is set
       setTimeout(() => {
@@ -1098,6 +1127,7 @@ export default function AllTasks() {
     return tasks
       .filter((task) => task.parent_id === parentId)
       .map((task, index) => (
+        console.log(`🔍 Rendering Task: ${task.id} - Description:`, task.description), // ✅ Debug Log
         <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
           {(provided) => (
             <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="group">
@@ -1163,7 +1193,7 @@ export default function AllTasks() {
                     ) : (
                       <button
                         onClick={() => handleTitleClick(task.id)}
-                        className="task-title-text text-left w-full px-2 py-1 bg-transparent border border-transparent hover:border-gray-400 rounded-md transition-all"
+                        className="task-title-text text-left w-full px-2 py-1 bg-transparent border border-transparent hover:bg-slate-900 rounded-md transition-all"
                       >
                         {task.name}
                       </button>
@@ -1314,7 +1344,6 @@ export default function AllTasks() {
       {/* ✅ Fixed Navigation Menu & Theme Toggle */}
       <nav className="fixed top-0 left-0 w-full bg-gray-800 p-4 flex items-center justify-between shadow-md z-50">
         <div className="flex items-center space-x-4">
-          <Image src="/logo.png" width={120} height={60} alt="PMS Logo" className="h-8 w-auto hidden sm:block" onError={(e) => e.target.style.display = 'none'} />
           <span className="text-white text-xl font-bold sm:hidden">PMS</span>
         </div>
         
@@ -1871,7 +1900,8 @@ function TaskModal({ isOpen, selectedTask, setSelectedTask, projects, selectedPr
                 <label className="label block text-sm font-medium text-gray-700">Description</label>
                 <TiptapEditor 
                   value={taskData.description} 
-                  onChange={(newContent) => handleChange(newContent, "description")} 
+                  onChange={(newContent) => handleChange(newContent, "description")}
+                  selectedTask={taskData} // ✅ Pass selectedTask to TiptapEditor
                 />
               </div>
             </div>

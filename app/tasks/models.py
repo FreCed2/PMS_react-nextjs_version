@@ -49,16 +49,18 @@ class Task(db.Model):
         default="Not Started",
         server_default="Not Started"
     )  # New status column
-    parent_id = db.Column(
-        db.Integer, db.ForeignKey("task.id"), index=True, nullable=True
-    )
-    project_id = db.Column(
-        db.Integer, db.ForeignKey("project.id"), nullable=False, index=True
-    )
-    contributor_id = db.Column(
-        db.Integer, db.ForeignKey("contributor.id"), index=True, nullable=True
-    )
-    story_points = db.Column(db.Integer, default=0, nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey("task.id"), index=True, nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False, index=True)
+    contributor_id = db.Column(db.Integer, db.ForeignKey("contributor.id"), index=True, nullable=True)
+    
+    
+    # ✅ New Fields for Estimate Support
+    estimate_type = db.Column(db.String(20), nullable=False, default="story_points")  # "story_points" or "time"
+    story_points = db.Column(db.Integer, nullable=True)  # ✅ Allow NULL
+    time_estimate = db.Column(db.Integer, nullable=True)  # ✅ New field for time estimates (e.g., hours)
+    #time_spent = db.Column(db.Integer, nullable=True)  # ✅ New field for time spent (e.g., hours)
+    
+    
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
         db.DateTime,
@@ -67,6 +69,34 @@ class Task(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
     )
     completed_date = db.Column(db.DateTime, nullable=True)
+    
+    
+    ALLOWED_ESTIMATE_TYPES = ["story_points", "time"]
+
+    @validates("estimate_type")
+    def validate_estimate_type(self, key, value):
+        """
+        Ensures that `estimate_type` is either 'story_points' or 'time'.
+        """
+        if value not in self.ALLOWED_ESTIMATE_TYPES:
+            raise ValueError(f"Invalid estimate type '{value}'. Allowed values: {self.ALLOWED_ESTIMATE_TYPES}")
+        return value
+    
+    @validates("story_points", "time_estimate")
+    def validate_estimates(self, key, value):
+        """
+        Ensures that only the correct estimate type is used.
+        """
+        if key == "story_points" and self.estimate_type != "story_points":
+            if value is not None:
+                raise ValueError("Cannot set story points when estimate_type is 'time'.")
+            return None  # Clear the field if estimate type changes
+        elif key == "time_estimate" and self.estimate_type != "time":
+            if value is not None:
+                raise ValueError("Cannot set time estimate when estimate_type is 'story_points'.")
+            return None  # Clear the field if estimate type changes
+        return value
+
     
     ALLOWED_STATUSES = ["Not Started", "In Progress", "Completed", "Archived"]  # Allowed statuses
     
@@ -259,7 +289,8 @@ class Task(db.Model):
             "project": self.project.name if self.project else "No Project Assigned",
             "contributor_id": self.contributor_id,
             "assigned_to": self.contributor.name if self.contributor else "Unassigned",
-            "story_points": self.story_points if self.story_points is not None else 0,
+            "estimate_type": self.estimate_type,  # ✅ Include estimate type
+            "estimate": self.story_points if self.estimate_type == "story_points" else self.time_estimate,  # ✅ Return correct estimate
             "status": self.status,  # ✅ Make sure this is included!
             "sort_order": self.sort_order,  # ✅ Ensure sort_order is included
             "created_at": self.created_at.isoformat() if self.created_at else None,

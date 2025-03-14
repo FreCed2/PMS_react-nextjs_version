@@ -412,7 +412,7 @@
     line-height: 1.0rem;
     font-size: 0.9rem;
     padding: 0.2rem 0.8rem 0.2rem 0.8rem;
-    background-color: transparent;
+    background-color: rgba(40, 44, 70, 1);
     border: 0px solid rgba(150,150,150,0.5);
     color: rgb(151, 171, 201);
     border-radius: 0.55rem;

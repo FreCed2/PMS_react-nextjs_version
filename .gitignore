@@ -23,7 +23,7 @@ venv/
 .env
 
 # Migrations
-migrations/
+# migrations/
 
 # Pytest
 .cache/
@@ -56,6 +56,9 @@ export/
 .gitignore
 
 out/
+
+# git workflows
+.github/workflows/*.yml
 ```
 
 

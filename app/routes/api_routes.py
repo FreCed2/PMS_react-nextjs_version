@@ -183,6 +183,9 @@ def list_tasks_json():
         traceback.print_exc()
         return jsonify({"error": "An unexpected error occurred while fetching tasks."}), 500
     
+
+
+    
 def ensure_miscellaneous_project():
     misc_project = Project.query.filter_by(name="Miscellaneous").first()
     if not misc_project:
@@ -191,6 +194,12 @@ def ensure_miscellaneous_project():
         db.session.commit()
         logger.info("✅ Created default 'Miscellaneous' project.")
     return misc_project.id  # Return its ID
+
+@api.route("/projects/miscellaneous", methods=["GET"])
+def get_miscellaneous_project():
+    """Fetches the 'Miscellaneous' project or creates it if missing."""
+    project_id = ensure_miscellaneous_project()
+    return jsonify({"id": project_id, "name": "Miscellaneous"})
     
 @api.route('/projects', methods=['GET'])
 def get_projects():
@@ -523,12 +532,222 @@ def save_task():
         return jsonify({"error": "Unexpected error occurred"}), 500
 
     
+# @csrf.exempt
+# @api.route('/tasks/<int:task_id>', methods=['PATCH'])
+# def update_task_route(task_id):
+#     """
+#     API endpoint to update a task.
+#     This function wraps the existing `update_task(data, task_id)`.
+#     """
+#     try:
+#         data = request.get_json()
+#         if not data:
+#             return jsonify({"error": "Invalid request. No JSON payload provided."}), 400
+        
+#         return update_task(data, task_id)
+
+#     except Exception as e:
+#         logger.error(f"Error in update_task_route: {e}", exc_info=True)
+#         return jsonify({"error": "Unexpected error occurred"}), 500
+
+# def update_task(data, task_id):
+#     """
+#     Updates an existing task with the provided data.
+#     Only updating fields that have changed to optimize database transactions.
+#     Ensures that the assigned contributor is also part of the task´s project.
+#     """
+#     task = Task.query.get(task_id)
+#     if not task:
+#         logger.error(f"Task with ID {task_id} not found")
+#         return jsonify({"error": f"Task with ID {task_id} not found."}), 404
+
+#     try:
+#         logger.debug(f"Received update payload for Task ID {task_id}: {data}")
+
+#         # Convert empty strings to None for nullable integer fields
+#         data['parent_id'] = int(data['parent_id']) if data.get('parent_id') and str(data['parent_id']).isdigit() else None
+#         data['project_id'] = int(data['project_id']) if data.get('project_id') and str(data['project_id']).isdigit() else task.project_id
+#         data['story_points'] = int(data['story_points']) if data.get('story_points') and str(data['story_points']).isdigit() else task.story_points
+#         data['sort_order'] = int(data['sort_order']) if data.get('sort_order') and str(data['sort_order']).isdigit() else task.sort_order
+#         data['contributor_id'] = int(data['contributor_id']) if 'contributor_id' in data and data['contributor_id'] else task.contributor_id
+
+#         # Define allowed statuses and priorities
+#         ALLOWED_STATUSES = ["Not Started", "In Progress", "Completed", "Archived"]
+#         ALLOWED_PRIORITIES = ["Unset", "Low", "Medium", "High", "Critical"]
+#         ALLOWED_EPIC_PRIORITIES = ["Unset", "P0", "P1", "P2", "P3", "P4"]
+
+#         updated_fields = []  # Track which fields are updated
+
+#         # ✅ Handle `task_type` changes before priority updates
+#         if "task_type" in data and data["task_type"] != task.task_type:
+#             logger.info(f"Task ID {task_id}: Changing task_type from {task.task_type} to {data['task_type']}")
+
+#             # ✅ Remove epic_priority if changing to non-Epic
+#             if task.task_type == "Epic" and data["task_type"] != "Epic":
+#                 logger.info(f"Task ID {task_id}: Removing epic_priority (was: {task.epic_priority})")
+#                 task.epic_priority = None
+#                 updated_fields.append("epic_priority")
+
+#             # ✅ Remove priority if changing to Epic
+#             if data["task_type"] == "Epic":
+#                 logger.info(f"Task ID {task_id}: Removing priority (was: {task.priority})")
+#                 task.priority = None
+#                 updated_fields.append("priority")
+
+#             task.task_type = data["task_type"]
+#             updated_fields.append("task_type")
+
+#         # ✅ Handle status updates
+#         if "status" in data and data["status"] in ALLOWED_STATUSES:
+#             if task.status != data["status"]:  # ✅ Prevent redundant updates
+#                 task.status = data["status"]
+#                 updated_fields.append("status")
+#                 logger.debug(f"Updated status for Task ID {task_id} to: {task.status}")
+
+#                 # ✅ Handle "completed" and "completed_date" updates
+#                 if task.status == "Completed":
+#                     if not task.completed:
+#                         task.completed = True
+#                         task.completed_date = datetime.utcnow()
+#                         updated_fields.append("completed")
+#                         updated_fields.append("completed_date")
+#                         logger.debug(f"Task {task_id} marked as completed at {task.completed_date}.")
+#                 else:
+#                     if task.completed:
+#                         task.completed = False
+#                         task.completed_date = None  # Reset completed_date
+#                         updated_fields.append("completed")
+#                         updated_fields.append("completed_date")
+#                         logger.debug(f"Task {task_id} unmarked as completed.")
+
+#         # ✅ Handle priority updates after `task_type` check
+#         if "priority" in data or "epic_priority" in data:
+#             if task.task_type == "Epic":
+#                 if "priority" in data:
+#                     return jsonify({"error": "Epics cannot have task priority."}), 400
+#                 if "epic_priority" in data and data["epic_priority"] in ALLOWED_EPIC_PRIORITIES:
+#                     if task.epic_priority != data["epic_priority"]:  # ✅ Prevent redundant updates
+#                         task.epic_priority = data["epic_priority"]
+#                         updated_fields.append("epic_priority")
+#                         logger.debug(f"Updated epic priority for Task ID {task_id} to: {task.epic_priority}")
+#             else:
+#                 if "epic_priority" in data:
+#                     # ✅ Remove epic_priority if task is not an Epic
+#                     logger.info(f"Task ID {task_id}: Removing epic_priority (was: {task.epic_priority})")
+#                     task.epic_priority = None
+#                     updated_fields.append("epic_priority")
+
+#                 if "priority" in data and data["priority"] in ALLOWED_PRIORITIES:
+#                     if task.priority != data["priority"]:  # ✅ Prevent redundant updates
+#                         task.priority = data["priority"]
+#                         updated_fields.append("priority")
+#                         logger.debug(f"Updated priority for Task ID {task_id}")
+
+#         # ✅ Handle general task field updates
+#         if "name" in data and data["name"].strip() and data["name"].strip() != task.name:
+#             task.name = data["name"].strip()
+#             updated_fields.append("name")
+
+#         if "description" in data and data["description"] != task.description:
+#             task.description = data["description"]
+#             updated_fields.append("description")
+
+#         if "parent_id" in data and data["parent_id"] != task.parent_id:
+#             task.parent_id = data["parent_id"]
+#             updated_fields.append("parent_id")
+
+#         if "project_id" in data and data["project_id"] != task.project_id:
+#             task.project_id = data["project_id"]
+#             updated_fields.append("project_id")
+
+#         if "story_points" in data and data["story_points"] != task.story_points:
+#             task.story_points = data["story_points"]
+#             updated_fields.append("story_points")
+
+#         # ✅ Assign Contributor and Ensure Project Membership
+#         if "contributor_id" in data and data["contributor_id"] != task.contributor_id:
+#             contributor = Contributor.query.get(data["contributor_id"])
+#             if contributor:
+#                 task.contributor_id = data["contributor_id"]
+#                 updated_fields.append("contributor_id")
+
+#                 # ✅ Ensure the contributor is part of the task's project
+#                 if contributor not in task.project.contributors:
+#                     task.project.contributors.append(contributor)
+#                     db.session.commit()
+#                     logger.info(f"✅ Contributor {contributor.id} added to Project {task.project.id}")
+
+#                     # ✅ WebSocket event for project update
+#                     socketio.emit("update_contributors", {
+#                         "id": contributor.id,
+#                         "name": contributor.name,
+#                         "project_id": task.project.id
+#                     }, namespace="/", to=None)
+
+#             else:
+#                 return jsonify({"error": "Invalid Contributor ID"}), 400
+
+#         # ✅ Commit task update if any changes were made
+#         if updated_fields:
+#             task.updated_at = datetime.utcnow()
+#             db.session.commit()
+#             logger.info(f"Task ID {task_id} updated successfully. Updated fields: {updated_fields}")
+
+#             # ✅ WebSocket event for task update
+#             socketio.emit("update_task", {
+#                 "taskId": task.id,
+#                 "contributor_id": task.contributor_id,
+#                 "contributor_name": task.contributor.name if task.contributor else "Unassigned"
+#             }, namespace="/", to=None)
+
+#         else:
+#             logger.info(f"Task ID {task_id} - No changes detected, skipping database commit.")
+
+#         # Include contributor name in the response
+#         contributor_name = task.contributor.name if task.contributor else None
+
+#         return jsonify({
+#             "message": "Task updated successfully",
+#             "task": {
+#                 "id": task.id,
+#                 "name": task.name,
+#                 "project_id": task.project_id,
+#                 "story_points": task.story_points,
+#                 "parent_id": task.parent_id,
+#                 "task_type": task.task_type,
+#                 "priority": task.priority,  # ✅ Include priority in response
+#                 "epic_priority": task.epic_priority,  # ✅ Include epic_priority in response
+#                 "contributor_id": task.contributor_id,
+#                 "contributor_name": contributor_name,
+#                 "completed": task.completed,
+#                 "completed_date": task.completed_date.isoformat() if task.completed_date else None,  # ✅ Include completion timestamp
+#                 "sort_order": task.sort_order,
+#                 "status": task.status,
+#                 "updated_at": task.updated_at.isoformat() if task.updated_at else None,
+#             }
+#         }), 200
+
+#     except IntegrityError as e:
+#         logger.error(f"Integrity error during update: {e}")
+#         db.session.rollback()
+#         return jsonify({"error": "Database constraint error"}), 400
+#     except Exception as e:
+#         logger.error(f"Unexpected error during update: {e}", exc_info=True)
+#         db.session.rollback()
+#         return jsonify({"error": "Unexpected error occurred"}), 500
+    
+    
+    
+    
+    
+#--------------New Update task route and helper functions for each separate field-----------------
+    
 @csrf.exempt
 @api.route('/tasks/<int:task_id>', methods=['PATCH'])
 def update_task_route(task_id):
     """
     API endpoint to update a task.
-    This function wraps the existing `update_task(data, task_id)`.
+    Delegates updates to specialized helper functions for maintainability.
     """
     try:
         data = request.get_json()
@@ -541,239 +760,370 @@ def update_task_route(task_id):
         logger.error(f"Error in update_task_route: {e}", exc_info=True)
         return jsonify({"error": "Unexpected error occurred"}), 500
 
+
 def update_task(data, task_id):
     """
-    Updates an existing task with the provided data.
-    Only updating fields that have changed to optimize database transactions.
-    Ensures that the assigned contributor is also part of the task´s project.
+    Updates an existing task by delegating specific updates to helper functions.
+    Ensures only fields that actually changed are updated.
     """
     task = Task.query.get(task_id)
     if not task:
-        logger.error(f"Task with ID {task_id} not found")
         return jsonify({"error": f"Task with ID {task_id} not found."}), 404
 
-    try:
-        logger.debug(f"Received update payload for Task ID {task_id}: {data}")
+    updated_fields = []
 
-        # Convert empty strings to None for nullable integer fields
-        data['parent_id'] = int(data['parent_id']) if data.get('parent_id') and str(data['parent_id']).isdigit() else None
-        data['project_id'] = int(data['project_id']) if data.get('project_id') and str(data['project_id']).isdigit() else task.project_id
-        data['story_points'] = int(data['story_points']) if data.get('story_points') and str(data['story_points']).isdigit() else task.story_points
-        data['sort_order'] = int(data['sort_order']) if data.get('sort_order') and str(data['sort_order']).isdigit() else task.sort_order
-        data['contributor_id'] = int(data['contributor_id']) if 'contributor_id' in data and data['contributor_id'] else task.contributor_id
+    # ✅ Delegate updates to helper functions (excluding parent updates)
 
-        # Define allowed statuses and priorities
-        ALLOWED_STATUSES = ["Not Started", "In Progress", "Completed", "Archived"]
-        ALLOWED_PRIORITIES = ["Unset", "Low", "Medium", "High", "Critical"]
-        ALLOWED_EPIC_PRIORITIES = ["Unset", "P0", "P1", "P2", "P3", "P4"]
+    if "project_id" in data:
+        response = update_task_project(task, data["project_id"])
+        if response:
+            updated_fields.append("project_id")
+        
+    # ✅ Handle status updates
+    if "status" in data:
+        response = update_task_status(task, data["status"])
+        if response:
+            updated_fields.append("status")
 
-        updated_fields = []  # Track which fields are updated
+    if "contributor_id" in data:
+        response = update_task_contributor(task, data["contributor_id"])
+        if response:
+            updated_fields.append("contributor_id")
 
-        # ✅ Handle `task_type` changes before priority updates
-        if "task_type" in data and data["task_type"] != task.task_type:
-            logger.info(f"Task ID {task_id}: Changing task_type from {task.task_type} to {data['task_type']}")
+    if "priority" in data:
+       if task.task_type == "Epic":
+           # ✅ Remove priority if task is an Epic (since Epics shouldn't have priority)
+           if task.priority is not None:
+               task.priority = None
+               updated_fields.append("priority")
+               logger.info(f"Task ID {task.id}: Removed priority as it's now an Epic.")
+       else:
+           response = update_task_priority(task, data["priority"])
+           if response:
+               updated_fields.append("priority")
 
-            # ✅ Remove epic_priority if changing to non-Epic
-            if task.task_type == "Epic" and data["task_type"] != "Epic":
-                logger.info(f"Task ID {task_id}: Removing epic_priority (was: {task.epic_priority})")
+    if "epic_priority" in data:
+        if task.task_type == "Epic":  # ✅ Ensure it's only applied to Epics
+            response = update_task_priority(task, data["epic_priority"], is_epic=True)
+            if response:
+                updated_fields.append("epic_priority")
+        else:
+            # ✅ Remove epic_priority if task is no longer an Epic
+            if task.epic_priority is not None:
                 task.epic_priority = None
                 updated_fields.append("epic_priority")
-
-            # ✅ Remove priority if changing to Epic
-            if data["task_type"] == "Epic":
-                logger.info(f"Task ID {task_id}: Removing priority (was: {task.priority})")
-                task.priority = None
-                updated_fields.append("priority")
-
-            task.task_type = data["task_type"]
+                logger.info(f"Task ID {task.id}: Removed epic_priority as it's no longer an Epic.")
+    
+    if "task_type" in data:
+        response = update_task_type(task, data["task_type"])
+        if response:
             updated_fields.append("task_type")
 
-        # ✅ Handle status updates
-        if "status" in data and data["status"] in ALLOWED_STATUSES:
-            if task.status != data["status"]:  # ✅ Prevent redundant updates
-                task.status = data["status"]
-                updated_fields.append("status")
-                logger.debug(f"Updated status for Task ID {task_id} to: {task.status}")
+    if "estimate" in data:
+        response = update_task_estimate(task, data["estimate"], data.get("estimate_type", "story_points"))
+        if response:
+            updated_fields.append("estimate")
 
-                # ✅ Handle "completed" and "completed_date" updates
-                if task.status == "Completed":
-                    if not task.completed:
-                        task.completed = True
-                        task.completed_date = datetime.utcnow()
-                        updated_fields.append("completed")
-                        updated_fields.append("completed_date")
-                        logger.debug(f"Task {task_id} marked as completed at {task.completed_date}.")
-                else:
-                    if task.completed:
-                        task.completed = False
-                        task.completed_date = None  # Reset completed_date
-                        updated_fields.append("completed")
-                        updated_fields.append("completed_date")
-                        logger.debug(f"Task {task_id} unmarked as completed.")
 
-        # ✅ Handle priority updates after `task_type` check
-        if "priority" in data or "epic_priority" in data:
-            if task.task_type == "Epic":
-                if "priority" in data:
-                    return jsonify({"error": "Epics cannot have task priority."}), 400
-                if "epic_priority" in data and data["epic_priority"] in ALLOWED_EPIC_PRIORITIES:
-                    if task.epic_priority != data["epic_priority"]:  # ✅ Prevent redundant updates
-                        task.epic_priority = data["epic_priority"]
-                        updated_fields.append("epic_priority")
-                        logger.debug(f"Updated epic priority for Task ID {task_id} to: {task.epic_priority}")
-            else:
-                if "epic_priority" in data:
-                    # ✅ Remove epic_priority if task is not an Epic
-                    logger.info(f"Task ID {task_id}: Removing epic_priority (was: {task.epic_priority})")
-                    task.epic_priority = None
-                    updated_fields.append("epic_priority")
+    # ✅ Delegate general field updates
+    for field in ["name", "description"]:
+        if field in data:
+            response = update_task_field(task, field, data[field])
+            if response:
+                updated_fields.append(field)
 
-                if "priority" in data and data["priority"] in ALLOWED_PRIORITIES:
-                    if task.priority != data["priority"]:  # ✅ Prevent redundant updates
-                        task.priority = data["priority"]
-                        updated_fields.append("priority")
-                        logger.debug(f"Updated priority for Task ID {task_id}")
-
-        # ✅ Handle general task field updates
-        if "name" in data and data["name"].strip() and data["name"].strip() != task.name:
-            task.name = data["name"].strip()
-            updated_fields.append("name")
-
-        if "description" in data and data["description"] != task.description:
-            task.description = data["description"]
-            updated_fields.append("description")
-
-        if "parent_id" in data and data["parent_id"] != task.parent_id:
-            task.parent_id = data["parent_id"]
-            updated_fields.append("parent_id")
-
-        if "project_id" in data and data["project_id"] != task.project_id:
-            task.project_id = data["project_id"]
-            updated_fields.append("project_id")
-
-        if "story_points" in data and data["story_points"] != task.story_points:
-            task.story_points = data["story_points"]
-            updated_fields.append("story_points")
-
-        # ✅ Assign Contributor and Ensure Project Membership
-        if "contributor_id" in data and data["contributor_id"] != task.contributor_id:
-            contributor = Contributor.query.get(data["contributor_id"])
-            if contributor:
-                task.contributor_id = data["contributor_id"]
-                updated_fields.append("contributor_id")
-
-                # ✅ Ensure the contributor is part of the task's project
-                if contributor not in task.project.contributors:
-                    task.project.contributors.append(contributor)
-                    db.session.commit()
-                    logger.info(f"✅ Contributor {contributor.id} added to Project {task.project.id}")
-
-                    # ✅ WebSocket event for project update
-                    socketio.emit("update_contributors", {
-                        "id": contributor.id,
-                        "name": contributor.name,
-                        "project_id": task.project.id
-                    }, namespace="/", to=None)
-
-            else:
-                return jsonify({"error": "Invalid Contributor ID"}), 400
-
-        # ✅ Commit task update if any changes were made
-        if updated_fields:
-            task.updated_at = datetime.utcnow()
-            db.session.commit()
-            logger.info(f"Task ID {task_id} updated successfully. Updated fields: {updated_fields}")
-
-            # ✅ WebSocket event for task update
-            socketio.emit("update_task", {
-                "taskId": task.id,
-                "contributor_id": task.contributor_id,
-                "contributor_name": task.contributor.name if task.contributor else "Unassigned"
-            }, namespace="/", to=None)
-
-        else:
-            logger.info(f"Task ID {task_id} - No changes detected, skipping database commit.")
-
-        # Include contributor name in the response
-        contributor_name = task.contributor.name if task.contributor else None
+    # ✅ Commit changes only if something was actually updated
+    if updated_fields:
+        task.updated_at = datetime.utcnow()
+        db.session.commit()
+        logger.info(f"Task ID {task_id} updated successfully. Updated fields: {updated_fields}")
 
         return jsonify({
-            "message": "Task updated successfully",
+            "message": f"Task {task_id} updated.",
+            "updated_fields": updated_fields,
             "task": {
                 "id": task.id,
                 "name": task.name,
                 "project_id": task.project_id,
                 "story_points": task.story_points,
-                "parent_id": task.parent_id,
+                "time_estimate": task.time_estimate,
                 "task_type": task.task_type,
-                "priority": task.priority,  # ✅ Include priority in response
-                "epic_priority": task.epic_priority,  # ✅ Include epic_priority in response
+                "priority": task.priority,
+                "epic_priority": task.epic_priority,
                 "contributor_id": task.contributor_id,
-                "contributor_name": contributor_name,
                 "completed": task.completed,
-                "completed_date": task.completed_date.isoformat() if task.completed_date else None,  # ✅ Include completion timestamp
-                "sort_order": task.sort_order,
                 "status": task.status,
-                "updated_at": task.updated_at.isoformat() if task.updated_at else None,
+                "sort_order": task.sort_order,  # ✅ Now included
+                "updated_at": task.updated_at.isoformat() if task.updated_at else None  # ✅ Now included
             }
         }), 200
 
-    except IntegrityError as e:
-        logger.error(f"Integrity error during update: {e}")
-        db.session.rollback()
-        return jsonify({"error": "Database constraint error"}), 400
-    except Exception as e:
-        logger.error(f"Unexpected error during update: {e}", exc_info=True)
-        db.session.rollback()
-        return jsonify({"error": "Unexpected error occurred"}), 500
+    return jsonify({"message": "No changes detected."}), 200
 
-# def update_task(data, task_id):
-#     """
-#     Handles updates to a task by delegating specific updates to helper functions.
-#     Only processes fields that actually changed.
-#     """
-#     task = Task.query.get(task_id)
-#     if not task:
-#         return jsonify({"error": f"Task with ID {task_id} not found."}), 404
 
-#     updated_fields = []
+### 🔹 **Helper Functions for Specific Updates**
 
-#     # ✅ Delegate status updates
-#     if "status" in data:
-#         response = update_task_status(task_id, data["status"])
-#         if response[1] == 200:
-#             updated_fields.append("status")
 
-#     # ✅ Delegate parent task updates
-#     if "parent_id" in data:
-#         response = update_task_parent(task_id, data["parent_id"])
-#         if response[1] == 200:
-#             updated_fields.append("parent_id")
+def update_task_project(task, new_project_id):
+    """
+    Updates the project_id of a task, ensuring the project exists.
+    Also ensures the contributor is part of the new project.
+    """
+    if new_project_id == task.project_id:
+        return False  # No change
 
-#     # ✅ Delegate contributor updates
-#     if "contributor_id" in data:
-#         response = update_task_contributor(task_id, data["contributor_id"])
-#         if response[1] == 200:
-#             updated_fields.append("contributor_id")
+    # Validate project existence
+    project = Project.query.get(new_project_id)
+    if not project:
+        return jsonify({"error": f"Project with ID {new_project_id} not found."}), 400
 
-#     # ✅ Delegate generic field updates
-#     for field in ["name", "description", "priority", "epic_priority", "sort_order"]:
-#         if field in data:
-#             response = update_task_field(task_id, field, data[field])
-#             if response[1] == 200:
-#                 updated_fields.append(field)
+    task.project_id = new_project_id
+    logger.info(f"Task ID {task.id}: Moved to Project ID {new_project_id}")
 
-#     # ✅ Emit WebSocket update only if something changed
-#     if updated_fields:
-#         socketio.emit("update_task", {
-#             "taskId": task.id,
-#             "updated_fields": updated_fields,
-#             "task": task.to_dict()
-#         }, namespace="/")
+    # ✅ Ensure the contributor remains part of the new project
+    if task.contributor_id:
+        contributor = Contributor.query.get(task.contributor_id)
+        if contributor and contributor not in project.contributors:
+            project.contributors.append(contributor)
+            db.session.commit()  # ✅ Commit contributor update separately
+            logger.info(f"Contributor {contributor.id} added to Project {project.id}")
 
-#         return jsonify({"message": f"Task {task_id} updated.", "updated_fields": updated_fields, "task": task.to_dict()}), 200
+            # ✅ Emit WebSocket event for contributor update
+            socketio.emit("update_contributors", {
+                "id": contributor.id,
+                "name": contributor.name,
+                "project_id": project.id
+            }, namespace="/", to=None)
 
-#     return jsonify({"message": "No changes detected."}), 200
+    # ✅ Commit immediately for autosave behavior
+    task.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    # ✅ Emit WebSocket event for project update
+    socketio.emit("update_task", {
+        "taskId": task.id,
+        "project_id": task.project_id
+    }, namespace="/")
+
+    return True
+
+# DONE ✅
+def update_task_status(task, new_status):
+    """ Updates the status of a task and handles completion logic. """
+    ALLOWED_STATUSES = ["Not Started", "In Progress", "Completed", "Archived"]
+
+    if new_status not in ALLOWED_STATUSES or task.status == new_status:
+        return False  # No change or invalid status
+
+    task.status = new_status
+    logger.debug(f"Updated status for Task ID {task.id} to: {task.status}")
+
+    # Handle completion updates
+    if new_status == "Completed":
+        task.completed = True
+        task.completed_date = datetime.utcnow()
+    else:
+        task.completed = False
+        task.completed_date = None
+
+    # ✅ Emit WebSocket event for real-time frontend updates
+    socketio.emit("update_task", {
+        "taskId": task.id,
+        "status": task.status,
+        
+        "completed": task.completed,
+        "completed_date": task.completed_date.isoformat() if task.completed_date else None
+    }, namespace="/")
+
+    return True
+
+# DONE ✅
+def update_task_priority(task, new_priority, is_epic=False):
+    """ Updates the priority of a task, ensuring validity. """
+    ALLOWED_PRIORITIES = ["Unset", "Low", "Medium", "High", "Critical"]
+    ALLOWED_EPIC_PRIORITIES = ["Unset", "P0", "P1", "P2", "P3", "P4"]
+
+    # ✅ Ensure Epics cannot have task priority
+    if is_epic:
+        if new_priority not in ALLOWED_EPIC_PRIORITIES or task.epic_priority == new_priority:
+            return False  # No change or invalid epic priority
+        task.epic_priority = new_priority
+        logger.debug(f"Updated epic priority for Task ID {task.id} to: {task.epic_priority}")
+
+        # ✅ Emit WebSocket event for epic priority update
+        socketio.emit("update_task", {
+            "taskId": task.id,
+            "epic_priority": task.epic_priority
+        }, namespace="/")
+
+        return True
+
+    else:
+        if new_priority not in ALLOWED_PRIORITIES or task.priority == new_priority:
+            return False  # No change or invalid priority
+
+        # ✅ If changing from an Epic, remove epic_priority
+        if task.task_type != "Epic" and task.epic_priority is not None:
+            logger.info(f"Removing epic_priority from Task ID {task.id} (no longer an Epic).")
+            task.epic_priority = None
+
+        task.priority = new_priority
+        logger.debug(f"Updated priority for Task ID {task.id} to: {task.priority}")
+
+        # ✅ Emit WebSocket event for priority update
+        socketio.emit("update_task", {
+            "taskId": task.id,
+            "priority": task.priority
+        }, namespace="/")
+
+        return True
+
+# DONE ✅
+def update_task_type(task, new_task_type):
+    """ Updates the task type and enforces hierarchy constraints. """
+    ALLOWED_TASK_TYPES = ["Epic", "User Story", "Subtask"]
+    
+    if new_task_type not in ALLOWED_TASK_TYPES or task.task_type == new_task_type:
+        return False  # No change or invalid task type
+    
+    logger.info(f"Updating task type for Task ID {task.id} to {new_task_type}")
+
+    # ✅ Handle Epic-Specific Constraints
+    if task.task_type == "Epic" and new_task_type != "Epic":
+        logger.info(f"Removing epic_priority from Task ID {task.id} as it's no longer an Epic.")
+        task.epic_priority = None
+
+    # ✅ Prevent setting priority for Epics
+    if new_task_type == "Epic":
+        task.priority = None
+    else:
+        # ✅ Remove epic_priority if task is not an Epic anymore
+        if task.epic_priority is not None:
+            logger.info(f"Removing epic_priority from Task ID {task.id} (no longer an Epic).")
+            task.epic_priority = None
+
+    # ✅ Ensure User Stories are only assigned to Epics
+    if new_task_type == "User Story" and task.parent_id:
+        parent_task = Task.query.get(task.parent_id)
+        if parent_task and parent_task.task_type != "Epic":
+            return jsonify({"error": "User Stories must have an Epic as a parent."}), 400
+
+    # ✅ Ensure Subtasks are only assigned to User Stories
+    if new_task_type == "Subtask" and task.parent_id:
+        parent_task = Task.query.get(task.parent_id)
+        if parent_task and parent_task.task_type != "User Story":
+            return jsonify({"error": "Subtasks must have a User Story as a parent."}), 400
+
+    task.task_type = new_task_type
+
+    # ✅ Emit WebSocket event
+    socketio.emit("update_task", {
+        "taskId": task.id,
+        "task_type": task.task_type
+    }, namespace="/")
+
+    return True
+
+def update_task_estimate(task, estimate_value, estimate_type="story_points"):
+    """ 
+    Updates the task estimate, supporting both story points and time estimates.
+    """
+
+    # ✅ Ensure valid estimate type
+    if estimate_type not in ["story_points", "time"]:
+        return False  # Invalid estimate type
+
+    updated = False
+
+    if estimate_type == "story_points":
+        if task.story_points != estimate_value:
+            task.story_points = estimate_value
+            task.time_estimate = None  # ✅ Reset time estimate if switching to story points
+            updated = True
+
+    else:  # estimate_type == "time"
+        if task.time_estimate != estimate_value:
+            task.time_estimate = estimate_value
+            task.story_points = None  # ✅ Reset story points if switching to time estimates
+            updated = True
+
+    # ✅ Update estimate_type if it changed
+    if task.estimate_type != estimate_type:
+        task.estimate_type = estimate_type
+        updated = True
+
+    if updated:
+        logger.debug(f"Updated {estimate_type} for Task ID {task.id} to: {estimate_value}")
+
+        # ✅ Emit WebSocket event
+        socketio.emit("update_task", {
+            "taskId": task.id,
+            "estimate_type": task.estimate_type,
+            "estimate_value": estimate_value
+        }, namespace="/")
+
+        return True
+
+    return False
+
+#DONE ✅
+def update_task_contributor(task, new_contributor_id):
+    """ 
+    Updates the assigned contributor and ensures they belong to the project.
+    Returns True if the contributor was updated, otherwise False.
+    """
+
+    if new_contributor_id is None or new_contributor_id == task.contributor_id:
+        return False  # No change
+
+    contributor = Contributor.query.get(new_contributor_id)
+    if not contributor:
+        return False  # Invalid contributor ID
+
+    project = task.project  # Get the task's project reference
+
+    # ✅ Ensure contributor is part of the task's project
+    if contributor not in project.contributors:
+        project.contributors.append(contributor)
+        db.session.commit()  # Commit once to improve performance
+        logger.info(f"✅ Contributor {contributor.id} added to Project {project.id}")
+
+        # ✅ WebSocket event for project contributor update
+        socketio.emit("update_contributors", {
+            "id": contributor.id,
+            "name": contributor.name,
+            "project_id": project.id
+        }, namespace="/", to=None)
+
+    # ✅ Assign contributor to task
+    task.contributor_id = new_contributor_id
+
+    # ✅ WebSocket event for task update
+    socketio.emit("update_task", {
+        "taskId": task.id,
+        "contributor_id": task.contributor_id,
+        "contributor_name": contributor.name
+    }, namespace="/", to=None)
+
+    return True  # Contributor successfully updated
+
+#DONE ✅
+def update_task_field(task, field, value):
+    """ Generic function to update a field if it has changed. """
+    if getattr(task, field) == value:
+        return False  # No change
+
+    setattr(task, field, value)
+
+    # ✅ Emit WebSocket event for real-time frontend updates
+    socketio.emit("update_task", {
+        "taskId": task.id,
+        field: value
+    }, namespace="/")
+
+    return True
+
+
     
 
 def create_task(data):
@@ -787,6 +1137,21 @@ def create_task(data):
         ALLOWED_EPIC_PRIORITIES = ["Unset", "P0", "P1", "P2", "P3", "P4"]
         
         logger.info(f"🔍 create_task() received data: {data}")
+        
+        # ✅ Validate and set estimation type
+        estimate_type = data.get("estimate_type", "story_points")  # Default to story points
+        if estimate_type not in ["story_points", "time"]:
+            logger.error(f"Invalid estimate type: {estimate_type}")
+            return jsonify({"error": "Invalid estimate type. Must be 'story_points' or 'time'."}), 400
+
+        # ✅ Set estimate_type explicitly before creating the Task object
+        story_points = None
+        time_estimate = None
+
+        if estimate_type == "story_points":
+            story_points = data.get("story_points", 0)
+        elif estimate_type == "time":
+            time_estimate = data.get("time_estimate", 0)
         
         # ✅ Explicitly Remove epic_priority if the task is NOT an Epic
         if data.get("task_type") != "Epic":
@@ -845,7 +1210,9 @@ def create_task(data):
             name=data['name'],
             description=data.get('description'),
             project_id=data['project_id'],
+            estimate_type=estimate_type,  # ✅ Explicitly setting estimate_type first
             story_points=data.get('story_points', 0),
+            time_estimate=time_estimate,
             parent_id=data.get('parent_id'),
             task_type=data['task_type'],
             contributor_id=data.get('contributor_id'),
@@ -875,18 +1242,6 @@ def create_task(data):
         # Include contributor_name in the response
         contributor_name = new_task.contributor.name if new_task.contributor else None
 
-        # Fetch the task after committing to ensure it's saved and retrievable
-        try:
-            logger.debug("Attempting to fetch task after save...")
-            task = Task.query.get(new_task.id)
-            if not task:
-                raise ValueError(f"Task with ID {new_task.id} not found after creation.")
-            logger.debug(f"Fetched task: {task}")
-        except Exception as e:
-            logger.error(f"Error fetching task after save: {e}")
-            db.session.rollback()
-            return jsonify({"error": "Failed to retrieve saved task"}), 500
-
         # Return the successfully fetched task details
         return jsonify({
             "message": "Task created successfully",
@@ -894,11 +1249,13 @@ def create_task(data):
                 "id": new_task.id,
                 "name": new_task.name,
                 "project_id": new_task.project_id,
-                "story_points": new_task.story_points,
+                "estimate_type": new_task.estimate_type,  # ✅ Include estimate type
+                "estimate": story_points if estimate_type == "story_points" else time_estimate,
                 "task_type": new_task.task_type,
                 "priority": new_task.priority,  # ✅ Return priority
                 "epic_priority": new_task.epic_priority,  # ✅ Return epic_priority
                 "status": new_task.status,  # ✅ Return status
+                "parent_id": new_task.parent_id,
                 "contributor_id": new_task.contributor_id,
                 "contributor_name": contributor_name,
                 "completed": new_task.completed,

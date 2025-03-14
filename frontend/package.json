@@ -31,7 +31,8 @@
     "react-tooltip": "^5.28.0",
     "react-use-draggable-scroll": "^0.4.7",
     "sass": "^1.85.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "tiptap-snippets-extension": "github:sereneinserenade/tiptap-snippets-extension"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
